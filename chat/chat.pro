@@ -17,9 +17,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
+    socket.cpp \
     widget.cpp
 
 HEADERS += \
+    socket.h \
     widget.h
 
 FORMS += \
