@@ -16,22 +16,23 @@ class Socket : public QTcpSocket
     Q_OBJECT
 public:
 
-    static Socket* getSocket(const int _usrID, const int _password);
+    // 通过该函数获取单例
+    static Socket* getSocket(const int _usrID, const QString _password);
     void slot_readData();
 
 signals:
-    void sig_disconnect(int);
-    void sig_readyRead(int, const QByteArray&);
+    void logout(int);
+    void login(int, QString);
 
 private slots:
     void slot_disconnect();
 
 private:
-    explicit Socket(const int _usrID, const int _password);
+    explicit Socket(const int _usrID, const QString _password);
 
     static Socket* socket;
     int usrID;
-    int password;
+    QString password;
 };
 
 
