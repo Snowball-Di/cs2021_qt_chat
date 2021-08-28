@@ -70,7 +70,7 @@ int NewGroup::getGroupID(){
 QString NewGroup::getGroupName(){
     return groupName;
 }
-
+/*new or delete Group,newJoin,joinOK*/
 NewJoin::NewJoin(int _senderID,QString _senderName):senderID(_senderID),senderName(_senderName){
 
 }
@@ -87,4 +87,4 @@ JoinOK::JoinOK(bool _yes,QString _groupName):Success(_yes),groupName(_groupName)
 QString JoinOK::getGroupName(){
     return groupName;
 }
-/**/
+
