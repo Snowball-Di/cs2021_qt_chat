@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
-#include <message.h>
+#include <c2s.h>
 #include <QHostAddress>
 #include "messagefromserver.h"
 
