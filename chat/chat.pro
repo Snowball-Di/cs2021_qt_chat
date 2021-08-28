@@ -19,12 +19,14 @@ SOURCES += \
     abstractmessage.cpp \
     main.cpp \
     message.cpp \
+    mytcpserver.cpp \
     socket.cpp \
     widget.cpp
 
 HEADERS += \
     abstractmessage.h \
     message.h \
+    mytcpserver.h \
     socket.h \
     widget.h
 
