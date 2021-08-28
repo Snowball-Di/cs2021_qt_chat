@@ -17,11 +17,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
-    mytcpserver.cpp \
+    socket.cpp \
     widget.cpp
 
 HEADERS += \
-    mytcpserver.h \
+    socket.h \
     widget.h
 
 FORMS += \
