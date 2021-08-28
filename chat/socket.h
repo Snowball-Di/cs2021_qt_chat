@@ -21,8 +21,7 @@ public:
     void slot_readData();
 
 signals:
-    void logout(int);
-    void login(int, QString);
+    void clientMessage();
 
 private slots:
     void slot_disconnect();
