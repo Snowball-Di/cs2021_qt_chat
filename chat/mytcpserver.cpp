@@ -1,6 +1,6 @@
 #include "mytcpserver.h"
-MyTCPserver* MyTCPserver::tcpserverhand = nullptr;
-MyTCPserver::MyTCPserver(QObject *parent) : QObject(parent)
+MyTcpServer* MyTcpServer::tcpserverhand = nullptr;
+MyTcpServer::MyTcpServer(QObject *parent) : QObject(parent)
 {
     QHostAddress hostadd;
     hostadd.setAddress(IP);
@@ -11,20 +11,19 @@ MyTCPserver::MyTCPserver(QObject *parent) : QObject(parent)
         qDebug()<<"server start error !";
     }
 }
-void MyTCPserver::slot_creatNewConnection(){
+void MyTcpServer::slot_creatNewConnection(){
     QTcpSocket* tcp_socket = tcp_server.nextPendingConnection();
-    clientList.append(tcp_socket);
-    connect(tcp_socket,SIGNAL(readyRead()),this,SLOT(slot_readdata()));
+    connect(tcp_socket,SIGNAL(clientMessage()),this,SLOT(slot_readdata()));
+
+    clientList[usr]=tcp_socket;
     qDebug()<<"someone connected!"<<tcp_socket->peerAddress();
     qDebug()<<"there are "<<clientList.count()<<"user online !";
 }
-void MyTCPserver::slot_readdata(){
+void MyTcpServer::slot_readdata(){
 
     QByteArray databyte = tcp_socket->readAll();
-    qDebug()<<QString::fromStdString(databyte.toStdString());
-    QString str = "I have get your worlds :";
-    str.append(QString::fromStdString(databyte.toStdString()));
-    tcp_socket->write(str.toLatin1());
+
+
 }
 void slot_login(int usr,QString password);
 void slot_logout(int usr);

@@ -19,6 +19,7 @@ SOURCES += \
     abstractmessage.cpp \
     main.cpp \
     message.cpp \
+    messagefromserver.cpp \
     mytcpserver.cpp \
     socket.cpp \
     widget.cpp
@@ -26,6 +27,7 @@ SOURCES += \
 HEADERS += \
     abstractmessage.h \
     message.h \
+    messagefromserver.h \
     mytcpserver.h \
     socket.h \
     widget.h
