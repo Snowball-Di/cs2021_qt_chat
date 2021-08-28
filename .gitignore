@@ -1,6 +1,7 @@
-/build
+*/build
 CmakeLists.txt
 *.user
 *.pro.user.*
 *.usr
 .qmake.stash
+.vscode
