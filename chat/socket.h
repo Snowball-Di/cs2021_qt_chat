@@ -2,9 +2,9 @@
 #define SOCKET_H
 
 #include <QObject>
-
-#include <QObject>
 #include <QTcpSocket>
+#include <message.h>
+#include <QHostAddress>
 
 /*
  * 此类继承自QTcpSocket，提供了标识自身的功能
@@ -17,21 +17,23 @@ class Socket : public QTcpSocket
 public:
 
     // 通过该函数获取单例
-    static Socket* getSocket(const int _usrID, const QString _password);
-    void slot_readData();
+    static Socket* getSocket(const int _usrID);
 
 signals:
     void clientMessage();
 
+
 private slots:
-    void slot_disconnect();
+    void serverMessage();
 
 private:
-    explicit Socket(const int _usrID, const QString _password);
+    explicit Socket(const int _usrID);
 
     static Socket* socket;
     int usrID;
-    QString password;
+
+    bool login(QString password);
+    bool waiting;
 };
 
 
