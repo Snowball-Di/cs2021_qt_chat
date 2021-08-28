@@ -15,7 +15,7 @@ void MyTcpServer::slot_creatNewConnection(){
     QTcpSocket* tcp_socket = tcp_server.nextPendingConnection();
     connect(tcp_socket,SIGNAL(clientMessage()),this,SLOT(slot_readdata()));
 
-    clientList[usr]=tcp_socket;
+    clientList.insert(usr,*tcp_socket);
     qDebug()<<"someone connected!"<<tcp_socket->peerAddress();
     qDebug()<<"there are "<<clientList.count()<<"user online !";
 }

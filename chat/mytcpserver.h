@@ -24,7 +24,7 @@ private:
     QTcpServer tcp_server;
     QTcpSocket* tcp_socket;
     //QList<QTcpSocket*> clientList;
-    QHash <QTcpSocket,int> clientList;
+    QHash <int,QTcpSocket> clientList;
 
     QString password,target,groupName;
     QString IP,port;
