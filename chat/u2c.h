@@ -116,23 +116,6 @@ private:
     QByteArray file;
 };
 
-/*
- * 登录/登出操作
- * isLogin()返回true时表示登录；返回false表示登出
- * getPassword()返回密码
- */
-class Log : Message
-{
-public:
-    Log(int _usrID, QDateTime _sendTime, bool _login, QString _password="");
-    int type() { return MSG_LOG; };
-    bool isLogin() { return operation; };
-    QString getPassword() { return password; };
-
-private:
-    QString password;
-    const bool operation; // 0: log out, 1: login
-};
 
 /*
  * 注册操作
