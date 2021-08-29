@@ -47,7 +47,7 @@ private:
  * isAdd()返回true时，表示添加；返回false表示删除
  * text()返回验证消息
  */
-class Request : Message
+class Request : public Message
 {
 public:
     Request(int _senderID, int _targetID, QDateTime _sendTime, bool _add, QString _text="");
@@ -67,25 +67,25 @@ private:
  * senderID()返回接受请求的群或好友的ID
  * accept()返回是否同意
  */
-class Accept : Message
+class Accept : public Message
 {
 public:
-    Accept(int _senderID, int _targetID, QDateTime _sendTime, QString _kind);
+    Accept(int _senderID, int _targetID, QDateTime _sendTime, QString _kind, bool _accept);
 
     int type() { return  MSG_ACCEPT; };
     QString kind() { return _kind; };
     bool accept() { return _accept; };
 
 private:
-    bool _accept;
     QString _kind;
+    bool _accept;
 };
 
 /*
  * 发送文本消息
  * text()返回发送的文本
  */
-class Text : Message
+class Text : public Message
 {
 public:
     Text(int _senderID, int _targetID, QDateTime _sendTime, QString _text);
@@ -102,7 +102,7 @@ private:
  * getName()返回文件名
  * getFile()返回文件本身
  */
-class Doc : Message
+class Doc : public Message
 {
 public:
     Doc(int _senderID, int _targetID, QDateTime _sendTime, int _type, QString _fileName, QByteArray f);
@@ -122,7 +122,7 @@ private:
  * isLogin()返回true时表示登录；返回false表示登出
  * getPassword()返回密码
  */
-class Log : Message
+class Log : public Message
 {
 public:
     Log(int _usrID, QDateTime _sendTime, bool _login, QString _password="");
@@ -139,7 +139,7 @@ private:
  * 注册操作
  * getPassword()返回密码
  */
-class Register : Message
+class Register : public Message
 {
 public:
     Register(QDateTime _sendTime, QString _password);
@@ -155,7 +155,7 @@ private:
  * isNew()返回true时表示新建群；返回false表示删除群（只有群主有权利删除群）
  * getName()返回群名称
  */
-class Group : Message
+class Group : public Message
 {
 public:
     Group(int _senderID, QDateTime _sendTime, bool _new, QString _name="");
@@ -175,7 +175,7 @@ private:
  * getGroupID()返回群ID
  * text()返回加入群时的验证消息（退出群时为空）
  */
-class Join : Message
+class Join : public Message
 {
 public:
     Join(int _senderID, int _groupID, QDateTime _sendTime, bool _join, QString _text="");
@@ -195,7 +195,7 @@ private:
  * getName()返回新昵称（返回为空时不更新）
  * getAvatar()返回新头像（返回为空值时不更新）
  */
-class Profile : Message
+class Profile : public Message
 {
 public:
     Profile(int _usrID, QDateTime _sendTime, QString _name, QByteArray _avatar);
