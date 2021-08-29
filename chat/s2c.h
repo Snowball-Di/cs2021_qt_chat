@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QDebug>
 /*Server to Client*/
 namespace S2C {
     const int SERVER_REPLY_LOGIN            =0x01;
@@ -23,6 +24,35 @@ namespace S2C {
     const int SERVER_NEWGROUP               =0x0C;
     const int SERVER_NEWJOIN                =0x0D;
     const int SERVER_JOINOK                 =0x0E;
+
+    const int SERVER_FRIENDLIST             =0x0F;
+    const int SERVER_GROUPLIST              =0x10;
+    const int SERVER_TEXTRECORD_GROUP       =0x11;
+    const int SERVER_TEXTRECORD_FRIEND      =0x12;
+
+    struct PersonInfo{
+        int personID;
+        QString personName;
+        QByteArray personAvatar;
+    };
+
+    struct GroupInfo{
+        int groupID;
+        QString groupName;
+    };
+
+    struct GroupMessage_text{
+        int senderID;
+        QDateTime time;
+//        QString type;
+        QString content;
+    };
+
+    struct FriendMessage_text{
+        QDateTime time;
+//        QString type;
+        QString content;
+    };
 
     class Type{
     public:
@@ -104,6 +134,7 @@ namespace S2C {
         QString _text;
         };
 
+
 /*new friend*/
     class NewFriend:virtual public Type{
     public:
@@ -160,6 +191,50 @@ namespace S2C {
         QString getGroupName();
     };
 
+/*friend list*/
+    class FriendList:virtual public Type{
+    private:
+        struct PersonInfo fr[100];//最多100个好友
+        int friendNumber;
+    public:
+        FriendList(PersonInfo _fr[],int _friendNumber);
+        int type() {    return SERVER_FRIENDLIST;};
+        int getFriendNumber();
+        PersonInfo getFriendInfo(int iter);
+    };
+
+/*group list*/
+    class GroupList:virtual public Type{
+    private:
+        struct GroupInfo gr[100];//最多100个好友
+        int groupNumber;
+    public:
+        GroupList(GroupInfo _gr[],int _groupNumber);
+        int type() {    return SERVER_GROUPLIST;};
+        int getGroupNumber();
+        GroupInfo getGroupInfo(int iter);
+    };
+/*message record*/
+    class GroupTextRecord:virtual public Type{
+    private:
+        GroupMessage_text txt[100];
+        int lastTxtNum;
+    public:
+        GroupTextRecord(GroupMessage_text _txt[],int _last);
+        int type()  {   return SERVER_TEXTRECORD_GROUP;};
+        int getTxtNum();
+        struct GroupMessage_text getText(int iter);
+    };
+    class FriendTextRecord:virtual public Type{
+    private:
+        FriendMessage_text txt[100];
+        int lastTxtNum;
+    public:
+        FriendTextRecord(FriendMessage_text _txt[],int _last);
+        int type()  {   return SERVER_TEXTRECORD_FRIEND;};
+        int getTxtNum();
+        struct FriendMessage_text getText(int iter);
+    };
 };
 
 #endif // MESSAGEFROMSERVER_H

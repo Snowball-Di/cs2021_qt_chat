@@ -10,6 +10,9 @@ bool Success::isSuccess(){
 Login::Login(bool _yes):Success(_yes){
 
 }
+Register::Register(bool _yes):Success(_yes){
+
+}
 FriendRequest::FriendRequest(bool _yes):Success(_yes){
 
 }
@@ -87,4 +90,68 @@ JoinOK::JoinOK(bool _yes,QString _groupName):Success(_yes),groupName(_groupName)
 QString JoinOK::getGroupName(){
     return groupName;
 }
-
+/*friend list*/
+FriendList::FriendList(PersonInfo _fr[],int _friendNumber){
+    friendNumber = _friendNumber;
+    int i;
+    for(i=0;i<friendNumber;i++){
+        fr[i]=_fr[i];
+    }
+//    for(;i<100;i++){
+//        fr[i].personID=0;
+//        fr[i].personName="";
+//        fr[i].personAvatar=0;
+//    }
+}
+int FriendList::getFriendNumber(){
+    return friendNumber;
+}
+PersonInfo FriendList::getFriendInfo(int iter){
+    if(iter>friendNumber)
+        qDebug()<<"More than total friend number";
+    return fr[iter];
+}
+/*group list*/
+GroupList::GroupList(GroupInfo _gr[],int _groupNumber){
+    groupNumber = _groupNumber;
+    int i;
+    for(i=0;i<groupNumber;i++){
+        gr[i]=_gr[i];
+    }
+//    for(;i<100;i++){
+//        gr[i].groupID=0;
+//        gr[i].groupName="";
+//    }
+}
+int GroupList::getGroupNumber(){
+    return groupNumber;
+}
+GroupInfo GroupList::getGroupInfo(int iter){
+    if(iter>groupNumber)
+        qDebug()<<"More than total friend number";
+    return gr[iter];
+}
+/*message record*/
+GroupTextRecord::GroupTextRecord(GroupMessage_text _txt[],int _last){
+    lastTxtNum=_last;
+    int i;
+    for(i=0;i<lastTxtNum;i++){
+        txt[i] = _txt[i];
+    }
+//    for(;i<100;i++){
+//        txt[i].senderID = 0;
+//        txt[i].time = QDateTime::currentDateTime();
+//        txt[i].content = "";
+//    }
+}
+FriendTextRecord::FriendTextRecord(FriendMessage_text _txt[],int _last){
+    lastTxtNum=_last;
+    int i;
+    for(i=0;i<lastTxtNum;i++){
+        txt[i] = _txt[i];
+    }
+//    for(;i<100;i++){
+//        txt[i].time = QDateTime::currentDateTime();
+//        txt[i].content = "";
+//    }
+}
