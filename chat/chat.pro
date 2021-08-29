@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     c2s.cpp \
+    client.cpp \
     main.cpp \
     messagefromserver.cpp \
     mytcpserver.cpp \
@@ -31,6 +32,7 @@ SOURCES += \
 
 HEADERS += \
     c2s.h \
+    client.h \
     messagefromserver.h \
     mytcpserver.h \
     socket.h \

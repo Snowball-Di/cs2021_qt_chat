@@ -3,16 +3,6 @@
 
 #define     mfs     MessageFromServer
 
-static C2S::Doc*        doc;
-static C2S::Log*        login;
-static C2S::Join*       join;
-static C2S::Text*       txt;
-static C2S::Group*      gro;
-static C2S::Accept*     acc;
-static C2S::Register*   reg;
-static C2S::Request*    req;
-static C2S::Profile*    pro;
-
 Socket* Socket::socket = nullptr;
 
 Socket::Socket(const int _usrID) : usrID(_usrID)
@@ -91,6 +81,7 @@ bool Socket::sendMessage(C2S::Message* msg)
         send_flag = send(msg, sizeof(C2S::Accept));
         if (send_flag)
             timeout_flag = waitFor();
+
         break;
     }
 

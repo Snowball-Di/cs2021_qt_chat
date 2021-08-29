@@ -9,7 +9,6 @@ namespace C2S {
 
 /*
  * 消息种类列表
- *
  */
 const int     MSG_REQUEST     =     0x01;
 const int     MSG_TEXT        =     0x02;

@@ -1,5 +1,5 @@
-#include "logWindow.h"
-#include "ui_LogWindow.h"
+#include "logwindow.h"
+#include "ui_logwindow.h"
 #include <QPainter>
 #include <QMouseEvent>
 

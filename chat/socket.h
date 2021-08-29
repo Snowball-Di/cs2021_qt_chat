@@ -10,7 +10,6 @@
 /*
  * 此类继承自QTcpSocket，提供了标识自身的功能
  */
-
 class Socket : public QTcpSocket
 {
     Q_OBJECT
