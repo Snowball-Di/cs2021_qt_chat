@@ -15,7 +15,8 @@ Socket::Socket(const int _usrID) : usrID(_usrID)
 Socket* Socket::getSocket(const int _usrID)
 {
     if (socket == nullptr) {
-        socket = new Socket(_usrID);
+        if (_usrID != 0)
+            socket = new Socket(_usrID);
     }
 
     return socket;
