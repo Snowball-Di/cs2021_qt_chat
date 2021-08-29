@@ -56,3 +56,8 @@ void Socket::serverMessageHandler()
 
 }
 
+void Socket::disconnectHandler()
+{
+    
+}
+

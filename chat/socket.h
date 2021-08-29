@@ -5,7 +5,7 @@
 #include <QTcpSocket>
 #include <message.h>
 #include <QHostAddress>
-#include "messagefromserver.h"
+#include "s2c.h"
 
 /*
  * 此类继承自QTcpSocket，提供了标识自身的功能
