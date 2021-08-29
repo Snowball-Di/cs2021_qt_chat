@@ -22,8 +22,6 @@ SOURCES += \
     mytcpserver.cpp \
     socket.cpp \
     u2c.cpp \
-    
-    
     addmember.cpp \
     chatwindow.cpp \
     friendlist.cpp \
@@ -37,8 +35,6 @@ HEADERS += \
     mytcpserver.h \
     socket.h \
     u2c.h addmember.h \
-    
-    
     chatwindow.h \
     friendlist.h \
     logWindow.h \
