@@ -16,20 +16,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    abstractmessage.cpp \
+    c2s.cpp \
     main.cpp \
-    message.cpp \
     messagefromserver.cpp \
     mytcpserver.cpp \
     socket.cpp \
+    u2c.cpp \
     widget.cpp
 
 HEADERS += \
-    abstractmessage.h \
-    message.h \
+    c2s.h \
     messagefromserver.h \
     mytcpserver.h \
     socket.h \
+    u2c.h \
     widget.h
 
 FORMS += \

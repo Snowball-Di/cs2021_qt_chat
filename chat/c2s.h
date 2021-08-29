@@ -4,26 +4,50 @@
 #include <QObject>
 #include <QDateTime>
 #include <QFile>
-#include <abstractmessage.h>
 
+namespace C2S {
 
-#define     MSG_REQUEST     0x01
-#define     MSG_TEXT        0x02
-#define     MSG_DOC         0x03
-#define     MSG_LOG         0x04
-#define     MSG_GROUP       0x05
-#define     MSG_JOIN        0x06
-#define     MSG_PROFILE     0x07
-#define     MSG_REGISTER    0x08
-#define     MSG_ACCEPT      0x09
+/*
+ * 消息种类列表
+ *
+ */
+const int     MSG_REQUEST     =     0x01;
+const int     MSG_TEXT        =     0x02;
+const int     MSG_DOC         =     0x03;
+const int     MSG_LOG         =     0x04;
+const int     MSG_GROUP       =     0x05;
+const int     MSG_JOIN        =     0x06;
+const int     MSG_PROFILE     =     0x07;
+const int     MSG_REGISTER    =     0x08;
+const int     MSG_ACCEPT      =     0x09;
 
+/*
+ * 抽象基类
+ */
+class Message
+{
+public:
+    Message(int _senderID, int _targetID, QDateTime _sendTime)
+        : senderID(_senderID), targetID(_targetID), sendTime(_sendTime)
+    { }
+
+    virtual int type() = 0;
+    int sender() { return senderID; };
+    int target() { return targetID; };
+    QDateTime time() { return sendTime; };
+
+private:
+    int senderID;
+    int targetID;
+    QDateTime sendTime;
+};
 
 /*
  * 添加/删除好友
  * isAdd()返回true时，表示添加；返回false表示删除
  * text()返回验证消息
  */
-class Request : AbstractMessage
+class Request : Message
 {
 public:
     Request(int _senderID, int _targetID, QDateTime _sendTime, bool _add, QString _text="");
@@ -38,19 +62,22 @@ private:
 };
 
 /*
- * 添加/删除好友
+ * 批准添加好友或加入群
  * kind()返回"group"时，表示同意target加入群；返回"friend"表示同意target加为好友
  * senderID()返回接受请求的群或好友的ID
+ * accept()返回是否同意
  */
-class Accept : AbstractMessage
+class Accept : Message
 {
 public:
     Accept(int _senderID, int _targetID, QDateTime _sendTime, QString _kind);
 
     int type() { return  MSG_ACCEPT; };
     QString kind() { return _kind; };
+    bool accept() { return _accept; };
 
 private:
+    bool _accept;
     QString _kind;
 };
 
@@ -58,7 +85,7 @@ private:
  * 发送文本消息
  * text()返回发送的文本
  */
-class Text : AbstractMessage
+class Text : Message
 {
 public:
     Text(int _senderID, int _targetID, QDateTime _sendTime, QString _text);
@@ -75,7 +102,7 @@ private:
  * getName()返回文件名
  * getFile()返回文件本身
  */
-class Doc : AbstractMessage
+class Doc : Message
 {
 public:
     Doc(int _senderID, int _targetID, QDateTime _sendTime, int _type, QString _fileName, QByteArray f);
@@ -95,7 +122,7 @@ private:
  * isLogin()返回true时表示登录；返回false表示登出
  * getPassword()返回密码
  */
-class Log : AbstractMessage
+class Log : Message
 {
 public:
     Log(int _usrID, QDateTime _sendTime, bool _login, QString _password="");
@@ -112,7 +139,7 @@ private:
  * 注册操作
  * getPassword()返回密码
  */
-class Register : AbstractMessage
+class Register : Message
 {
 public:
     Register(QDateTime _sendTime, QString _password);
@@ -128,7 +155,7 @@ private:
  * isNew()返回true时表示新建群；返回false表示删除群（只有群主有权利删除群）
  * getName()返回群名称
  */
-class Group : AbstractMessage
+class Group : Message
 {
 public:
     Group(int _senderID, QDateTime _sendTime, bool _new, QString _name="");
@@ -148,7 +175,7 @@ private:
  * getGroupID()返回群ID
  * text()返回加入群时的验证消息（退出群时为空）
  */
-class Join : AbstractMessage
+class Join : Message
 {
 public:
     Join(int _senderID, int _groupID, QDateTime _sendTime, bool _join, QString _text="");
@@ -168,7 +195,7 @@ private:
  * getName()返回新昵称（返回为空时不更新）
  * getAvatar()返回新头像（返回为空值时不更新）
  */
-class Profile : AbstractMessage
+class Profile : Message
 {
 public:
     Profile(int _usrID, QDateTime _sendTime, QString _name, QByteArray _avatar);
@@ -182,5 +209,5 @@ private:
     QByteArray avatar;
 };
 
-
+}
 #endif // MESSAGE_H
