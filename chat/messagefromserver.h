@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QDateTime>
-
-namespace MessageFromServer {
+/*Server to Client*/
+namespace S2C {
     const int SERVER_REPLY_LOGIN            =0x01;
     const int SERVER_REPLY_REGISTER         =0x02;
     const int SERVER_REPLY_FRIENDREQUEST    =0x03;
@@ -22,7 +22,7 @@ namespace MessageFromServer {
 
     const int SERVER_NEWGROUP               =0x0C;
     const int SERVER_NEWJOIN                =0x0D;
-    const int SERVER_JOINOK                 =0x0D;
+    const int SERVER_JOINOK                 =0x0E;
 
     class Type{
     public:

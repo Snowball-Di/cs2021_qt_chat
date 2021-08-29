@@ -1,5 +1,5 @@
 #include "messagefromserver.h"
-using namespace MessageFromServer;
+using namespace S2C;
 /*Server Reply whether your behavior succeed*/
 Success::Success(bool _yes):yes(_yes){
 
