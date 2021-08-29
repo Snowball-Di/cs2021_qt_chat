@@ -106,11 +106,6 @@ FriendList::FriendList(PersonInfo _fr[],int _friendNumber){
 int FriendList::getFriendNumber(){
     return friendNumber;
 }
-PersonInfo FriendList::getFriendInfo(int iter){
-    if(iter>friendNumber)
-        qDebug()<<"More than total friend number";
-    return fr[iter];
-}
 /*group list*/
 GroupList::GroupList(GroupInfo _gr[],int _groupNumber){
     groupNumber = _groupNumber;
@@ -126,11 +121,6 @@ GroupList::GroupList(GroupInfo _gr[],int _groupNumber){
 int GroupList::getGroupNumber(){
     return groupNumber;
 }
-GroupInfo GroupList::getGroupInfo(int iter){
-    if(iter>groupNumber)
-        qDebug()<<"More than total friend number";
-    return gr[iter];
-}
 /*message record*/
 GroupTextRecord::GroupTextRecord(GroupMessage_text _txt[],int _last){
     lastTxtNum=_last;
@@ -144,6 +134,10 @@ GroupTextRecord::GroupTextRecord(GroupMessage_text _txt[],int _last){
 //        txt[i].content = "";
 //    }
 }
+int GroupTextRecord::getTxtNum(){
+    return lastTxtNum;
+}
+
 FriendTextRecord::FriendTextRecord(FriendMessage_text _txt[],int _last){
     lastTxtNum=_last;
     int i;
@@ -154,4 +148,7 @@ FriendTextRecord::FriendTextRecord(FriendMessage_text _txt[],int _last){
 //        txt[i].time = QDateTime::currentDateTime();
 //        txt[i].content = "";
 //    }
+}
+int FriendTextRecord::getTxtNum(){
+    return lastTxtNum;
 }

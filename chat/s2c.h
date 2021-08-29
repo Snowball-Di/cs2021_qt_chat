@@ -194,46 +194,42 @@ namespace S2C {
 /*friend list*/
     class FriendList:virtual public Type{
     private:
-        struct PersonInfo fr[100];//最多100个好友
         int friendNumber;
     public:
+        struct PersonInfo fr[100];//最多100个好友，从0开始
         FriendList(PersonInfo _fr[],int _friendNumber);
         int type() {    return SERVER_FRIENDLIST;};
         int getFriendNumber();
-        PersonInfo getFriendInfo(int iter);
     };
 
 /*group list*/
     class GroupList:virtual public Type{
     private:
-        struct GroupInfo gr[100];//最多100个好友
         int groupNumber;
     public:
+        struct GroupInfo gr[100];//最多100个群组，从0开始
         GroupList(GroupInfo _gr[],int _groupNumber);
         int type() {    return SERVER_GROUPLIST;};
         int getGroupNumber();
-        GroupInfo getGroupInfo(int iter);
     };
 /*message record*/
     class GroupTextRecord:virtual public Type{
     private:
-        GroupMessage_text txt[100];
         int lastTxtNum;
     public:
+        GroupMessage_text txt[100];//一次最多100条消息记录，从0开始
         GroupTextRecord(GroupMessage_text _txt[],int _last);
         int type()  {   return SERVER_TEXTRECORD_GROUP;};
-        int getTxtNum();
-        struct GroupMessage_text getText(int iter);
+        int getTxtNum();//假如不足100条消息记录，返回记录数量，否则返回100
     };
     class FriendTextRecord:virtual public Type{
     private:
-        FriendMessage_text txt[100];
         int lastTxtNum;
     public:
+        FriendMessage_text txt[100];//一次最多100条消息记录，从0开始
         FriendTextRecord(FriendMessage_text _txt[],int _last);
         int type()  {   return SERVER_TEXTRECORD_FRIEND;};
-        int getTxtNum();
-        struct FriendMessage_text getText(int iter);
+        int getTxtNum();//假如不足100条消息记录，返回记录数量，否则返回100
     };
 };
 
