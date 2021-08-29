@@ -1,4 +1,4 @@
-#include "messagefromserver.h"
+#include "s2c.h"
 using namespace S2C;
 /*Server Reply whether your behavior succeed*/
 Success::Success(bool _yes):yes(_yes){

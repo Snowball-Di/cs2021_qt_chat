@@ -6,6 +6,8 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QHostInfo>
+#include "c2s.h"
+#include "s2c.h"
 
 class MyTcpServer : public QObject
 {

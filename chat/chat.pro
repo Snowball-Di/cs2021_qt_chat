@@ -18,16 +18,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     c2s.cpp \
     main.cpp \
-    messagefromserver.cpp \
     mytcpserver.cpp \
+    s2c.cpp \
     socket.cpp \
     u2c.cpp \
     widget.cpp
 
 HEADERS += \
     c2s.h \
-    messagefromserver.h \
     mytcpserver.h \
+    s2c.h \
     socket.h \
     u2c.h \
     widget.h
