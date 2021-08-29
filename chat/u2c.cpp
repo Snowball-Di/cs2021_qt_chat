@@ -27,3 +27,10 @@ Request::Request(int _targetID, bool _add, QString _text)
 {
 
 }
+
+Accept::Accept(int _targetID, QString _kind, bool _accept)
+    : Message(_targetID),
+      kind(_kind), accept(_accept)
+{
+
+}

@@ -3,14 +3,13 @@
 
 #include <QObject>
 #include <QTcpSocket>
-#include <message.h>
+#include <c2s.h>
 #include <QHostAddress>
 #include "s2c.h"
 
 /*
  * 此类继承自QTcpSocket，提供了标识自身的功能
  */
-
 class Socket : public QTcpSocket
 {
     Q_OBJECT
@@ -18,6 +17,8 @@ public:
 
     // 通过该函数获取单例
     static Socket* getSocket(const int _usrID);
+
+    bool sendMessage(C2S::Message* msg);
 
 signals:
     void clientMessage();
@@ -33,8 +34,9 @@ private:
     static Socket* socket;
     int usrID;
 
-    bool login(QString password);
-    bool waiting;
+    bool send(C2S::Message* msg, size_t size);
+    bool waitFor();
+    bool wait_flag;
 };
 
 
