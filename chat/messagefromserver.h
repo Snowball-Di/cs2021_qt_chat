@@ -19,7 +19,7 @@ namespace MessageFromServer {
         bool yes;
     public:
         Success(bool);
-        bool isSuccess{return yes};
+        bool isSuccess(){return yes;};
         int type(){return SERVER_MSG_SUCCESS;};
     };
 

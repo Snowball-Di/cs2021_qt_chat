@@ -22,19 +22,40 @@ SOURCES += \
     mytcpserver.cpp \
     socket.cpp \
     u2c.cpp \
-    widget.cpp
+    
+    
+    addmember.cpp \
+    chatwindow.cpp \
+    friendlist.cpp \
+    logwindow.cpp  \
+    moredetail.cpp \
+    usrmain.cpp
 
 HEADERS += \
     c2s.h \
     messagefromserver.h \
     mytcpserver.h \
     socket.h \
-    u2c.h \
-    widget.h
+    u2c.h addmember.h \
+    
+    
+    chatwindow.h \
+    friendlist.h \
+    logWindow.h \
+    moredetail.h \
+    usrmain.h
 
 FORMS += \
-    widget.ui
+    addmember.ui \
+    chatwindow.ui \
+    friendlist.ui \
+    logwindow.ui \
+    moredetail.ui \
+    usrmain.ui
 
+RESOURCES += \
+    source/img.qrc
+    
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
