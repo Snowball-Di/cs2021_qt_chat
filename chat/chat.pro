@@ -16,49 +16,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-#    c2s.cpp \
-    chatmessagebox.cpp \
-#    client.cpp \
+    c2s.cpp \
     main.cpp \
-    mainwindow.cpp \
-#    messagefromserver.cpp \
-#    mytcpserver.cpp \
-#    socket.cpp \
-#    u2c.cpp \
-    addmember.cpp \
-    chatwindow.cpp \
-    friendlist.cpp \
-    logwindow.cpp  \
-    moredetail.cpp \
-    usrmain.cpp
+    mytcpserver.cpp \
+    qt_chat_sql.cpp \
+    s2c.cpp \
+    socket.cpp \
+    u2c.cpp \
+    widget.cpp
 
 HEADERS += \
-    chatmessagebox.h \
-#    client.h \
-    mainwindow.h \
-#    messagefromserver.h \
-#    mytcpserver.h \
-#    socket.h \
-#    u2c.h \
-    addmember.h \
-    chatwindow.h \
-    friendlist.h \
-    logwindow.h \
-    moredetail.h \
-    usrmain.h
+    c2s.h \
+    mytcpserver.h \
+    qt_chat_sql.h \
+    s2c.h \
+    socket.h \
+    u2c.h \
+    widget.h
 
 FORMS += \
-    addmember.ui \
-    chatwindow.ui \
-    friendlist.ui \
-    logwindow.ui \
-    mainwindow.ui \
-    moredetail.ui \
-    usrmain.ui
+    widget.ui
 
-RESOURCES += \
-    source/img.qrc
-    
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

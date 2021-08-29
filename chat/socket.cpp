@@ -1,8 +1,6 @@
 #include <windows.h>
 #include "socket.h"
 
-#define     mfs     MessageFromServer
-
 Socket* Socket::socket = nullptr;
 
 Socket::Socket(const int _usrID) : usrID(_usrID)
@@ -16,6 +14,8 @@ Socket* Socket::getSocket(const int _usrID)
 {
     if (socket == nullptr) {
         socket = new Socket(_usrID);
+        if (_usrID != 0)
+            socket = new Socket(_usrID);
     }
 
     return socket;
@@ -117,15 +117,15 @@ bool Socket::waitFor()
 void Socket::serverMessageHandler()
 {
     QByteArray array = readAll();
-    mfs::AbstractMessageFromServer *msg
-            = (mfs::AbstractMessageFromServer*)&array;
+    S2C::Type *msg
+            = (S2C::Type*)&array;
 
     switch (msg->type()) {
-        case mfs::SERVER_MSG_SUCCESS:
+    case S2C::SERVER_JOINOK:
 
             break;
 
-        case mfs::SERVER_MES_GROUPORFRIEND:
+    case S2C::SERVER_REPLY_JOIN:
 
             break;
     }
