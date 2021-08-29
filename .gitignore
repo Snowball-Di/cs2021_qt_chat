@@ -7,3 +7,5 @@ CmakeLists.txt
 .vscode
 *\build-chat-Desktop_Qt_5_9_9_MinGW_32bit-Debug
 \build-chat-Desktop_Qt_5_9_9_MinGW_32bit-Debug
+chat\chat.pro
+

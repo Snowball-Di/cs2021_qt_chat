@@ -16,13 +16,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    c2s.cpp \
-    client.cpp \
+#    c2s.cpp \
+    chatmessagebox.cpp \
+#    client.cpp \
     main.cpp \
-    messagefromserver.cpp \
-    mytcpserver.cpp \
-    socket.cpp \
-    u2c.cpp \
+    mainwindow.cpp \
+#    messagefromserver.cpp \
+#    mytcpserver.cpp \
+#    socket.cpp \
+#    u2c.cpp \
     addmember.cpp \
     chatwindow.cpp \
     friendlist.cpp \
@@ -31,15 +33,17 @@ SOURCES += \
     usrmain.cpp
 
 HEADERS += \
-    c2s.h \
-    client.h \
-    messagefromserver.h \
-    mytcpserver.h \
-    socket.h \
-    u2c.h addmember.h \
+    chatmessagebox.h \
+#    client.h \
+    mainwindow.h \
+#    messagefromserver.h \
+#    mytcpserver.h \
+#    socket.h \
+#    u2c.h \
+    addmember.h \
     chatwindow.h \
     friendlist.h \
-    logWindow.h \
+    logwindow.h \
     moredetail.h \
     usrmain.h
 
@@ -48,6 +52,7 @@ FORMS += \
     chatwindow.ui \
     friendlist.ui \
     logwindow.ui \
+    mainwindow.ui \
     moredetail.ui \
     usrmain.ui
 

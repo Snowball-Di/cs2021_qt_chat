@@ -16,7 +16,7 @@
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
-     <x>-1</x>
+     <x>0</x>
      <y>0</y>
      <width>171</width>
      <height>391</height>
@@ -105,8 +105,8 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>120</y>
+      <x>120</x>
+      <y>350</y>
       <width>31</width>
       <height>31</height>
      </rect>
@@ -115,7 +115,7 @@
      <enum>QFrame::Box</enum>
     </property>
     <property name="text">
-     <string>成员</string>
+     <string>del</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_6">

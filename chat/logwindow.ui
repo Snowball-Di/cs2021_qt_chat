@@ -264,4 +264,8 @@ color: rgb(255, 255, 255);</string>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>on_login_clicked()</slot>
+  <slot>on_checkBox_clicked()</slot>
+ </slots>
 </ui>
