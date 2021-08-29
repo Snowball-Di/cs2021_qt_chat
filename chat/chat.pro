@@ -19,6 +19,7 @@ SOURCES += \
     c2s.cpp \
     main.cpp \
     mytcpserver.cpp \
+    qt_chat_sql.cpp \
     s2c.cpp \
     socket.cpp \
     u2c.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 HEADERS += \
     c2s.h \
     mytcpserver.h \
+    qt_chat_sql.h \
     s2c.h \
     socket.h \
     u2c.h \

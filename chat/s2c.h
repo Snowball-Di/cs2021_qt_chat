@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QDebug>
 /*Server to Client*/
 namespace S2C {
     const int SERVER_REPLY_LOGIN            =0x01;
@@ -24,7 +25,36 @@ namespace S2C {
     const int SERVER_NEWJOIN                =0x0D;
     const int SERVER_JOINOK                 =0x0E;
 
-    class Type {
+    const int SERVER_FRIENDLIST             =0x0F;
+    const int SERVER_GROUPLIST              =0x10;
+    const int SERVER_TEXTRECORD_GROUP       =0x11;
+    const int SERVER_TEXTRECORD_FRIEND      =0x12;
+
+    struct PersonInfo{
+        int personID;
+        QString personName;
+        QByteArray personAvatar;
+    };
+
+    struct GroupInfo{
+        int groupID;
+        QString groupName;
+    };
+
+    struct GroupMessage_text{
+        int senderID;
+        QDateTime time;
+//        QString type;
+        QString content;
+    };
+
+    struct FriendMessage_text{
+        QDateTime time;
+//        QString type;
+        QString content;
+    };
+
+    class Type{
     public:
         virtual int type() = 0;
     };
@@ -104,6 +134,7 @@ namespace S2C {
         QString _text;
         };
 
+
 /*new friend*/
     class NewFriend:virtual public Type{
     public:
@@ -160,6 +191,46 @@ namespace S2C {
         QString getGroupName();
     };
 
+/*friend list*/
+    class FriendList:virtual public Type{
+    private:
+        int friendNumber;
+    public:
+        struct PersonInfo fr[100];//最多100个好友，从0开始
+        FriendList(PersonInfo _fr[],int _friendNumber);
+        int type() {    return SERVER_FRIENDLIST;};
+        int getFriendNumber();
+    };
+
+/*group list*/
+    class GroupList:virtual public Type{
+    private:
+        int groupNumber;
+    public:
+        struct GroupInfo gr[100];//最多100个群组，从0开始
+        GroupList(GroupInfo _gr[],int _groupNumber);
+        int type() {    return SERVER_GROUPLIST;};
+        int getGroupNumber();
+    };
+/*message record*/
+    class GroupTextRecord:virtual public Type{
+    private:
+        int lastTxtNum;
+    public:
+        GroupMessage_text txt[100];//一次最多100条消息记录，从0开始
+        GroupTextRecord(GroupMessage_text _txt[],int _last);
+        int type()  {   return SERVER_TEXTRECORD_GROUP;};
+        int getTxtNum();//假如不足100条消息记录，返回记录数量，否则返回100
+    };
+    class FriendTextRecord:virtual public Type{
+    private:
+        int lastTxtNum;
+    public:
+        FriendMessage_text txt[100];//一次最多100条消息记录，从0开始
+        FriendTextRecord(FriendMessage_text _txt[],int _last);
+        int type()  {   return SERVER_TEXTRECORD_FRIEND;};
+        int getTxtNum();//假如不足100条消息记录，返回记录数量，否则返回100
+    };
 };
 
 #endif // MESSAGEFROMSERVER_H
