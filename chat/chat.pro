@@ -17,45 +17,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     c2s.cpp \
-    client.cpp \
-    filemanager.cpp \
     main.cpp \
-    messagefromserver.cpp \
     mytcpserver.cpp \
+    s2c.cpp \
     socket.cpp \
     u2c.cpp \
-    addmember.cpp \
-    chatwindow.cpp \
-    friendlist.cpp \
-    logwindow.cpp  \
-    moredetail.cpp \
-    usrmain.cpp
+    widget.cpp
 
 HEADERS += \
     c2s.h \
-    client.h \
-    filemanager.h \
-    messagefromserver.h \
     mytcpserver.h \
+    s2c.h \
     socket.h \
-    u2c.h addmember.h \
-    chatwindow.h \
-    friendlist.h \
-    logWindow.h \
-    moredetail.h \
-    usrmain.h
+    u2c.h \
+    widget.h
 
 FORMS += \
-    addmember.ui \
-    chatwindow.ui \
-    friendlist.ui \
-    logwindow.ui \
-    moredetail.ui \
-    usrmain.ui
+    widget.ui
 
-RESOURCES += \
-    source/img.qrc
-    
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

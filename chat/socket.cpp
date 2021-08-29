@@ -22,98 +22,22 @@ Socket* Socket::getSocket(const int _usrID)
     return socket;
 }
 
-bool Socket::sendMessage(C2S::Message* msg)
+bool Socket::login(QString password)
 {
-    bool send_flag = 0, timeout_flag = 0;
-
-    switch (msg->type())
-    {
-    case C2S::MSG_REQUEST  :
-        send_flag = send(msg, sizeof(C2S::Request));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_TEXT     :
-        send_flag = send(msg, sizeof(C2S::Text));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_DOC      :
-        send_flag = send(msg, sizeof(C2S::Doc));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_LOG      :
-        connectToHost(QHostAddress::LocalHost, 5566);
-        Sleep(500);
-        send_flag = send(msg, sizeof(C2S::Log));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_GROUP    :
-        send_flag = send(msg, sizeof(C2S::Group));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_JOIN     :
-        send_flag = send(msg, sizeof(C2S::Join));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_PROFILE  :
-        send_flag = send(msg, sizeof(C2S::Profile));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_REGISTER :
-        send_flag = send(msg, sizeof(C2S::Register));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_ACCEPT   :
-        send_flag = send(msg, sizeof(C2S::Accept));
-        if (send_flag)
-            timeout_flag = waitFor();
-
-        break;
-    }
-
-    return send_flag && timeout_flag;
-}
-
-bool Socket::send(C2S::Message* msg, size_t size)
-{
-
-    if (write((char *)msg, size) == -1)
-        return false;
+    connectToHost(QHostAddress::LocalHost, 5566);
+    Log login_msg(usrID, QDateTime::currentDateTime(), true, password);
+    write((char*)&login_msg, sizeof(login_msg));
     emit clientMessage();
-    return true;
-}
 
-
-bool Socket::waitFor()
-{
-    wait_flag = true;
+    waiting = true;
     Sleep(7000);    // 等待7秒
-    if (wait_flag == true) {
+    if (waiting == true) {
         /*
          * 登录失败处理
          */
-        qDebug() << "No response.";
-        wait_flag = false;
-        return false;
+        qDebug() << "Unable to login.";
     }
-    return true;
 }
-
 
 void Socket::serverMessageHandler()
 {
@@ -133,9 +57,8 @@ void Socket::serverMessageHandler()
 
 }
 
-
 void Socket::disconnectHandler()
 {
-
+    
 }
 
