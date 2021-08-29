@@ -24,7 +24,7 @@ namespace S2C {
     const int SERVER_NEWJOIN                =0x0D;
     const int SERVER_JOINOK                 =0x0E;
 
-    class Type{
+    class Type {
     public:
         virtual int type() = 0;
     };
