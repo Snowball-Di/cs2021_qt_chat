@@ -3,100 +3,62 @@
 
 Socket* Socket::socket = nullptr;
 
-Socket::Socket(const int _usrID) : usrID(_usrID)
+Socket::Socket()
 {
-    this->setSocketDescriptor(_usrID);
     connectToHost(QHostAddress::LocalHost, 5566);
     connect(this, &Socket::disconnected, this, SLOT(disconnectHandler()));
     connect(this, &Socket::readyRead, this, SLOT(serverMessageHandler()));
 }
 
-Socket* Socket::getSocket(const int _usrID)
+Socket* Socket::getSocket()
 {
     if (socket == nullptr) {
-        socket = new Socket(_usrID);
-        if (_usrID != 0)
-            socket = new Socket(_usrID);
+        socket = new Socket();
     }
 
     return socket;
 }
 
-bool Socket::sendMessage(C2S::Message* msg)
+
+bool Socket::sendMessage(char* msg, int size)
 {
-    bool send_flag = 0;
-
-    switch (msg->type())
-    {
-    case C2S::MSG_REQUEST  :
-        send_flag = send(msg, sizeof(C2S::Request));
-        break;
-
-    case C2S::MSG_TEXT     :
-        send_flag = send(msg, sizeof(C2S::Text));
-        break;
-
-    case C2S::MSG_DOC      :
-        send_flag = send(msg, sizeof(C2S::Doc));
-        break;
-
-    case C2S::MSG_LOG      :
-        send_flag = send(msg, sizeof(C2S::Log));
-        break;
-
-    case C2S::MSG_GROUP    :
-        send_flag = send(msg, sizeof(C2S::Group));
-        break;
-
-    case C2S::MSG_JOIN     :
-        send_flag = send(msg, sizeof(C2S::Join));
-        break;
-
-    case C2S::MSG_PROFILE  :
-        send_flag = send(msg, sizeof(C2S::Profile));
-        break;
-
-    case C2S::MSG_REGISTER :
-        send_flag = send(msg, sizeof(C2S::Register));
-        break;
-
-    case C2S::MSG_ACCEPT   :
-        send_flag = send(msg, sizeof(C2S::Accept));
-        break;
-    }
-
-    return send_flag;
-}
-
-bool Socket::send(C2S::Message* msg, size_t size)
-{
-
-    if (write((char *)msg, size) == -1)
-        return false;
+    qint64 length = write(msg, size);
     emit clientMessage();
-    return true;
+    waiting = true;
+    return length != -1;
 }
-
-
 
 void Socket::serverMessageHandler()
 {
-    QByteArray array = readAll();
-    S2C::Type *msg
-            = (S2C::Type*)array.data();
+    bool local_waiting = waiting;
 
-    switch (msg->type()) {
-    case S2C::SERVER_JOINOK:
+    char *data = new char[1024];
+    memcpy(data, socket->readAll().data(), 1024);
+    int* type = (int*)data;
 
-            break;
-
-    case S2C::SERVER_REPLY_JOIN:
-
-            break;
+    if (local_waiting) {
+        waiting = false;
+        responseFromServer = {*type, data};
+    } else {
+        serverMsgs.enqueue({*type, data});
     }
-
 }
 
+SocketMsg Socket::getResponse()
+{
+    auto temp = responseFromServer;
+    responseFromServer.data = 0;
+    return temp;
+}
+
+
+SocketMsg Socket::nextPendingMessage()
+{
+    if (serverMsgs.empty())
+        return {0, 0};
+
+    return serverMsgs.dequeue();
+}
 
 void Socket::disconnectHandler()
 {

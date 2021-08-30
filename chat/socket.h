@@ -8,6 +8,16 @@
 #include "s2c.h"
 #include "c2s.h"
 
+
+struct SocketMsg
+{
+    int type;
+    char *data;
+    ~SocketMsg() { delete[] data; }
+};
+
+
+
 /*
  * 此类继承自QTcpSocket，提供了标识自身的功能
  */
@@ -17,22 +27,24 @@ class Socket : public QTcpSocket
 public:
 
     // 通过该函数获取单例
-    static Socket* getSocket(const int _usrID=0);
+    static Socket* getSocket();
 
     // 向服务器发送消息
-    bool sendMessage(C2S::Message* msg);
+    bool sendMessage(char* msg, int length);
 
     // 从消息队列取出一条消息
     bool getNextMessage();  /* to be completed. */
 
     // 发送请求后，通过该函数获取反馈消息
-    S2C::Type* getResponse();
+    // 如果暂时没有消息，返回的对象type和data均为0
+    SocketMsg getResponse();
 
-    // 发送请求后，通过该函数获取反馈消息
-    S2C::Type* nextPendingMessage();
+    // 获取server发来的消息
+    // 如果没有消息，返回的对象type和data均为0
+    SocketMsg nextPendingMessage();
 
     // 关闭套接字
-    void close() { QTcpSocket::close(); };
+    void close() { QAbstractSocket::close(); };
 
 signals:
     void clientMessage();
@@ -44,14 +56,15 @@ private slots:
     void disconnectHandler();
 
 private:
-    explicit Socket(const int _usrID);
+    explicit Socket();
 
     static Socket* socket;
     int usrID;
 
-    bool send(C2S::Message* msg, size_t size);
+    bool waiting = false;
+    SocketMsg responseFromServer = {0, 0};
 
-    QQueue<S2C::Type*> serverMsgs;
+    QQueue<SocketMsg> serverMsgs;
 };
 
 
