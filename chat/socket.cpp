@@ -3,12 +3,12 @@
 
 Socket* Socket::socket = nullptr;
 
-Socket::Socket()
+Socket::Socket(QObject *parent) : QObject(parent)
 {
     s = new QTcpSocket(this);
-    s->connectToHost("10.194.54.239", 5566);
     connect(s, SIGNAL(disconnected()), this, SLOT(disconnectHandler()));
     connect(s, SIGNAL(readyRead()), this, SLOT(serverMessageHandler()));
+    s->connectToHost("10.194.54.239", 5566);
 }
 
 Socket* Socket::getSocket()
@@ -24,10 +24,14 @@ Socket* Socket::getSocket()
 
 bool Socket::sendMessage(char* msg, int size)
 {
-    qDebug() << "send";
-    qint64 length = s->write(msg, size);
-    waiting = true;
-    return length != -1;
+//    qint64 length = s->write(msg, size);
+//    qDebug() << "send: " << length<<msg;
+//    waiting = true;
+
+//    return length != -1;
+    QString mes = "QWERTYU";
+    qDebug()<<s->write(mes.toLatin1());
+    return 1;
 }
 
 void Socket::serverMessageHandler()

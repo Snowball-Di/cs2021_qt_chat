@@ -54,7 +54,7 @@ private slots:
     void disconnectHandler();
 
 private:
-    explicit Socket();
+    explicit Socket(QObject *parent=nullptr);
 
     static Socket* socket;
     QTcpSocket* s;
