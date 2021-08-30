@@ -1,4 +1,5 @@
 #include "client.h"
+#include <windows.h>
 
 Client* Client::client = nullptr;
 
@@ -45,6 +46,8 @@ void Client::userRegister(QString name, QString password)
      */
     qDebug() << "register success.";
     qDebug() << "注册ID：" << res->text;
+
+    delete[] info.data;
 }
 
 void Client::login(int usrID, QString password)
@@ -60,7 +63,7 @@ void Client::login(int usrID, QString password)
 
     s->sendMessage((char *)&msg, sizeof(msg));
 
-    SocketMsg info = {S2C::SERVER_REPLY_LOGIN, 0};
+    SocketMsg info = {S2C::SERVER_REPLY, 0};
 
     if (!waiting(info)) {
         qDebug() << "fail to login.";
@@ -73,27 +76,29 @@ void Client::login(int usrID, QString password)
      * 待完成
      */
     qDebug() << "login success: " << res->success;
-    qDebug() << "登录回复：" << res->text;
+    qDebug() << "user's name：" << res->text;
     this->usrID = usrID;
+    this->usrName = res->text;
+    delete[] info.data;
 }
 
-void Client::sendText(int groupID)
+void Client::sendText(int groupID, QString text)
 {
     C2S::Text msg;
     msg.senderID = usrID;
-    msg.type = C2S::MSG_LOG;
+    msg.type = C2S::MSG_TEXT;
+    msg.groupID = groupID;
     time(&msg.sendTime);
-    msg.operation = true;
 
-    memcpy(msg.password, password.data(), password.length());
-    msg.password[password.length()] = 0;
+    memcpy(msg.text, text.data(), text.length());
+    msg.text[text.length()] = 0;
 
     s->sendMessage((char *)&msg, sizeof(msg));
 
-    SocketMsg info = {S2C::SERVER_REPLY_LOGIN, 0};
+    SocketMsg info = {S2C::SERVER_REPLY, 0};
 
     if (!waiting(info)) {
-        qDebug() << "fail to login.";
+        qDebug() << "fail to send text.";
         return;
     }
 
@@ -102,11 +107,14 @@ void Client::sendText(int groupID)
     /*
      * 待完成
      */
-    qDebug() << "login success: " << res->success;
-    qDebug() << "登录回复：" << res->text;
+    qDebug() << QString("%1 : ").arg(usrID) + res->text;
+    delete[] info.data;
 }
 
-void Client::sendFriendRequest(int friendID){}
+void Client::sendFriendRequest(int friendID)
+{
+
+}
 void Client::acceptFriendRequest(){}
 
 void Client::newGroup(QString groupName){}
@@ -115,16 +123,20 @@ void Client::acceptJoinGroup(int groupID){}
 
 bool Client::waiting(SocketMsg& msg)
 {
-    time_t begin, now;
+    time_t begin = 0, now = 0;
     time(&begin);
 
     while (now - begin <= 7) {
         auto m = s->getResponse();
+        if (m.type != 0) {
+            qDebug() << m.type;
+        }
         if (m.type == msg.type) {
             msg = m;
             return true;
         }
         time(&now);
+        Sleep(20);
     }
     return false;
 }

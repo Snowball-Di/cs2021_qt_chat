@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,24 +18,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     c2s.cpp \
     main.cpp \
-    mytcpserver.cpp \
-    qt_chat_sql.cpp \
+#    mytcpserver.cpp \
+#    qt_chat_sql.cpp \
     s2c.cpp \
     socket.cpp \
-    u2c.cpp \
-    widget.cpp
+    client.cpp
 
 HEADERS += \
     c2s.h \
-    mytcpserver.h \
-    qt_chat_sql.h \
+#    mytcpserver.h \
+#    qt_chat_sql.h \
     s2c.h \
     socket.h \
-    u2c.h \
-    widget.h
+    client.h
 
-FORMS += \
-    widget.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

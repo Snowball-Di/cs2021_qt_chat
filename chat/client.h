@@ -39,6 +39,7 @@ private:
 
     Socket* s;
     int usrID;
+    QString usrName;
 
 
     bool waiting(SocketMsg& msg);

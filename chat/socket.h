@@ -13,7 +13,6 @@ struct SocketMsg
 {
     int type;
     char *data;
-    ~SocketMsg() { delete[] data; }
 };
 
 
@@ -21,7 +20,7 @@ struct SocketMsg
 /*
  * 此类继承自QTcpSocket，提供了标识自身的功能
  */
-class Socket : public QTcpSocket
+class Socket : public QObject
 {
     Q_OBJECT
 public:
@@ -44,10 +43,9 @@ public:
     SocketMsg nextPendingMessage();
 
     // 关闭套接字
-    void close() { QAbstractSocket::close(); };
+    void close() { s->close(); };
 
 signals:
-    void clientMessage();
     void serverMessage(/* class */);
 
 
@@ -59,6 +57,7 @@ private:
     explicit Socket();
 
     static Socket* socket;
+    QTcpSocket* s;
     int usrID;
 
     bool waiting = false;
