@@ -50,11 +50,8 @@ private:
     int usrID;
 
     bool send(C2S::Message* msg, size_t size);
-    bool waitFor();
-    bool wait_flag;
 
-    QQueue<int> serverMsgs;
-    int response;
+    QQueue<S2C::Type*> serverMsgs;
 };
 
 
