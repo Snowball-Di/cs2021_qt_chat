@@ -15,12 +15,13 @@ class Client : public QObject
 public:
     static Client* client_init();
 
+private slots:
     void userRegister(QString name, QString password);
     void login(int usrID, QString password);
 
     void sendText(int groupID, QString text);
 
-    void sendFriendRequest(int friendID);
+    void friendReq(int friendID, QString verifyText);
     void acceptFriendRequest();
 
     void newGroup(QString groupName);

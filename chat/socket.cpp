@@ -8,7 +8,7 @@ Socket::Socket(QObject *parent) : QObject(parent)
     s = new QTcpSocket(this);
     connect(s, SIGNAL(disconnected()), this, SLOT(disconnectHandler()));
     connect(s, SIGNAL(readyRead()), this, SLOT(serverMessageHandler()));
-    s->connectToHost("10.194.54.239", 5566);
+    s->connectToHost(QHostAddress::LocalHost, 5566);
 }
 
 Socket* Socket::getSocket()
@@ -24,7 +24,7 @@ Socket* Socket::getSocket()
 
 bool Socket::sendMessage(char* msg, int size)
 {
-//    qint64 length = s->write(msg, size);
+    qint64 length = s->write(msg, size);
 //    qDebug() << "send: " << length<<msg;
 //    waiting = true;
 

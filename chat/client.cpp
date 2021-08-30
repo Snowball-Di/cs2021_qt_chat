@@ -44,6 +44,7 @@ void Client::userRegister(QString name, QString password)
     /*
      * 待完成
      */
+
     qDebug() << "register success.";
     qDebug() << "注册ID：" << res->text;
 
@@ -103,7 +104,7 @@ void Client::sendText(int groupID, QString text)
     }
 
     S2C::Response* res = (S2C::Response*)info.data;
-    // 显示注册信息
+    // UI显示
     /*
      * 待完成
      */
@@ -111,15 +112,129 @@ void Client::sendText(int groupID, QString text)
     delete[] info.data;
 }
 
-void Client::sendFriendRequest(int friendID)
+void Client::friendReq(int friendID, QString verifyText)
+{
+    C2S::Request msg;
+    msg.senderID = usrID;
+    msg.targetID = friendID;
+    msg.type = C2S::MSG_REQUEST;
+    msg.add = true;
+    time(&msg.sendTime);
+
+    memcpy(msg.text, verifyText.data(), verifyText.length());
+    msg.text[verifyText.length()] = 0;
+
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_REPLY, 0};
+
+    if (!waiting(info)) {
+        qDebug() << "fail to send request.";
+        return;
+    }
+
+    S2C::Response* res = (S2C::Response*)info.data;
+    // UI显示
+    /*
+     * 待完成
+     */
+    qDebug() << QString("%1 : ").arg(usrID) + res->text;
+    delete[] info.data;
+}
+
+void Client::acceptFriendRequest()
 {
 
 }
-void Client::acceptFriendRequest(){}
 
-void Client::newGroup(QString groupName){}
-void Client::joinGroup(int groupID){}
-void Client::acceptJoinGroup(int groupID){}
+void Client::newGroup(QString groupName)
+{
+    C2S::Group msg;
+    msg.type = C2S::MSG_GROUP;
+    msg.newGroup = true;
+    msg.userID = usrID;
+    time(&msg.sendTime);
+
+    memcpy(msg.name, groupName.data(), groupName.length());
+    msg.name[groupName.length()] = 0;
+
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_NEWGROUP, 0};
+
+    if (!waiting(info)) {
+        qDebug() << "fail to send request.";
+        return;
+    }
+
+    S2C::Response* res = (S2C::Response*)info.data;
+    // UI显示
+    /*
+     * 待完成
+     */
+    qDebug() << QString("%1 : ").arg(usrID) + res->text;
+    delete[] info.data;
+}
+
+void Client::joinGroup(int groupID)
+{
+    C2S::Request msg;
+    msg.senderID = usrID;
+    msg.targetID = friendID;
+    msg.type = C2S::MSG_REQUEST;
+    msg.add = true;
+    time(&msg.sendTime);
+
+    memcpy(msg.text, verifyText.data(), verifyText.length());
+    msg.text[verifyText.length()] = 0;
+
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_REPLY, 0};
+
+    if (!waiting(info)) {
+        qDebug() << "fail to send request.";
+        return;
+    }
+
+    S2C::Response* res = (S2C::Response*)info.data;
+    // UI显示
+    /*
+     * 待完成
+     */
+    qDebug() << QString("%1 : ").arg(usrID) + res->text;
+    delete[] info.data;
+}
+
+void Client::acceptJoinGroup(int groupID)
+{
+    C2S::Request msg;
+    msg.senderID = usrID;
+    msg.targetID = friendID;
+    msg.type = C2S::MSG_REQUEST;
+    msg.add = true;
+    time(&msg.sendTime);
+
+    memcpy(msg.text, verifyText.data(), verifyText.length());
+    msg.text[verifyText.length()] = 0;
+
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_REPLY, 0};
+
+    if (!waiting(info)) {
+        qDebug() << "fail to send request.";
+        return;
+    }
+
+    S2C::Response* res = (S2C::Response*)info.data;
+    // UI显示
+    /*
+     * 待完成
+     */
+    qDebug() << QString("%1 : ").arg(usrID) + res->text;
+    delete[] info.data;
+}
 
 bool Client::waiting(SocketMsg& msg)
 {
@@ -136,7 +251,7 @@ bool Client::waiting(SocketMsg& msg)
             return true;
         }
         time(&now);
-        Sleep(20);
+        Sleep(50);
     }
     return false;
 }
