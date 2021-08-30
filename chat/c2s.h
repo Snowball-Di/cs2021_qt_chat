@@ -104,6 +104,7 @@ struct Register
 {
     int type;
     time_t sendTime;
+    char name[30];
     char password[20];
 };
 
@@ -127,7 +128,7 @@ struct Group
  * getGroupID()返回群ID
  * text()返回加入群时的验证消息（退出群时为空）
  */
-struct Join : public Message
+struct Join
 {
     int type;
     int senderID;
@@ -142,7 +143,7 @@ struct Join : public Message
  * getName()返回新昵称（返回为空时不更新）
  * getAvatar()返回新头像（返回为空值时不更新）
  */
-struct Profile : public Message
+struct Profile
 {
     int type;
     int senderID;
