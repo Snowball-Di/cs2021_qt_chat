@@ -9,3 +9,4 @@ CmakeLists.txt
 \build-chat-Desktop_Qt_5_9_9_MinGW_32bit-Debug
 chat\chat.pro
 
+*.autosave

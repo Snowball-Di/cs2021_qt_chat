@@ -101,14 +101,15 @@ bool Socket::send(C2S::Message* msg, size_t size)
 bool Socket::waitFor()
 {
     wait_flag = true;
-    Sleep(7000);    // 等待7秒
-    if (wait_flag == true) {
+
+
+    while (wait_flag == true) {
         /*
          * 登录失败处理
          */
         qDebug() << "No response.";
         wait_flag = false;
-        return false;
+        Sleep(10);
     }
     return true;
 }
