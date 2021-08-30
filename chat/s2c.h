@@ -2,7 +2,6 @@
 #define MESSAGEFROMSERVER_H
 
 #include <QObject>
-#include <time_t>
 #include <QDebug>
 /*Server to Client*/
 namespace S2C {

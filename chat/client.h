@@ -16,18 +16,22 @@ public:
     static Client* client_init();
 
 private slots:
-    void userRegister(QString name, QString password);
-    void login(int usrID, QString password);
+    void slot_register(QString name, QString password);
+    void slot_login(int usrID, QString password, bool save);
+    void slot_logout();
 
-    void sendText(int groupID, QString text);
+    void slot_dialog(int groupID);
+    void slot_send(int groupID, QString text);
 
-    void friendReq(int friendID, QString verifyText);
-    void acceptFriendRequest();
+    void slot_friendReq(int friendID, QString verifyText);
+    void slot_acceptFriendRequest();
 
-    void newGroup(QString groupName);
-    void joinGroup(int groupID);
-    void acceptJoinGroup(int groupID);
+    void slot_newGroup(QString groupName);
+    void slot_groupReq(int groupID);
+    void slot_acceptReq(bool req);
 
+    void slot_friendList();
+    void slot_groupList();
 
 signals:
 

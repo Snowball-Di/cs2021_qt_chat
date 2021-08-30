@@ -17,7 +17,10 @@ const int     MSG_GROUP       =     0x05;
 const int     MSG_JOIN        =     0x06;
 const int     MSG_PROFILE     =     0x07;
 const int     MSG_REGISTER    =     0x08;
-const int     MSG_ACCEPT      =     0x09;
+const int     MSG_FRIENDLIST  =     0x09;
+const int     MSG_GROUPLIST   =     0x0A;
+const int     MSG_TIME        =     0x0B;
+const int     MSG_RECORD      =     0x0C;
 
 
 /*
@@ -137,6 +140,49 @@ struct Join
     bool join;
     QString _text;
 };
+
+/*
+ * 请求好友列表
+ */
+struct FriendList
+{
+    int type;
+    int userID;
+    time_t sendTime;
+};
+
+/*
+ * 请求群组列表
+ */
+struct GroupList
+{
+    int type;
+    int userID;
+    time_t sendTime;
+};
+
+/*
+ * 请求群组时间戳
+ */
+struct Time
+{
+    int type;
+    int userID;
+    time_t reqTime; // 请求该时间之后的消息
+    time_t sendTime;
+};
+
+/*
+ * 请求群组消息列表
+ */
+struct Record
+{
+    int type;
+    int groupID;
+    int messageNumber;  // 请求消息数量, 不超过10条
+    time_t sendTime;
+};
+
 
 /*
  * 更新个人信息
