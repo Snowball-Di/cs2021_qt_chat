@@ -7,14 +7,8 @@
 /*Server to Client*/
 namespace S2C {
 
-const int SERVER_REPLY_LOGIN            =0x01;
+const int SERVER_REPLY                  =0x01;
 const int SERVER_REPLY_REGISTER         =0x02;
-const int SERVER_REPLY_FRIENDREQUEST    =0x03;
-const int SERVER_REPLY_JOIN             =0x04;
-const int SERVER_REPLY_SETNAME          =0x05;
-const int SERVER_REPLY_SETAVATAR        =0x06;
-const int SERVER_REPLY_SETGROUPNAME     =0x07;
-
 
 const int SERVER_MSG_TEXT               =0x08;
 const int SERVER_MSG_DOC                =0x09;
@@ -44,6 +38,14 @@ struct Response
 {
     int type;
     bool success;
+    char text[60];
+};
+
+struct Register
+{
+    int type;
+    bool success;
+    int usrID;
     char text[60];
 };
 
