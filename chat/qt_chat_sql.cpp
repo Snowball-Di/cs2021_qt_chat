@@ -26,8 +26,8 @@ bool Qt_chat_sql::InitDatabase(){//测试完成
 
         sqlquery = QSqlQuery(database);
         sqlquery.exec("CREATE TABLE friendRequest (senderID INT,recieverID INT,content VARCHAR,PRIMARY KEY(senderID,recieverID),FOREIGN KEY(senderID) REFERENCES user_info (userID),FOREIGN KEY (recieverID) REFERENCES user_info (userID));");
-        sqlquery.exec("CREATE TABLE user_info (userID INT PRIMARY KEY,userName VARCHAR,password VARCHAR,sculptureaddress VARCHAR);");
-        sqlquery.exec("CREATE TABLE group_info (groupID INT PRIMARY KEY,groupName VARCHAR,type INT,friendID1 INT,friendID2 INT,lasttime DATETIME,FOREIGN KEY (friendID1) REFERENCES user_info (userID),FOREIGN KEY (friendID2) REFERENCES user_info (userID));");
+        sqlquery.exec("CREATE TABLE user_info (userID INT PRIMARY KEY,userName VARCHAR,password VARCHAR,sculptureaddress VARCHAR,logouttime INT8);");
+        sqlquery.exec("CREATE TABLE group_info (groupID INT PRIMARY KEY,groupName VARCHAR,type INT,friendID1 INT,friendID2 INT,lasttime INT8,FOREIGN KEY (friendID1) REFERENCES user_info (userID),FOREIGN KEY (friendID2) REFERENCES user_info (userID));");
         sqlquery.exec("CREATE TABLE groupRequest (senderID INT,groupID INT,content VARCHAR,recieverID INT,PRIMARY KEY(groupID,senderID),FOREIGN KEY (groupID) REFERENCES group_info (groupID),FOREIGN KEY (senderID) REFERENCES user_info (userID),FOREIGN KEY (recieverID) REFERENCES user_info (userID));");
 
         return true;
@@ -43,7 +43,7 @@ int Qt_chat_sql::Register(QString log_name, QString password){//测试完成
 
     sqlquery = QSqlQuery(database);
     //开始在用户信息表中添加新用户
-    sqlquery.prepare("INSERT INTO user_info (userID,userName,password,sculptureaddress) VALUES (:usrID,:lgname,:psw,NULL)");
+    sqlquery.prepare("INSERT INTO user_info (userID,userName,password,sculptureaddress,logouttime) VALUES (:usrID,:lgname,:psw,NULL,NULL)");
     sqlquery.bindValue(":usrID",userID);
     sqlquery.bindValue(":lgname",log_name);
     sqlquery.bindValue(":psw",password);
@@ -60,12 +60,12 @@ int Qt_chat_sql::Register(QString log_name, QString password){//测试完成
     creatlist.append(" (groupID INT,friendID INT,PRIMARY KEY (groupID),FOREIGN KEY (groupID) REFERENCES group_info (groupID),FOREIGN KEY (friendID) REFERENCES user_info (userID));");
 
     ok2=sqlquery.exec(creatlist);
-
+    qDebug()<<"sql"<<usrID<<"ok1"<<ok1<<"ok2"<<ok2;
     if(ok1&&ok2){
-        return 0;
+        return usrID;
     }
-
-    return usrID;
+    qDebug()<<"sql"<<"ok1"<<ok1<<"ok2"<<ok2;
+    return 0;
 
 }
 
@@ -96,7 +96,7 @@ int Qt_chat_sql::newGroup(bool kind,QString groupName,int usrID){//新建群组�
 
         QString createMsg="CREATE TABLE ";
         createMsg.append(groupMsg);
-        createMsg.append(" (time DATETIME,senderID INT,type VARCHAR,content VARCHAR,PRIMARY KEY (time,senderID),FOREIGN KEY (senderID) REFERENCES user_info (userID))");
+        createMsg.append(" (time INT8,senderID INT,type VARCHAR,content VARCHAR,PRIMARY KEY (time,senderID),FOREIGN KEY (senderID) REFERENCES user_info (userID))");
         ok2=sqlquery.exec(createMsg);
 
 
@@ -168,7 +168,7 @@ int Qt_chat_sql::newGroup(bool kind,QString groupName,int usrID){//新建群组�
         QString groupMsg="Msg_";
         groupMsg.append(groupID);
 
-        sqlquery.prepare("CREATE TABLE "+groupMsg+" (time DATETIME,senderID INT,type VARCHAR,content VARCHAR,PRIMARY KEY (time,senderID),FOREIGN KEY (senderID) REFERENCES user_info (userID))");
+        sqlquery.prepare("CREATE TABLE "+groupMsg+" (time INT8,senderID INT,type VARCHAR,content VARCHAR,PRIMARY KEY (time,senderID),FOREIGN KEY (senderID) REFERENCES user_info (userID))");
         bool ok5=sqlquery.exec();
 
         if(ok1&&ok2&&ok3&&ok4&&ok5){
@@ -540,10 +540,11 @@ bool Qt_chat_sql::getUser_info(QStringList userIDlist, USER_INFO *user_infoList)
     return true;
 }
 
-bool Qt_chat_sql::newMsg(MESSAGE msg){//写入时间可能有问题
+bool Qt_chat_sql::newMsg(MESSAGE msg){//测试完成
     QString groupID=QString::number(msg.groupID);
     QString senderID=QString::number(msg.senderID);
-    QDateTime time=msg.time;
+    long long int tm=msg.time;
+    QString time=QString::number(tm);
 
     //插入消息记录表，更新群组信息最新时间记录
 
@@ -563,8 +564,9 @@ bool Qt_chat_sql::newMsg(MESSAGE msg){//写入时间可能有问题
 
 
     //更新群组信息表
-    sqlquery.prepare("UPDATE group_info SET lasttime = :tm");
+    sqlquery.prepare("UPDATE group_info SET lasttime = :tm WHERE groupID = :grpID");
     sqlquery.bindValue(":tm",time);
+    sqlquery.bindValue(":grpID",groupID);
 
     bool ok2=sqlquery.exec();
 
@@ -577,7 +579,7 @@ bool Qt_chat_sql::newMsg(MESSAGE msg){//写入时间可能有问题
     }
 }
 
-int Qt_chat_sql::get_history(int limit, int grpID, MESSAGE *messagelist,QDateTime time){//时间可能有问题
+int Qt_chat_sql::get_history(int limit, int grpID, MESSAGE *messagelist,long long int time){//测试完成
     QString selectMsg;
     QString groupID=QString::number(grpID);
     QString groupMsg="Msg_";
@@ -589,24 +591,25 @@ int Qt_chat_sql::get_history(int limit, int grpID, MESSAGE *messagelist,QDateTim
     bool ok=sqlquery.exec();
 
     if(ok==0){
-        return 0;
+        return -1;
     }
 
     while(sqlquery.next()||sum>limit){
 
-        if(sqlquery.value(0).toDateTime()>time){
-            sum++;
-            messagelist[sum].time=sqlquery.value(0).toDateTime();
+        if(sqlquery.value(0).toLongLong()>time){
+            messagelist[sum].time=sqlquery.value(0).toLongLong();
             messagelist[sum].senderID=sqlquery.value(1).toInt();
             messagelist[sum].type=sqlquery.value(2).toString();
             messagelist[sum].content=sqlquery.value(3).toString();
+            messagelist[sum].groupID=grpID;
+            sum++;
         }
     }
 
     return sum;
 }
 
-int Qt_chat_sql::getGroup_info(QStringList groupIDList, GROUP_INFO* groupinfo){
+int Qt_chat_sql::getGroup_info(QStringList groupIDList, GROUP_INFO* groupinfo){//测试完成
     QString grpName;
     bool ok;
     int i;
@@ -620,7 +623,7 @@ int Qt_chat_sql::getGroup_info(QStringList groupIDList, GROUP_INFO* groupinfo){
         }
 
         sqlquery.first();
-        groupinfo[i].time=sqlquery.value(5).toDateTime();
+        groupinfo[i].time=sqlquery.value(5).toLongLong();
         groupinfo[i].type=sqlquery.value(2).toInt();
         groupinfo[i].groupID=sqlquery.value(0).toInt();
         groupinfo[i].masterID=sqlquery.value(3).toInt();
@@ -750,7 +753,7 @@ bool Qt_chat_sql::deleteFriendrequest(int sdrID, int rcvID){
 
     sqlquery.prepare("DELETE FROM friendRequest WHERE senderID = :sdrID AND recieverID = :rcvID");
     sqlquery.bindValue(":sdrID",senderID);
-    sqlquery.bindValue(":grpID",recieverID);
+    sqlquery.bindValue(":rcvID",recieverID);
 
     bool ok=sqlquery.exec();
 
@@ -799,6 +802,65 @@ QString Qt_chat_sql::getUserName(int usrID){
 
 QString Qt_chat_sql::getGroupName(int grpID){
     QString groupID=QString::number(grpID);
+    QString groupName="hhh";
+
+    sqlquery.prepare("SELECT * FROM group_info WHERE groupID = :grpID");
+    sqlquery.bindValue(":grpID",groupID);
+
+    bool ok=sqlquery.exec();
+
+    qDebug()<<ok;
+
+    if(ok==0){
+        return 0;
+    }
+
+    sqlquery.first();
+
+    groupName=sqlquery.value("groupName").toString();
+
+    qDebug()<<groupName;
+
+
+    return groupName;
+}
+
+bool Qt_chat_sql::Logout(int usrID, long long time){
+    QString userID=QString::number(usrID);
+
+    sqlquery.prepare("UPDATE user_info SET logouttime = :tm WHERE userID = :usrID");
+    sqlquery.bindValue(":tm",time);
+    sqlquery.bindValue(":usrID",userID);
+
+    bool ok=sqlquery.exec();
+
+    if(ok==0){
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+
+long long int Qt_chat_sql::getLogoutTime(int usrID){
+    QString userID=QString::number(usrID);
+
+    sqlquery.prepare("SELECT * FROM user_info WHERE userID = :usrID");
+    sqlquery.bindValue(":usrID",userID);
+
+    bool ok=sqlquery.exec();
+
+    if(ok==0){
+        return -1;
+    }
+
+    sqlquery.first();
+
+    return sqlquery.value(4).toLongLong();
+}
+
+bool Qt_chat_sql::getGroup_info(int grpID,GROUP_INFO& groupinfo){
+    QString groupID=QString::number(grpID);
 
     sqlquery.prepare("SELECT * FROM group_info WHERE groupID = :grpID");
     sqlquery.bindValue(":grpID",groupID);
@@ -806,9 +868,16 @@ QString Qt_chat_sql::getGroupName(int grpID){
     bool ok=sqlquery.exec();
 
     if(ok==0){
-        return 0;
+        return false;
     }
 
     sqlquery.first();
-    return sqlquery.value(1).toString();
+    groupinfo.groupID=sqlquery.value(0).toInt();
+    groupinfo.groupName=sqlquery.value(1).toString();
+    groupinfo.type=sqlquery.value(2).toInt();
+    groupinfo.masterID=sqlquery.value(3).toInt();
+    groupinfo.friendID=sqlquery.value(4).toInt();
+    groupinfo.time=sqlquery.value(5).toLongLong();
+
+    return true;
 }
