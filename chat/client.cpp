@@ -20,10 +20,10 @@ Client::Client(QObject *parent) : QObject(parent)
     connect(log_w, SIGNAL(signal_login(int, QString, bool)), this, SLOT(slot_login(int, QString, bool)));
     connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
 
-    for (int i = 0; i < 10; i++)
-        connect(chat_w[i], SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
+//    for (int i = 0; i < 10; i++)
+//        connect(chat_w[i], SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
 
-    connect(acpt, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
+//    connect(acpt, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
     
     
     // 启动UI
@@ -34,8 +34,6 @@ Client::Client(QObject *parent) : QObject(parent)
 
     if(lastId != 0)
         log_w->setUi(lastId, false);
-
-
 
     s = Socket::getSocket();
 }
@@ -66,7 +64,7 @@ void Client::slot_func()
     more_func = new Moredetail(this->cli_ui);
     QString name = usrName;
     int usr_id = usrID;
-    more_func->setUser(name, QString(usr_id), QPixmap(":/img/img/log_icon.png"));
+    more_func->setUser(name, QString("%1").args(usr_id), QPixmap(":/img/img/log_icon.png"));
 }
 
 void Client::slot_register(QString name, QString password)
@@ -565,38 +563,7 @@ void Client::newFriend(int senderID, QString name, QString text)
      * 待完成
      */
     // senderID, groupID = 0
-    C2S::Accept msg;
-    msg.senderID = targetID;
-    msg.targetID = usrID;
-    msg.type = C2S::MSG_ACCEPT;
-    msg.kind = isFriend;
-    msg.accept = accept;
-    time(&msg.sendTime);
 
-    s->sendMessage((char *)&msg, sizeof(msg));
-
-    SocketMsg info = {S2C::SERVER_REPLY, 0};
-
-    if (!waiting(info)) {
-        qDebug() << "fail to accept.";
-        return;
-    }
-
-    S2C::Response* res = (S2C::Response*)info.data;
-    if (res->success == true) {
-        // 发送成功
-        requestfriendList();
-        /*
-         * 待完成
-         */
-    } else {
-        // 发送失败
-        /*
-         * 待完成
-         */
-    }
-
-    delete res;
 }
 
 
