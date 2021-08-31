@@ -58,6 +58,7 @@ struct NewFriend
     int type;
     int senderID;
     char senderName[30];
+    char text[50];
 };
 
 
@@ -77,6 +78,7 @@ struct NewJoin
     char senderName[30];
     int groupID;
     char groupName[30];
+    char text[50];
 };
 
 
@@ -98,6 +100,7 @@ struct GroupInfo
 struct NewFriendInfo{
     int personID;
     char personName[30];
+    char text[50];
 };
 
 struct NewJoinInfo
@@ -105,19 +108,22 @@ struct NewJoinInfo
     int senderID;
     int groupID;
     char senderName[30];
+    char text[50];
 };
 
 /*friend list*/
 struct FriendList
 {
     int type;
+    bool success;
     int size; // 好友总数
     PersonInfo friends[10];//最多100个好友，从0开始
 };
 
-struct NewFriendWaiting
+struct NewFriendWaiting//等待验证的新好友
 {
     int type;
+    bool success;
     int size;
     NewFriendInfo friends[10];
 };
@@ -126,6 +132,7 @@ struct NewFriendWaiting
 struct GroupList
 {
     int type;
+    bool success;
     int size; // 群组总数
     GroupInfo groups[20];
 };
@@ -133,13 +140,15 @@ struct GroupList
 struct NewJoinWaiting
 {
     int type;
+    bool success;
     int size;
-    NewJoinInfo friends[10];
+    NewJoinInfo members[20];
 };
 
 /*message record*/
 struct Time{
     int type;
+    bool success;
     int groupID;
     bool isfriend;
     time_t latest_time;
@@ -152,6 +161,7 @@ struct Message{
 
 struct Record{
     int type;
+    bool success;
     int messageNumber;
     Message history[10];
 };
