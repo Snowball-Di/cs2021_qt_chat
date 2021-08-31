@@ -52,6 +52,12 @@ void listItem::setItemDone()
     d_loaded = true;
 }
 
+void listItem::setItemLoad()
+{
+    d_waiting->show();
+    d_waitingMovie->start();
+}
+
 QSize listItem::getRealString(QString src)
 {
     QFontMetricsF fm(this->font());

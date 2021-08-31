@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2021-08-27 19:32:48
+ * @LastEditTime: 2021-09-01 01:08:04
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: \chat\socket.cpp
+ */
 #include <windows.h>
 #include "socket.h"
 

@@ -90,6 +90,7 @@ void UsrMain::showdialog()
 void UsrMain::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
        int d_id = ((listItem*)(item->listWidget()->itemWidget(item)))->get_dialog_id();
+       ((listItem*)(item->listWidget()->itemWidget(item)))->setItemDone();
        emit this->signal_dialog(d_id);
 }
 
@@ -119,7 +120,7 @@ void UsrMain::load_grouplist(QVector<Group>& list)
     listItem *groups[20];
     for(int i = 0; i < list.length(); i++)
     {
-        groups[i] = new listItem(ui->listWidget->parentWidget());
+        groups[i] = new listItem(ui->listWidget->parentWidget(), list[i].group_id);
         // TODO 接入头像
         QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
         UsrMain::setDialogItem(groups[i], item, list[i].name, QPixmap(":/img/img/log_icon.png"), listItem::Group);
@@ -132,7 +133,7 @@ void UsrMain::load_friendlist(QVector<Friend>& list)
     listItem *friends[20];
     for(int i = 0; i < list.length(); i++)
     {
-        friends[i] = new listItem(ui->listWidget->parentWidget());
+        friends[i] = new listItem(ui->listWidget->parentWidget(), list[i].group_id, list[i].id);
         // TODO 接入头像
         QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
         UsrMain::setDialogItem(friends[i], item, list[i].name, QPixmap(":/img/img/log_icon.png"), listItem::Group);

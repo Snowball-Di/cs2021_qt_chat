@@ -17,6 +17,7 @@
 #include <QMessageBox>
 #include "newfrireq.h"
 #include "newingroup.h"
+#include "acceptreq.h"
 
 /*
  * 客户端类
@@ -59,7 +60,7 @@ private slots:
 //signals:
 //    void signal_newMessage(QVector<int> groupID);
 
-private:
+public:
 
     explicit Client(QObject *parent = nullptr);
 
@@ -94,8 +95,7 @@ private:
     LogWindow *log_w;
     Register *regis;
     UsrMain *main_w;
-    ChatWindow *chat_w[10];
-    acceptReq* acpt;
+    QVector<ChatWindow*> chat_w;
     Moredetail *more_func;
     client_ui *cli_ui = new client_ui;
 

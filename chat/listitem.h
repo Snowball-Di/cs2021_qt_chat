@@ -21,6 +21,11 @@ public:
         Group
     };
 
+    QString d_name; //会话对象名字
+    QPixmap d_pic; //会话对象头像
+    int group_id; //会话对象标识号码
+    int fri_id;
+
     inline QString name() {return d_name;};
 
     void setItem(QString name, QPixmap pic, List_Type type);
@@ -31,14 +36,13 @@ public:
 
     inline int get_dialog_id(){return this->group_id;};
 
+    void setItemLoad();
+
 protected:
     void paintEvent(QPaintEvent *event); 
 
 private:
-    QString d_name; //会话对象名字
-    QPixmap d_pic; //会话对象头像
-    int group_id; //会话对象标识号码
-    int fri_id;
+
 
     bool d_loaded = false; //是否得到响应
     List_Type d_type; // 默认为用户会话
