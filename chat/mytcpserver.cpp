@@ -150,6 +150,8 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
             reply2client.groupID = mes.groupID;
             reply2client.sendTime = mes.sendTime;
             memcpy(reply2client.text,mes.text,sizeof(mes.text));
+            QString senderName = server2db->getUserName(mes.senderID);
+            qstring2char(reply2client.senderName,senderName,30*sizeof(char));
             GROUP_INFO groupinfo;
             bool dbreply2 = server2db->getGroup_info(mes.groupID,groupinfo);
             qDebug()<<mes.groupID;
