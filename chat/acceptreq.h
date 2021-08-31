@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2021-08-31 14:28:23
+ * @LastEditTime: 2021-08-31 18:46:07
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \chat\acceptreq.h
+ */
 #ifndef ACCEPTREQ_H
 #define ACCEPTREQ_H
 

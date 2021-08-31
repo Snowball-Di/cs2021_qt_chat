@@ -85,11 +85,12 @@ void UsrMain::showdialog()
     }
 }
 
+
+
 void UsrMain::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
-    ChatWindow *chat = new ChatWindow(this);
-    chat->adjustSize();
-    chat->show();
+       int d_id = ((listItem*)(item->listWidget()->itemWidget(item)))->get_dialog_id();
+       emit this->signal_dialog(d_id);
 }
 
 void UsrMain::on_friendlist_clicked()
@@ -111,3 +112,49 @@ void UsrMain::on_grouplist_clicked()
         ui->friendlist->setChecked(false);
     }
 }
+
+void UsrMain::load_grouplist(QVector<Group>& list)
+{
+    this->ui->listWidget->clear();
+    listItem *groups[20];
+    for(int i = 0; i < list.length(); i++)
+    {
+        groups[i] = new listItem(ui->listWidget->parentWidget());
+        // TODO 接入头像
+        QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
+        UsrMain::setDialogItem(groups[i], item, list[i].name, QPixmap(":/img/img/log_icon.png"), listItem::Group);
+    }
+}
+
+void UsrMain::load_friendlist(QVector<Friend>& list)
+{
+    this->ui->listWidget->clear();
+    listItem *friends[20];
+    for(int i = 0; i < list.length(); i++)
+    {
+        friends[i] = new listItem(ui->listWidget->parentWidget());
+        // TODO 接入头像
+        QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
+        UsrMain::setDialogItem(friends[i], item, list[i].name, QPixmap(":/img/img/log_icon.png"), listItem::Group);
+    }
+}
+
+void UsrMain::insert_friend(Friend &fri)
+{
+    listItem *data = new listItem(ui->listWidget->parentWidget());
+    QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
+    UsrMain::setDialogItem(data, item, fri.name, QPixmap(":/img/img/log_icon.png"), listItem::Friend);
+}
+
+void UsrMain::insert_group(Group& gro)
+{
+    listItem *data = new listItem(ui->listWidget->parentWidget());
+    QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
+    UsrMain::setDialogItem(data, item, gro.name, QPixmap(":/img/img/log_icon.png"), listItem::Group);
+}
+
+
+
+
+
+

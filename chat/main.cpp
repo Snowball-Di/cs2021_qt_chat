@@ -4,6 +4,7 @@
 #include "QDebug"
 #include "usrmain.h"
 #include <QApplication>
+#include "client.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,7 +19,7 @@ int main(int argc, char *argv[])
     // m->setGroups(g);
     // qDebug() << m->getGroups()[0].name;
 
-    Moredetail usr;
-    usr.show();
+    Client* client = Client::client_init();
+    client->execute();
     return a.exec();
 }

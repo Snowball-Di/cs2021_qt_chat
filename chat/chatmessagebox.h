@@ -23,8 +23,8 @@ public:
         User_Time,  //时间
     };
 
-    void setTextSuccess();
-    void setText(QString text, QString time, QSize allSize, Text_Type userType);
+    void setItemSuccess();
+    void setItem(QString text, time_t time, QSize allSize, Text_Type userType);
 
     QSize getRealString(QString src);
     QSize fontRect(QString str);

@@ -18,22 +18,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     acceptreq.cpp \
     addnew.cpp \
+    client_ui.cpp \
     listitem.cpp \
     main.cpp \
     chatwindow.cpp \
     friendlist.cpp \
     logwindow.cpp  \
+    mainwindow.cpp \
     moredetail.cpp \
     newgroup.cpp \
     register.cpp \
     usrmain.cpp \
     chatmessagebox.cpp \
     c2s.cpp \
-    mytcpserver.cpp \
-    qt_chat_sql.cpp \
+#    mytcpserver.cpp \
+#    qt_chat_sql.cpp \
     s2c.cpp \
     socket.cpp \
-    u2c.cpp \
     manager.cpp \
     client.cpp
 
@@ -41,20 +42,21 @@ HEADERS += \
     acceptreq.h \
     addnew.h \
     chatwindow.h \
+    client_ui.h \
     friendlist.h \
     listitem.h \
     logwindow.h \
+    mainwindow.h \
     moredetail.h \
     newgroup.h \
     register.h \
     usrmain.h   \
     chatmessagebox.h \
     c2s.h \
-    mytcpserver.h \
-    qt_chat_sql.h \
+#    mytcpserver.h \
+#    qt_chat_sql.h \
     s2c.h \
     socket.h \
-    u2c.h \
     manager.h \
     client.h
 
@@ -62,8 +64,10 @@ FORMS += \
     acceptreq.ui \
     addnew.ui \
     chatwindow.ui \
+    client_ui.ui \
     friendlist.ui \
     logwindow.ui \
+    mainwindow.ui \
     moredetail.ui \
     newgroup.ui \
     register.ui \

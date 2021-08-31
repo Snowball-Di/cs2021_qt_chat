@@ -29,19 +29,19 @@ chatmessagebox::chatmessagebox(QWidget *parent) : QWidget(parent)
     m_loading->setAutoFillBackground(false);
 }
 
-void chatmessagebox::setTextSuccess()
+void chatmessagebox::setItemSuccess()
 {
     m_loading->hide();
     m_loadingMovie->stop();
     m_isSending = true;
 }
 
-void chatmessagebox::setText(QString text, QString time, QSize allSize, chatmessagebox::Text_Type userType)
+void chatmessagebox::setItem(QString text, time_t time, QSize allSize, chatmessagebox::Text_Type userType)
 {
     m_msg = text;
     m_userType = userType;
     m_time = time;
-    m_curTime = QDateTime::fromTime_t(time.toInt()).toString("hh:mm");
+    m_curTime = QDateTime::fromTime_t(time).toString("hh:mm");
     m_allSize = allSize;
     if(userType == User_Me) {
         if(!m_isSending) {
@@ -110,7 +110,6 @@ QSize chatmessagebox::getRealString(QString src)
             nMaxWidth = m_textWidth;
             int size = m_textWidth / fm.width(" ");
             int num = fm.width(value) / m_textWidth;
-            int ttmp = num*fm.width(" ");
             num = ( fm.width(value) ) / m_textWidth;
             nCount += num;
             QString temp = "";

@@ -5,10 +5,36 @@ Client* Client::client = nullptr;
 
 Client::Client(QObject *parent) : QObject(parent)
 {
+    connect(main_w, SIGNAL(signal_dialog(int)), this, SLOT(slot_dialog(int)));
+    // connect(main_w, SIGNAL(signal_func()), this, SLOT(slot_func()));
+    connect(main_w, SIGNAL(signal_logout()), this, SLOT(slot_logout()));
+    connect(main_w, SIGNAL(signal_friendList()), this, SLOT(slot_friendList()));
+    connect(main_w, SIGNAL(signal_groupList()), this, SLOT(slot_groupList()));
+
+    connect(regis, SIGNAL(signal_register(QString, QString)), this, SLOT(slot_register(QString, QString)));
+    // connect(regis, SIGNAL(signal_cancel()), this, SLOT(slot_cancel()));
+
+    connect(log_w, SIGNAL(signal_login(int, QString, bool)), this, SLOT(slot_login(int, QString, bool)));
+    // connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
+
+    for (int i = 0; i < 10; i++)
+        connect(chat_w[i], SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
+
+    connect(acpt, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
+    
+    
     // 启动UI
     /*
      * 待完成
      */
+    int lastId = Manager::getLastID();
+    log_w = new LogWindow();
+    if(lastId == 0)
+        log_w->setUi(lastId, false);
+    else
+        log_w->setUi(lastId, true);
+
+
 
     s = Socket::getSocket();
 }
@@ -18,6 +44,7 @@ Client* Client::client_init()
     if (client == nullptr)
         client = new Client();
 
+    client->log_w->show();
     return client;
 }
 
@@ -57,7 +84,7 @@ void Client::slot_register(QString name, QString password)
     qDebug() << "register success.";
     qDebug() << "注册ID：" << res->text;
 
-    delete[] info.data;
+    delete res;
 }
 
 void Client::slot_login(int usrID, QString password, bool save)
@@ -85,21 +112,28 @@ void Client::slot_login(int usrID, QString password, bool save)
     if (res->success == true) {
         // 登录成功
         manager = Manager::getManager(usrID, save);     // 文件管理器
+        auto waiting_groups = waitingGroups();
+        auto waiting_friends = waitingFriends();
+        requestfriendList();
+        auto friendList = manager->getFriends();
+        // 显示waiting_groups/friends
         /*
          * 待完成
          */
+
+        main_w = new UsrMain(this->cli_ui);
+        main_w->load_friendlist(friendList);
+
+
     } else {
-        // 登陆失败
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->cli_ui, tr("提示"), tr("帐号或密码不正确，请检查"), QMessageBox::Yes);
     }
 
     qDebug() << "login success: " << res->success;
     qDebug() << "user's name：" << res->text;
     this->usrID = usrID;
     this->usrName = res->text;
-    delete[] info.data;
+    delete res;
 }
 
 void Client::slot_send(int groupID, QString text)
@@ -136,7 +170,7 @@ void Client::slot_send(int groupID, QString text)
     }
 
     qDebug() << QString("%1 : ").arg(usrID) + res->text;
-    delete[] info.data;
+    delete res;
 }
 
 void Client::slot_friendReq(int friendID, QString verifyText)
@@ -173,43 +207,44 @@ void Client::slot_friendReq(int friendID, QString verifyText)
          */
     }
 
-    delete[] info.data;
+    delete res;
 }
 
-void Client::slot_acceptReq(int targetID, bool accept, bool isFriend)
+void Client::slot_acceptReq(bool accept)
 {
-    C2S::Accept msg;
-    msg.senderID = targetID;
-    msg.targetID = usrID;
-    msg.type = C2S::MSG_ACCEPT;
-    msg.kind = isFriend;
-    msg.accept = accept;
-    time(&msg.sendTime);
+    accept_flag = accept;
+//    C2S::Accept msg;
+//    msg.senderID = targetID;
+//    msg.targetID = usrID;
+//    msg.type = C2S::MSG_ACCEPT;
+//    msg.kind = isFriend;
+//    msg.accept = accept;
+//    time(&msg.sendTime);
 
-    s->sendMessage((char *)&msg, sizeof(msg));
+//    s->sendMessage((char *)&msg, sizeof(msg));
 
-    SocketMsg info = {S2C::SERVER_REPLY, 0};
+//    SocketMsg info = {S2C::SERVER_REPLY, 0};
 
-    if (!waiting(info)) {
-        qDebug() << "fail to accept.";
-        return;
-    }
+//    if (!waiting(info)) {
+//        qDebug() << "fail to accept.";
+//        return;
+//    }
 
-    S2C::Response* res = (S2C::Response*)info.data;
-    if (res->success == true) {
-        // 发送成功
-        slot_friendList();
-        /*
-         * 待完成
-         */
-    } else {
-        // 发送失败
-        /*
-         * 待完成
-         */
-    }
+//    S2C::Response* res = (S2C::Response*)info.data;
+//    if (res->success == true) {
+//        // 发送成功
+//        requestfriendList();
+//        /*
+//         * 待完成
+//         */
+//    } else {
+//        // 发送失败
+//        /*
+//         * 待完成
+//         */
+//    }
 
-    delete[] info.data;
+//    delete res;
 }
 
 void Client::slot_newGroup(QString groupName)
@@ -233,24 +268,38 @@ void Client::slot_newGroup(QString groupName)
     }
 
     S2C::Response* res = (S2C::Response*)info.data;
+
     if (res->success == true) {
-        // 创建成功
-        slot_groupList();
+        // 发送成功
+        requestgroupList();
         /*
          * 待完成
          */
     } else {
-        // 创建失败
+        // 发送失败
         /*
          * 待完成
          */
     }
 
-    delete[] info.data;
+
+
+    delete res;
 }
 
-
 void Client::slot_friendList()
+{
+    requestfriendList();
+    auto fl = manager->getFriends();
+}
+
+void Client::slot_groupList()
+{
+    requestgroupList();
+    auto gl = manager->getGroups();
+}
+
+void Client::requestfriendList()
 {
     C2S::FriendList msg;
     msg.type = C2S::MSG_FRIENDLIST;
@@ -274,15 +323,10 @@ void Client::slot_friendList()
     }
     manager->setFriends(temp);
 
-    // UI更新好友列表
-    /*
-     * 待完成
-     */
-
-    delete[] info.data;
+    delete res;
 }
 
-void Client::slot_groupList()
+void Client::requestgroupList()
 {
     C2S::GroupList msg;
     msg.type = C2S::MSG_GROUPLIST;
@@ -304,16 +348,9 @@ void Client::slot_groupList()
     for (auto &i : res->groups) {
         temp.append({i.groupID, i.groupName});
     }
-
-
     manager->setGroups(temp);
 
-    // UI更新群组列表
-    /*
-     * 待完成
-     */
-
-    delete[] info.data;
+    delete res;
 }
 
 
@@ -374,7 +411,7 @@ void Client::slot_groupReq(int groupID, QString text)
          */
     }
 
-    delete[] info.data;
+    delete res;
 }
 
 bool Client::waiting(SocketMsg& msg)
@@ -400,18 +437,101 @@ bool Client::waiting(SocketMsg& msg)
 void Client::execute()
 {
     while (!exit_flag) {
-        SocketMsg m = s->nextPendingMessage();
-        if (m.type != 0) {
-            switch (m.type) {
+        SocketMsg msg = s->nextPendingMessage();
+        if (msg.type != 0) {
+            switch (msg.type) {
             case S2C::SERVER_NEWFRIEND :
-                break;
-            case S2C::SERVER_NEWGROUP:
+                newFriend(msg);
                 break;
             case S2C::SERVER_NEWJOIN:
+                newJoin(msg);
                 break;
             case S2C::SERVER_MSG_TEXT:
-
+                newText(msg);
+                break;
             }
         }
+
+        Sleep(100);
     }
+}
+
+QVector<S2C::NewFriendInfo> Client::waitingFriends()
+{
+    C2S::WaitingFriends msg;
+    msg.userID = usrID;
+    msg.type = C2S::MSG_JOIN;
+    time(&msg.sendTime);
+
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_WAITING_FRIEND, 0};
+    QVector<S2C::NewFriendInfo> list;
+
+    if (!waiting(info)) {
+        qDebug() << "fail to get list.";
+        return list;
+    }
+
+    S2C::NewFriendWaiting* res = (S2C::NewFriendWaiting*)info.data;
+    for (int i = 0; i < res->size; i++)
+        list.append(res->friends[i]);
+
+    delete res;
+    return list;
+}
+
+
+QVector<S2C::NewJoinInfo> Client::waitingGroups()
+{
+    C2S::WaitingGroups msg;
+    msg.userID = usrID;
+    msg.type = C2S::MSG_JOIN;
+    time(&msg.sendTime);
+
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_WAITING_FRIEND, 0};
+    QVector<S2C::NewJoinInfo> list;
+
+    if (!waiting(info)) {
+        qDebug() << "fail to get list.";
+        return list;
+    }
+
+    S2C::NewJoinWaiting* res = (S2C::NewJoinWaiting*)info.data;
+    for (int i = 0; i < res->size; i++)
+        list.append(res->friends[i]);
+
+    delete res;
+    return list;
+}
+
+void Client::newFriend(SocketMsg &msg)
+{
+    S2C::NewFriend* res = (S2C::NewFriend*)msg.data;
+    // 显示
+    /*
+     * 待完成
+     */
+}
+
+
+void Client::newJoin(SocketMsg &msg)
+{
+    S2C::NewJoin* res = (S2C::NewJoin*)msg.data;
+    // 显示
+    /*
+     * 待完成
+     */
+}
+
+
+void Client::newText(SocketMsg &msg)
+{
+    S2C::Text* res = (S2C::Text*)msg.data;
+    // 显示
+    /*
+     * 待完成
+     */
 }

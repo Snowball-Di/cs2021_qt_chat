@@ -22,7 +22,7 @@ void ChatWindow::on_send_clicked()
 {
     QString msg = ui->textEdit->toPlainText();
     ui->textEdit->clear();
-    QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
+    time_t time = QDateTime::currentDateTime().toTime_t(); //时间戳
 
     bool isSending = true; // 发送中
 
@@ -40,7 +40,7 @@ void ChatWindow::on_send_clicked()
                 chatmessagebox* messageW = (chatmessagebox*)ui->listWidget->itemWidget(ui->listWidget->item(i));
                 if(messageW->text() == msg) {
                     isOver = false;
-                    messageW->setTextSuccess();
+                    messageW->setItemSuccess();
                 }
             }
             if(isOver) {
@@ -49,7 +49,7 @@ void ChatWindow::on_send_clicked()
                 chatmessagebox* messageW = new chatmessagebox(ui->listWidget->parentWidget());
                 QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
                 dealMessage(messageW, item, msg, time, chatmessagebox::User_Me);
-                messageW->setTextSuccess();
+                messageW->setItemSuccess();
             }
         }
     } else {
@@ -64,23 +64,24 @@ void ChatWindow::on_send_clicked()
     ui->listWidget->setCurrentRow(ui->listWidget->count()-1);
 }
 
-void ChatWindow::dealMessage(chatmessagebox *messageW, QListWidgetItem *item, QString text, QString time,  chatmessagebox::Text_Type type)
+void ChatWindow::dealMessage(chatmessagebox *messageW, QListWidgetItem *item, QString text, time_t time,  chatmessagebox::Text_Type type)
 {
     messageW->setFixedWidth(this->width());
     QSize size = messageW->fontRect(text);
     item->setSizeHint(size);
-    messageW->setText(text, time, size, type);
+    messageW->setItem(text, time, size, type);
     ui->listWidget->setItemWidget(item, messageW);
 }
 
-void ChatWindow::dealMessageTime(QString curMsgTime)
+
+void ChatWindow::dealMessageTime(time_t curMsgTime)
 {
     bool isShowTime = false;
     if(ui->listWidget->count() > 0) {
         QListWidgetItem* lastItem = ui->listWidget->item(ui->listWidget->count() - 1);
         chatmessagebox* messageW = (chatmessagebox*)ui->listWidget->itemWidget(lastItem);
         int lastTime = messageW->time().toInt();
-        int curTime = curMsgTime.toInt();
+        int curTime = curMsgTime;
         qDebug() << "curTime lastTime:" << curTime - lastTime;
         isShowTime = ((curTime - lastTime) > 60); // 两个消息相差一分钟
 //        isShowTime = true;
@@ -94,8 +95,27 @@ void ChatWindow::dealMessageTime(QString curMsgTime)
         QSize size = QSize(this->width(), 40);
         messageTime->resize(size);
         itemTime->setSizeHint(size);
-        messageTime->setText(curMsgTime, curMsgTime, size, chatmessagebox::User_Time);
+        QString timetext = QDateTime::fromTime_t(curMsgTime).toString("hh:mm");
+        messageTime->setItem(timetext, curMsgTime, size, chatmessagebox::User_Time);
         ui->listWidget->setItemWidget(itemTime, messageTime);
     }
 }
 
+void ChatWindow::loadMessageHis(QVector<Msg>&list, int usrid)
+{
+    for(int i = 0; i< list.length(); i++)
+    {
+        if(list[i].senderID != usrid)
+        {
+        chatmessagebox* messageW = new chatmessagebox(ui->listWidget->parentWidget());
+        QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
+        dealMessage(messageW, item, list[i].text, list[i].sendTime, chatmessagebox::User_She);
+        }
+        else
+        {
+            chatmessagebox* messageW = new chatmessagebox(ui->listWidget->parentWidget());
+            QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
+            dealMessage(messageW, item, list[i].text, list[i].sendTime, chatmessagebox::User_Me);
+        }
+    }
+}
