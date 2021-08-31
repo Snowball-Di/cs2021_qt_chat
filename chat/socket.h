@@ -27,7 +27,7 @@ public:
 
     // 通过该函数获取单例
     static Socket* getSocket();
-
+    void connectToHost();
     // 向服务器发送消息
     bool sendMessage(char* msg, int length);
 
@@ -50,7 +50,7 @@ private slots:
     void serverMessageHandler();
     void disconnectHandler();
 
-private:
+public:
     explicit Socket(QObject *parent=nullptr);
 
     static Socket* socket;

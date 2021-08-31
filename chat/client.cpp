@@ -19,11 +19,6 @@ Client::Client(QObject *parent) : QObject(parent)
 
     connect(log_w, SIGNAL(signal_login(int, QString, bool)), this, SLOT(slot_login(int, QString, bool)));
     connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
-
-    for (int i = 0; i < 10; i++)
-        connect(chat_w[i], SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
-
-    connect(acpt, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
     
     
     // 启动UI
@@ -72,10 +67,12 @@ void Client::slot_func()
 void Client::slot_register(QString name, QString password)
 {
     C2S::Register msg;
-    memcpy(msg.name, name.data(), name.length());
-    msg.name[password.length()] = 0;
-    memcpy(msg.password, password.data(), password.length());
-    msg.password[password.length()] = 0;
+    auto n = name.toStdString();
+    auto p = password.toStdString();
+    memcpy(msg.name, n.c_str(), n.length());
+//    msg.name[n.length()] = 0;
+    memcpy(msg.password, p.c_str(), p.length());
+//    msg.password[p.length()] = 0;
     msg.type = C2S::MSG_REGISTER;
 
     s->sendMessage((char *)&msg, sizeof(msg));
@@ -273,14 +270,12 @@ void Client::slot_acceptReq(int senderID, int groupID, bool accept)
     if (res->success == true) {
         requestfriendList();
         // reload friend list
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->main_w, tr("success"), tr(res->text), QMessageBox::Yes);
+        QVector<Friend> temp_friends = manager->getFriends();
+        this->main_w->load_friendlist(temp_friends);
     } else {
         // 发送失败
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->main_w, tr("fail"), tr(res->text), QMessageBox::Yes);
     }
 
     delete res;
@@ -424,10 +419,23 @@ void Client::slot_dialog(int groupID)
     manager->setMsg(groupID, temp);
 
     QVector<Msg> msgList = manager->getMsg(groupID);
-    // 构建聊天框
-    /*
-     * 待完成
-     */
+
+    for(int i = 0; i < chat_w.length(); i++)
+    {
+        if (chat_w[i]->groupid == groupID)
+        {
+            chat_w[i]->loadMessageHis(msgList, usrID);
+            chat_w[i]->show();
+            break;
+        }
+    }
+
+    ChatWindow *temp_w = new ChatWindow(this->main_w);
+    connect(temp_w, SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
+    temp_w->groupid = groupID;
+    // todo 显示对方信息
+    temp_w->show();
+    chat_w.append(temp_w);
 }
 
 
@@ -479,7 +487,7 @@ bool Client::waiting(SocketMsg& msg)
             return true;
         }
         time(&now);
-        Sleep(50);
+
     }
     return false;
 }
@@ -562,34 +570,46 @@ void Client::newFriend(int senderID, QString name, QString text)
 {
     // 显示
     acceptReq* ac = new acceptReq();
-    ac->setUi(0, senderID, "", name, text);
-    ac->show();
-    
+    connect(ac, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
+    ac->setUi(0, senderID, name, text);
+    ac->show(); 
+
 }
 
 
 void Client::newJoin(int senderID, QString name, int groupID, QString text)
 {
     // 显示
-    /*
-     * 待完成
-     */
-    // senderID, groupID != 0
+    acceptReq* ac = new acceptReq();
+    connect(ac, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
+    ac->setUi(groupID, senderID, name, text);
+    ac->show();
 }
 
 
 void Client::newText(int groupID)
 {
-
-    if (1/*窗口active*/) {
-
-    } else {
-
+    // 已经初始化窗口，在现在的窗口中加载记录
+    for(int i = 0; i < chat_w.length(); i++)
+    {
+        if(chat_w[i]->groupid == groupID)
+        {
+           QVector<Msg> temp_msgs = manager->getMsg(groupID);
+           chat_w[i]->loadMessageHis(temp_msgs, usrID);
+        }
     }
-    // 显示
-    /*
-     * 待完成
-     */
+
+    // 在列表中标识新消息
+    for(int i = 0; i < this->main_w->len; i++)
+    {
+        if(this->main_w->items[i].group_id == groupID)
+        {
+            this->main_w->items[i].setItemLoad();
+            //todo add interface
+        }
+    }
+
+
 }
 
 QVector<S2C::NewMesList> Client::getOfflineMessage()

@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QDebug>
 
-listItem::listItem(QWidget *parent, int groupid, int friid) :QWidget(parent), group_id(groupid), fri_id(friid);
+listItem::listItem(QWidget *parent, int groupid, int friid) :QWidget(parent), group_id(groupid), fri_id(friid)
 {
     //TODO 接入好友列表返回的头像
     d_pic = QPixmap(":/img/img/log_icon.png");
@@ -50,6 +50,12 @@ void listItem::setItemDone()
     d_waiting->hide();
     d_waitingMovie->stop();
     d_loaded = true;
+}
+
+void listItem::setItemLoad()
+{
+    d_waiting->show();
+    d_waitingMovie->start();
 }
 
 QSize listItem::getRealString(QString src)

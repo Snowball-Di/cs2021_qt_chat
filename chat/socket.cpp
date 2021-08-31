@@ -6,9 +6,7 @@ Socket* Socket::socket = nullptr;
 Socket::Socket(QObject *parent) : QObject(parent)
 {
     s = new QTcpSocket(this);
-    connect(s, SIGNAL(disconnected()), this, SLOT(disconnectHandler()));
-    connect(s, SIGNAL(readyRead()), this, SLOT(serverMessageHandler()));
-    s->connectToHost(QHostAddress::LocalHost, 5566);
+
 }
 
 Socket* Socket::getSocket()
@@ -19,6 +17,14 @@ Socket* Socket::getSocket()
     }
 
     return socket;
+}
+
+void Socket::connectToHost()
+{
+    s->connectToHost("10.194.173.180", 5566);
+    connect(s, SIGNAL(disconnected()), this, SLOT(disconnectHandler()));
+    connect(s, SIGNAL(readyRead()), this, SLOT(serverMessageHandler()));
+
 }
 
 
