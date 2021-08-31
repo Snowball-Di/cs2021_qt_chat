@@ -21,6 +21,7 @@ const int     MSG_FRIENDLIST  =     0x09;
 const int     MSG_GROUPLIST   =     0x0A;
 const int     MSG_TIME        =     0x0B;
 const int     MSG_RECORD      =     0x0C;
+const int     MSG_ACCEPT      =     0x0D;
 
 
 /*
