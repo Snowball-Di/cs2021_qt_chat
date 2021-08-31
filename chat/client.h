@@ -29,6 +29,8 @@ public:
     void execute();
 
 private slots:
+
+
     void slot_register(QString name, QString password);
     void slot_login(int usrID, QString password, bool save);
     void slot_logout();
@@ -46,8 +48,10 @@ private slots:
     void slot_friendList();
     void slot_groupList();
 
-
-
+    //new
+    void slot_to_register();
+    void slot_cancel();
+    void slot_func();
 
 signals:
 

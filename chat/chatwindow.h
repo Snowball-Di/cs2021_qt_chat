@@ -18,7 +18,7 @@ public:
     ~ChatWindow();
 
     void loadMessageHis(QVector<Msg>&, int);
-    void addMessage(Msg& m);
+    void me_sendingMsg(QString text);
 
     void dealMessage(chatmessagebox *messageW, QListWidgetItem *item, QString text, time_t time, chatmessagebox::Text_Type type);
     void dealMessageTime(time_t curMsgTime);

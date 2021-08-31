@@ -24,10 +24,12 @@ void ChatWindow::on_send_clicked()
     ui->textEdit->clear();
     time_t time = QDateTime::currentDateTime().toTime_t(); //时间戳
 
+    emit this->signal_send(123123, msg);
+
     bool isSending = true; // 发送中
 
     qDebug()<<"addMessage" << msg << time << ui->listWidget->count();
-    if(ui->listWidget->count()%2) {
+
         if(isSending) {
             dealMessageTime(time);
 
@@ -52,15 +54,7 @@ void ChatWindow::on_send_clicked()
                 messageW->setItemSuccess();
             }
         }
-    } else {
-        if(msg != "") {
-            dealMessageTime(time);
 
-            chatmessagebox* messageW = new chatmessagebox(ui->listWidget->parentWidget());
-            QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
-            dealMessage(messageW, item, msg, time, chatmessagebox::User_She);
-        }
-    }
     ui->listWidget->setCurrentRow(ui->listWidget->count()-1);
 }
 
@@ -118,4 +112,9 @@ void ChatWindow::loadMessageHis(QVector<Msg>&list, int usrid)
             dealMessage(messageW, item, list[i].text, list[i].sendTime, chatmessagebox::User_Me);
         }
     }
+}
+
+void ChatWindow::me_sendingMsg(QString text)
+{
+
 }
