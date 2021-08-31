@@ -5,6 +5,24 @@ Client* Client::client = nullptr;
 
 Client::Client(QObject *parent) : QObject(parent)
 {
+    connect(main_w, SIGNAL(signal_dialog(int)), this, SLOT(slot_dialog(int)));
+    // connect(main_w, SIGNAL(signal_func()), this, SLOT(slot_func()));
+    connect(main_w, SIGNAL(signal_logout()), this, SLOT(slot_logout()));
+    connect(main_w, SIGNAL(signal_friendList()), this, SLOT(slot_friendList()));
+    connect(main_w, SIGNAL(signal_groupList()), this, SLOT(slot_groupList()));
+
+    connect(regis, SIGNAL(signal_register(QString, QString)), this, SLOT(slot_register(QString, QString)));
+    // connect(regis, SIGNAL(signal_cancel()), this, SLOT(slot_cancel()));
+
+    connect(log_w, SIGNAL(signal_login(int, QString, bool)), this, SLOT(slot_login(int, QString, bool)));
+    // connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
+
+    for (int i = 0; i < 10; i++)
+        connect(chat_w[i], SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
+
+    connect(acpt, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
+    
+    
     // 启动UI
     /*
      * 待完成
@@ -16,7 +34,7 @@ Client::Client(QObject *parent) : QObject(parent)
     else
         log_w->setUi(lastId, true);
 
-    log_w->show();
+
 
     s = Socket::getSocket();
 }
@@ -26,6 +44,7 @@ Client* Client::client_init()
     if (client == nullptr)
         client = new Client();
 
+    client->log_w->show();
     return client;
 }
 
@@ -191,40 +210,41 @@ void Client::slot_friendReq(int friendID, QString verifyText)
     delete res;
 }
 
-void Client::slot_acceptReq(int targetID, bool accept, bool isFriend)
+void Client::slot_acceptReq(bool accept)
 {
-    C2S::Accept msg;
-    msg.senderID = targetID;
-    msg.targetID = usrID;
-    msg.type = C2S::MSG_ACCEPT;
-    msg.kind = isFriend;
-    msg.accept = accept;
-    time(&msg.sendTime);
+    accept_flag = accept;
+//    C2S::Accept msg;
+//    msg.senderID = targetID;
+//    msg.targetID = usrID;
+//    msg.type = C2S::MSG_ACCEPT;
+//    msg.kind = isFriend;
+//    msg.accept = accept;
+//    time(&msg.sendTime);
 
-    s->sendMessage((char *)&msg, sizeof(msg));
+//    s->sendMessage((char *)&msg, sizeof(msg));
 
-    SocketMsg info = {S2C::SERVER_REPLY, 0};
+//    SocketMsg info = {S2C::SERVER_REPLY, 0};
 
-    if (!waiting(info)) {
-        qDebug() << "fail to accept.";
-        return;
-    }
+//    if (!waiting(info)) {
+//        qDebug() << "fail to accept.";
+//        return;
+//    }
 
-    S2C::Response* res = (S2C::Response*)info.data;
-    if (res->success == true) {
-        // 发送成功
-        requestfriendList();
-        /*
-         * 待完成
-         */
-    } else {
-        // 发送失败
-        /*
-         * 待完成
-         */
-    }
+//    S2C::Response* res = (S2C::Response*)info.data;
+//    if (res->success == true) {
+//        // 发送成功
+//        requestfriendList();
+//        /*
+//         * 待完成
+//         */
+//    } else {
+//        // 发送失败
+//        /*
+//         * 待完成
+//         */
+//    }
 
-    delete res;
+//    delete res;
 }
 
 void Client::slot_newGroup(QString groupName)
@@ -431,6 +451,8 @@ void Client::execute()
                 break;
             }
         }
+
+        Sleep(100);
     }
 }
 

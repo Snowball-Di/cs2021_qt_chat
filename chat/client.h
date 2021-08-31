@@ -40,7 +40,7 @@ private slots:
 
     void slot_newGroup(QString groupName);
     void slot_groupReq(int groupID, QString text);
-    void slot_acceptReq(int targetID, bool accept, bool isFriend);
+    void slot_acceptReq(bool accept);
 
     // 下面两个函数会保存后台数据，不会刷新前台
     void slot_friendList();
@@ -64,6 +64,7 @@ private:
     QString usrName;
 
     bool exit_flag = false;
+    bool accept_flag;
 
     bool waiting(SocketMsg& msg);
 
