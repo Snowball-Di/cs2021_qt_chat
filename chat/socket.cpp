@@ -55,7 +55,7 @@ void Socket::serverMessageHandler()
     qDebug() << "get msg from server.";
 
     responseFromServer = {*type, data};
-    emit *type;
+    emit serverMessage(responseFromServer);
 }
 
 SocketMsg Socket::getResponse()

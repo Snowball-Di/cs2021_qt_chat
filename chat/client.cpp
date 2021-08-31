@@ -71,11 +71,10 @@ void Client::slot_func()
 
 void Client::slot_serverHandler(SocketMsg msg)
 {
+    qDebug() << "test!!!!";
     if (msg.type == S2C::SERVER_REPLY_REGISTER) {
         getRegister(*(S2C::Register *)msg.data);
     } else if (msg.type == S2C::SERVER_REPLY) {
-
-    } else if (msg.type == S2C::SERVER_REPLY_REGISTER) {
 
     }
     else if (msg.type == S2C::SERVER_NEWFRIEND) {
@@ -144,7 +143,7 @@ void Client::getRegister(S2C::Register msg)
         qDebug() << "register success.";
     } else {
         // 注册失败
-       QMessageBox::information(this->cli_ui, tr("注册失败"), QString("请重试！")+usrID, QMessageBox::Yes);
+       QMessageBox::information(this->cli_ui, tr("注册失败"), QString("请重试！"), QMessageBox::Yes);
        qDebug() << "register fail.";
     }
 }

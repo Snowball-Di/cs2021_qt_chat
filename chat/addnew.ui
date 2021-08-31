@@ -63,6 +63,9 @@
       <height>91</height>
      </rect>
     </property>
+    <property name="placeholderText">
+     <string>请输入验证消息</string>
+    </property>
    </widget>
    <widget class="QLineEdit" name="id">
     <property name="geometry">
