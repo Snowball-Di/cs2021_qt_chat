@@ -27,13 +27,15 @@ SOURCES += \
     newgroup.cpp \
     register.cpp \
     usrmain.cpp \
-    chatmessagebox.cpp
-#    c2s.cpp \
-#    mytcpserver.cpp \
-#    qt_chat_sql.cpp \
-#    s2c.cpp \
-#    socket.cpp \
-#    u2c.cpp
+    chatmessagebox.cpp \
+    c2s.cpp \
+    mytcpserver.cpp \
+    qt_chat_sql.cpp \
+    s2c.cpp \
+    socket.cpp \
+    u2c.cpp \
+    manager.cpp \
+    client.cpp
 
 HEADERS += \
     acceptreq.h \
@@ -46,13 +48,15 @@ HEADERS += \
     newgroup.h \
     register.h \
     usrmain.h   \
-    chatmessagebox.h
-#    c2s.h \
-#    mytcpserver.h \
-#    qt_chat_sql.h \
-#    s2c.h \
-#    socket.h \
-#    u2c.h \
+    chatmessagebox.h \
+    c2s.h \
+    mytcpserver.h \
+    qt_chat_sql.h \
+    s2c.h \
+    socket.h \
+    u2c.h \
+    manager.h \
+    client.h
 
 FORMS += \
     acceptreq.ui \
