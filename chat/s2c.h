@@ -154,7 +154,7 @@ struct Time{
     int groupID;
     bool isfriend;
     bool ifnew[20];
-};//各个群的最新消息事件
+};//各个群是否有新消息，ifnew[i]=true时有新消息
 
 struct Message{
     time_t time;
