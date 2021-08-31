@@ -33,6 +33,7 @@ struct Text
     int senderID;
     int groupID;
     time_t sendTime;
+    char senderName[30];
     char text[100];
 };
 

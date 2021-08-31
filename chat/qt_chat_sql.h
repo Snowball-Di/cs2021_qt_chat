@@ -20,7 +20,7 @@ struct USER_INFO{
 struct MESSAGE{
     int groupID;
     int senderID;
-    QDateTime time;
+    long long int time;
     QString type;
     QString content;
 };
@@ -29,7 +29,7 @@ struct GROUP_INFO{
     int groupID;
     int type;
     QString groupName;
-    QDateTime time;
+    long long int time;
     int masterID;
     int friendID;
 };
@@ -79,7 +79,7 @@ public:
     bool newMsg(MESSAGE msg);//消息信息
     int groupMembers(int groupID,int* group_members);//获取群组成员
     bool editUser_info(int userID,USER_INFO user_info);//更改用户信息
-    int get_history(int limit,int groupID,MESSAGE* messagelist,QDateTime time);//获取消息记录
+    int get_history(int limit,int groupID,MESSAGE* messagelist,long long int time);//获取消息记录
     int getGroup_info(QStringList groupIDList,GROUP_INFO* groupinfo);//获取群组信息
 
 
@@ -95,6 +95,11 @@ public:
 
     QString getUserName(int userID);//返回用户姓名
     QString getGroupName(int groupID);//返回群组姓名
+
+    bool Logout(int userID,long long int time);
+    long long int getLogoutTime(int userID);
+
+    bool getGroup_info(int groupID,GROUP_INFO& groupinfo);
 
 
 

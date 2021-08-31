@@ -90,7 +90,7 @@ void Client::slot_serverHandler(SocketMsg msg)
 
     }
     else if (msg.type == S2C::SERVER_MSG_TEXT) {
-
+        getText(*(S2C::Text *)msg.data);
     }
     else if (msg.type == S2C::SERVER_MSG_DOC) {
 
@@ -129,7 +129,7 @@ void Client::slot_register(QString name, QString password)
     s->sendMessage((char *)&msg, sizeof(msg));
 }
 
-void Client::getRegister(S2C::Register msg)
+void Client::getRegister(S2C::Register& msg)
 {
 
     if (msg.success == true) {
@@ -148,73 +148,52 @@ void Client::getRegister(S2C::Register msg)
     }
 }
 
+static bool save_flag;
+
 void Client::slot_login(int usrID, QString password, bool save)
 {
+    save_flag = save;
     C2S::Log msg;
     msg.id = usrID;
     msg.type = C2S::MSG_LOG;
     time(&msg.sendTime);
     msg.operation = true;
 
-    memcpy(msg.password, password.data(), password.length());
-    msg.password[password.length()] = 0;
-
-    s->sendMessage((char *)&msg, sizeof(msg));
-
-    SocketMsg info = {S2C::SERVER_REPLY, 0};
-
-    if (!waiting(info)) {
-        qDebug() << "fail to login.";
-        return;
-    }
-
-    S2C::Response* res = (S2C::Response*)info.data;
-
-
-    if (res->success == true) {
-        // 登录成功
-        manager = Manager::getManager(usrID, save);     // 文件管理器
-        auto waiting_groups = waitingGroups();
-        auto waiting_friends = waitingFriends();
-        requestfriendList();
-        auto friendList = manager->getFriends();
-        auto msgs = getOfflineMessage();
-
-         for (auto &i : waiting_groups)
-            newJoin(i.senderID, i.senderName, i.groupID, i.text);
-
-         for (auto &i : waiting_friends)
-            newFriend(i.personID, i.personName, i.text);
-
-         for (auto &i : msgs) {
-             if (i.ifnew)
-                newText(i.groupID);
-         }
-
-//        //mock
-//         QVector<Friend> fri(5);
-//         fri[0].name = "Max";
-//         fri[2].name = "Max2341234";
-//         fri[1].name = "Max21";
-//         fri[3].name = "我是呆瓜";
-//         fri[4].name = "另一个呆瓜";
-
-
-        main_w->load_friendlist(friendList);
-        main_w->show();
-        log_w->close();
-
-        qDebug() << "login success: " << res->success;
-        qDebug() << "user's name：" << res->text;
-    } else {
-        QMessageBox::information(this->cli_ui, tr("提示"), tr("帐号或密码不正确，请检查"), QMessageBox::Yes);
-        qDebug() << "login fail: " << res->success;
-        qDebug() << "user's name：" << res->text;
-    }
+    auto p = password.toStdString();
+    memcpy(msg.password, p.c_str(), p.length());
+    msg.password[p.length()] = 0;
 
     this->usrID = usrID;
-    this->usrName = res->text;
-    delete res;
+    s->sendMessage((char *)&msg, sizeof(msg));
+}
+
+
+void Client::getLogin(S2C::Response& res)
+{
+    if (res.success == true) {
+        // 登录成功
+        manager = Manager::getManager(usrID, save_flag);     // 文件管理器
+        // 反复请求数据
+        requestgroupList();
+    } else {
+        QMessageBox::information(this->cli_ui, tr("提示"), tr("帐号或密码不正确，请检查"), QMessageBox::Yes);
+        qDebug() << "login fail: " << res.success;
+        qDebug() << "user's name：" << res.text;
+    }
+    this->usrName = res.text;
+}
+
+
+void Client::initMain()
+{
+    // 展示前端
+    auto friendList = manager->getFriends();
+
+    main_w->load_friendlist(friendList);
+    main_w->show();
+    log_w->close();
+
+    qDebug() << "login success" ;
 }
 
 void Client::slot_send(int groupID, QString text)
@@ -229,28 +208,19 @@ void Client::slot_send(int groupID, QString text)
     msg.text[text.length()] = 0;
 
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_REPLY, 0};
-
-    if (!waiting(info)) {
-        qDebug() << "fail to send text.";
-        return;
-    }
-
-    S2C::Response* res = (S2C::Response*)info.data;
-    if (res->success == true) {
-        // 发送成功
-
-
-    } else {
-        // 发送失败
-        /*
-         * 待完成
-         */
-    }
-
-    qDebug() << QString("%1 : ").arg(usrID) + res->text;
-    delete res;
+void Client::getText(S2C::Text& res)
+{
+    auto msgs = manager->getMsg(res.groupID);
+    Msg m;
+    m.text = res.text;
+    m.sendTime = res.sendTime;
+    m.senderID = res.senderID;
+//    m.senderName = res.name;
+    msgs.append(m);
+    manager->setMsg(res.groupID, msgs);
+    newText(res.groupID);
 }
 
 void Client::slot_friendReq(int friendID, QString verifyText)
@@ -266,24 +236,17 @@ void Client::slot_friendReq(int friendID, QString verifyText)
     msg.text[verifyText.length()] = 0;
 
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_REPLY, 0};
-
-    if (!waiting(info)) {
-        qDebug() << "fail to send request.";
-        return;
-    }
-
-    S2C::Response* res = (S2C::Response*)info.data;
-    if (res->success == true) {
+void Client::getFriendReq(S2C::Response& res)
+{
+    if (res.success == true) {
         // 发送成功
-        QMessageBox::information(this->more_func, tr("success"), tr(res->text), QMessageBox::Yes);
+        QMessageBox::information(this->more_func, tr("success"), tr(res.text), QMessageBox::Yes);
     } else {
         // 发送失败
-        QMessageBox::information(this->more_func, tr("success"), tr(res->text), QMessageBox::Yes);
+        QMessageBox::information(this->more_func, tr("success"), tr(res.text), QMessageBox::Yes);
     }
-
-    delete res;
 }
 
 void Client::slot_acceptReq(int senderID, int groupID, bool accept)
@@ -297,27 +260,21 @@ void Client::slot_acceptReq(int senderID, int groupID, bool accept)
     time(&msg.sendTime);
 
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_REPLY, 0};
-
-    if (!waiting(info)) {
-        qDebug() << "fail to accept.";
-        return;
-    }
-
-    S2C::Response* res = (S2C::Response*)info.data;
-    if (res->success == true) {
-        requestfriendList();
+void Client::getAcceptReq(S2C::Response& res)
+{
+    if (res.success == true) {
         // reload friend list
-        QMessageBox::information(this->main_w, tr("success"), tr(res->text), QMessageBox::Yes);
-        QVector<Friend> temp_friends = manager->getFriends();
-        this->main_w->load_friendlist(temp_friends);
+        QMessageBox::information(this->main_w, tr("success"), tr(res.text), QMessageBox::Yes);
+        // 请求好友列表
+//        QVector<Friend> temp_friends = manager->getFriends();
+//        this->main_w->load_friendlist(temp_friends);
+        requestfriendList();
     } else {
         // 发送失败
-        QMessageBox::information(this->main_w, tr("fail"), tr(res->text), QMessageBox::Yes);
+        QMessageBox::information(this->main_w, tr("fail"), tr(res.text), QMessageBox::Yes);
     }
-
-    delete res;
 }
 
 void Client::slot_newGroup(QString groupName)
@@ -332,38 +289,34 @@ void Client::slot_newGroup(QString groupName)
     msg.name[groupName.length()] = 0;
 
     s->sendMessage((char *)&msg, sizeof(msg));
-
-    SocketMsg info = {S2C::SERVER_NEWGROUP, 0};
-
-    if (!waiting(info)) {
-        qDebug() << "fail to new group.";
-        return;
-    }
-
-    S2C::Response* res = (S2C::Response*)info.data;
-
-    if (res->success == true) {
-        // 发送成功
-        requestgroupList();
-        QMessageBox::information(this->more_func, tr("success"), tr(res->text), QMessageBox::Yes);
-    } else {
-        // 发送失败
-        QMessageBox::information(this->more_func, tr("fail"), tr(res->text), QMessageBox::Yes);
-    }
-
-    delete res;
 }
 
+void Client::getNewGroup(S2C::Response& res)
+{
+    if (res.success == true) {
+        // 发送成功
+        QMessageBox::information(this->more_func, tr("success"), tr(res.text), QMessageBox::Yes);
+        requestgroupList();
+    } else {
+        // 发送失败
+        QMessageBox::information(this->more_func, tr("fail"), tr(res.text), QMessageBox::Yes);
+    }
+}
+
+static bool showGroup = false;
+static bool showFriend = true;
 void Client::slot_friendList()
 {
+    showGroup = false;
+    showFriend = true;
     requestfriendList();
-    auto fl = manager->getFriends();
 }
 
 void Client::slot_groupList()
 {
+    showGroup = true;
+    showFriend = false;
     requestgroupList();
-    auto gl = manager->getGroups();
 }
 
 void Client::requestfriendList()
@@ -374,23 +327,27 @@ void Client::requestfriendList()
     time(&msg.sendTime);
 
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_FRIENDLIST, 0};
 
-    if (!waiting(info)) {
-        qDebug() << "fail to get friend list.";
-        return;
-    }
-
-    S2C::FriendList* res = (S2C::FriendList*)info.data;
-
+void Client::getFriendList(S2C::FriendList& res)
+{
     QVector<Friend> temp;
-    for (auto &i : res->friends) {
+    for (auto &i : res.friends) {
         temp.append({i.personID, i.groupID, i.personName, ""});
     }
     manager->setFriends(temp);
 
-    delete res;
+
+    if (showFriend) {
+        // ui显示
+        this->main_w->load_friendlist(temp);
+        this->main_w->show();
+    }
+
+    if (init_flag) {
+        slot_waitingGroups();
+    }
 }
 
 void Client::requestgroupList()
@@ -401,23 +358,25 @@ void Client::requestgroupList()
     time(&msg.sendTime);
 
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_GROUPLIST, 0};
 
-    if (!waiting(info)) {
-        qDebug() << "fail to get friend list.";
-        return;
-    }
-
-    S2C::GroupList* res = (S2C::GroupList*)info.data;
-
+void Client::getGroupList(S2C::GroupList& res)
+{
     QVector<Group> temp;
-    for (auto &i : res->groups) {
+    for (auto &i : res.groups) {
         temp.append({i.groupID, i.groupName});
     }
     manager->setGroups(temp);
 
-    delete res;
+    if (showGroup) {
+        // ui显示
+        this->main_w->load_grouplist(temp);
+        this->main_w->show();
+    }
+    if (init_flag) {
+        requestfriendList();
+    }
 }
 
 
@@ -430,48 +389,45 @@ void Client::slot_logout()
     msg.operation = false;
 
     s->sendMessage((char *)&msg, sizeof(msg));
-    exit_flag = true;
 }
 
+static int groupID_dialog = 0;
 
 void Client::slot_dialog(int groupID)
 {
     C2S::Record msg;
+    groupID_dialog = groupID;
     msg.type = C2S::MSG_RECORD;
     msg.groupID = groupID;
     msg.messageNumber = 10;
     time(&msg.sendTime);
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_TEXTRECORD, 0};
-
-    if (!waiting(info)) {
-        qDebug() << "fail to get friend list.";
-        return;
-    }
-
-    S2C::Record* res = (S2C::Record*)info.data;
+void Client::getDialog(S2C::Record& res)
+{
     QVector<Msg> temp;
-    for (int i = 0; i < res->messageNumber; i++)
-        temp.append({res->history[i].senderID, res->history[i].senderName,
-                     res->history[i].time, res->history[i].content});
-    manager->setMsg(groupID, temp);
+    for (int i = 0; i < res.messageNumber; i++)
+        temp.append({res.history[i].senderID, res.history[i].senderName,
+                     res.history[i].time, res.history[i].content});
+    manager->setMsg(groupID_dialog, temp);
 
-    QVector<Msg> msgList = manager->getMsg(groupID);
+    QVector<Msg> msgList = manager->getMsg(groupID_dialog);
 
     for(int i = 0; i < chat_w.length(); i++)
     {
-        if (chat_w[i]->groupid == groupID)
+        if (chat_w[i]->groupid == groupID_dialog)
         {
             chat_w[i]->loadMessageHis(msgList, usrID);
             chat_w[i]->show();
-            break;
+            return;
         }
     }
 
     ChatWindow *temp_w = new ChatWindow(this->main_w);
     connect(temp_w, SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
-    temp_w->groupid = groupID;
+    connect(temp_w, SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
+    temp_w->groupid = groupID_dialog;
     // todo 显示对方信息
     temp_w->show();
     chat_w.append(temp_w);
@@ -491,45 +447,19 @@ void Client::slot_groupReq(int groupID, QString text)
     msg.text[text.length()] = 0;
 
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_REPLY, 0};
-
-    if (!waiting(info)) {
-        qDebug() << "fail to send request.";
-        return;
-    }
-
-    S2C::Response* res = (S2C::Response*)info.data;
-    if (res->success == true) {
+void Client::getGroupReq(S2C::Response& res)
+{
+    if (res.success == true) {
         // 发送成功
-        QMessageBox::information(this->more_func, tr("success"), tr(res->text), QMessageBox::Yes);
+        QMessageBox::information(this->more_func, tr("success"), tr(res.text), QMessageBox::Yes);
     } else {
         // 发送失败
-        QMessageBox::information(this->more_func, tr("success"), tr(res->text), QMessageBox::Yes);
+        QMessageBox::information(this->more_func, tr("success"), tr(res.text), QMessageBox::Yes);
     }
-
-    delete res;
 }
 
-bool Client::waiting(SocketMsg& msg)
-{
-    time_t begin = 0, now = 0;
-    time(&begin);
-
-    while (now - begin <= 20) {
-        auto m = s->getResponse();
-        if (m.type != 0) {
-            qDebug() << m.type;
-        }
-        if (m.type == msg.type) {
-            msg = m;
-            return true;
-        }
-        time(&now);
-
-    }
-    return false;
-}
 
 void Client::execute()
 {
@@ -554,55 +484,48 @@ void Client::execute()
     }
 }
 
-QVector<S2C::NewFriendInfo> Client::waitingFriends()
+void Client::slot_waitingFriends()
 {
     C2S::WaitingFriends msg;
     msg.userID = usrID;
-    msg.type = C2S::MSG_JOIN;
+    msg.type = C2S::MSG_WAITINNG_FRIEND;
     time(&msg.sendTime);
 
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_WAITING_FRIEND, 0};
-    QVector<S2C::NewFriendInfo> list;
-
-    if (!waiting(info)) {
-        qDebug() << "fail to get list.";
-        return list;
+void Client::getWaitingFriends(S2C::NewFriendWaiting& res)
+{
+    for (int i = 0; i < res.size; i++) {
+        waitingFriends.append(res.friends[i]);
+        newFriend(res.friends[i].personID,
+                  res.friends[i].personName, res.friends[i].text);
     }
 
-    S2C::NewFriendWaiting* res = (S2C::NewFriendWaiting*)info.data;
-    for (int i = 0; i < res->size; i++)
-        list.append(res->friends[i]);
-
-    delete res;
-    return list;
+    slot_offlineMessage();
 }
 
 
-QVector<S2C::NewJoinInfo> Client::waitingGroups()
+void Client::slot_waitingGroups()
 {
     C2S::WaitingGroups msg;
     msg.userID = usrID;
-    msg.type = C2S::MSG_JOIN;
+    msg.type = C2S::MSG_WAITINNG_GROUP;
     time(&msg.sendTime);
 
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_WAITING_FRIEND, 0};
-    QVector<S2C::NewJoinInfo> list;
 
-    if (!waiting(info)) {
-        qDebug() << "fail to get list.";
-        return list;
+void Client::getWaitingGroups(S2C::NewJoinWaiting& res)
+{
+    for (int i = 0; i < res.size; i++) {
+        waitingGroups.append(res.members[i]);
+        newJoin(res.members[i].senderID, res.members[i].senderName,
+                res.members[i].groupID, res.members[i].text);
     }
 
-    S2C::NewJoinWaiting* res = (S2C::NewJoinWaiting*)info.data;
-    for (int i = 0; i < res->size; i++)
-        list.append(res->members[i]);
-
-    delete res;
-    return list;
+    slot_waitingFriends();
 }
 
 void Client::newFriend(int senderID, QString name, QString text)
@@ -612,13 +535,7 @@ void Client::newFriend(int senderID, QString name, QString text)
     connect(ac, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
     ac->setUi(0, senderID, name, text);
     ac->show(); 
-    /*
-     * 待完成
-     */
-    // senderID, groupID = 0
-
 }
-
 
 void Client::newJoin(int senderID, QString name, int groupID, QString text)
 {
@@ -639,6 +556,7 @@ void Client::newText(int groupID)
         {
            QVector<Msg> temp_msgs = manager->getMsg(groupID);
            chat_w[i]->loadMessageHis(temp_msgs, usrID);
+           return;
         }
     }
 
@@ -648,14 +566,12 @@ void Client::newText(int groupID)
         if(this->main_w->items[i].group_id == groupID)
         {
             this->main_w->items[i].setItemLoad();
-            //todo add interface
+            return;
         }
     }
-
-
 }
 
-QVector<S2C::NewMesList> Client::getOfflineMessage()
+void Client::slot_offlineMessage()
 {
     C2S::Time msg;
     msg.userID = usrID;
@@ -663,19 +579,15 @@ QVector<S2C::NewMesList> Client::getOfflineMessage()
     time(&msg.sendTime);
 
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_LATEST_MSG_TIME, 0};
-    QVector<S2C::NewMesList> list;
-
-    if (!waiting(info)) {
-        qDebug() << "fail to get list.";
-        return list;
+void Client::getOfflineMessage(S2C::Time& res)
+{
+    for (int i = 0; i < res.size; i++) {
+        waitingText.append(res.group[i]);
+        if (res.group[i].ifnew)
+            newText(res.group[i].groupID);
     }
+    init_flag = false;
 
-    S2C::Time* res = (S2C::Time*)info.data;
-    for (int i = 0; i < res->size; i++)
-        list.append(res->group[i]);
-
-    delete res;
-    return list;
 }

@@ -34,6 +34,7 @@ public:
 private slots:
     void slot_register(QString name, QString password);
     void slot_login(int usrID, QString password, bool save);
+
     void slot_logout();
 
     void slot_dialog(int groupID);
@@ -48,6 +49,9 @@ private slots:
     // 下面两个函数会保存后台数据，不会刷新前台
     void slot_friendList();
     void slot_groupList();
+    void slot_waitingFriends();
+    void slot_waitingGroups();
+    void slot_offlineMessage();
 
     //new
     void slot_to_register();
@@ -74,11 +78,13 @@ public:
 
     bool exit_flag = false;
     bool accept_flag;
+    bool init_flag = true;
+
+    QVector<S2C::NewJoinInfo> waitingGroups;
+    QVector<S2C::NewFriendInfo> waitingFriends;
+    QVector<S2C::NewMesList> waitingText;
 
     bool waiting(SocketMsg& msg);
-
-    QVector<S2C::NewFriendInfo> waitingFriends();
-    QVector<S2C::NewJoinInfo> waitingGroups();
 
     // 在线时，处理三类消息
     void newFriend(int senderID, QString name, QString text);
@@ -87,8 +93,22 @@ public:
 
     void requestfriendList();
     void requestgroupList();
-    void getRegister(S2C::Register msg);
-    QVector<S2C::NewMesList> getOfflineMessage();
+
+    void getRegister(S2C::Register& msg);
+    void getLogin(S2C::Response& res);
+    void getFriendReq(S2C::Response& res);
+    void getAcceptReq(S2C::Response& res);
+    void getNewGroup(S2C::Response& res);
+    void getFriendList(S2C::FriendList& res);
+    void getGroupList(S2C::GroupList& res);
+    void getDialog(S2C::Record& res);
+    void getGroupReq(S2C::Response& res);
+    void getWaitingFriends(S2C::NewFriendWaiting& res);
+    void getWaitingGroups(S2C::NewJoinWaiting& res);
+    void getOfflineMessage(S2C::Time& res);
+    void getText(S2C::Text& res);
+
+    void initMain();
 
 
     // 需要加入UI
