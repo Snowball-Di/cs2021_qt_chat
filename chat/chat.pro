@@ -16,23 +16,57 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    c2s.cpp \
+    acceptreq.cpp \
+    addnew.cpp \
+    listitem.cpp \
     main.cpp \
+    chatwindow.cpp \
+    friendlist.cpp \
+    logwindow.cpp  \
+    moredetail.cpp \
+    newgroup.cpp \
+    register.cpp \
+    usrmain.cpp \
+    chatmessagebox.cpp
+#    c2s.cpp \
 #    mytcpserver.cpp \
 #    qt_chat_sql.cpp \
-    s2c.cpp \
-    socket.cpp \
-    client.cpp
+#    s2c.cpp \
+#    socket.cpp \
+#    u2c.cpp
 
 HEADERS += \
-    c2s.h \
+    acceptreq.h \
+    addnew.h \
+    chatwindow.h \
+    friendlist.h \
+    listitem.h \
+    logwindow.h \
+    moredetail.h \
+    newgroup.h \
+    register.h \
+    usrmain.h   \
+    chatmessagebox.h
+#    c2s.h \
 #    mytcpserver.h \
 #    qt_chat_sql.h \
-    s2c.h \
-    socket.h \
-    client.h
+#    s2c.h \
+#    socket.h \
+#    u2c.h \
 
-FORMS +=
+FORMS += \
+    acceptreq.ui \
+    addnew.ui \
+    chatwindow.ui \
+    friendlist.ui \
+    logwindow.ui \
+    moredetail.ui \
+    newgroup.ui \
+    register.ui \
+    usrmain.ui
+
+RESOURCES += \
+    source\img.qrc
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>409</width>
-    <height>237</height>
+    <width>289</width>
+    <height>466</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>411</width>
+     <width>331</width>
      <height>51</height>
     </rect>
    </property>
@@ -31,9 +31,9 @@
    <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>80</x>
       <y>10</y>
-      <width>201</width>
+      <width>131</width>
       <height>23</height>
      </rect>
     </property>
@@ -48,32 +48,32 @@
      </rect>
     </property>
     <property name="text">
-     <string>...</string>
+     <string>返回</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>10</y>
+      <width>51</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>搜索</string>
     </property>
    </widget>
   </widget>
-  <widget class="QScrollArea" name="scrollArea">
+  <widget class="QListWidget" name="listWidget">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>44</y>
-     <width>411</width>
-     <height>201</height>
+     <y>50</y>
+     <width>291</width>
+     <height>421</height>
     </rect>
    </property>
-   <property name="widgetResizable">
-    <bool>true</bool>
-   </property>
-   <widget class="QWidget" name="scrollAreaWidgetContents">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>409</width>
-      <height>199</height>
-     </rect>
-    </property>
-   </widget>
   </widget>
  </widget>
  <resources/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LogWindow</class>
- <widget class="QDialog" name="LogWindow">
+ <class>Register</class>
+ <widget class="QDialog" name="Register">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -71,7 +71,7 @@ font-size:14px;
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QLineEdit" name="id">
+   <widget class="QLineEdit" name="name">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -89,7 +89,7 @@ border-radius:10px;
 font-style:MingLiU-ExtB;</string>
     </property>
     <property name="placeholderText">
-     <string>帐号id</string>
+     <string>用户名</string>
     </property>
     <property name="clearButtonEnabled">
      <bool>true</bool>
@@ -128,7 +128,7 @@ font-style:MingLiU-ExtB;</string>
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="login">
+   <widget class="QPushButton" name="cancel">
     <property name="geometry">
      <rect>
       <x>470</x>
@@ -141,30 +141,13 @@ font-style:MingLiU-ExtB;</string>
      <string notr="true">background-color: rgb(170, 170, 127);</string>
     </property>
     <property name="text">
-     <string>登录</string>
+     <string>取消</string>
     </property>
     <property name="iconSize">
      <size>
       <width>24</width>
       <height>24</height>
      </size>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBox">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>330</y>
-      <width>121</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">
-color: rgb(255, 255, 255);</string>
-    </property>
-    <property name="text">
-     <string>记住账号</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -192,7 +175,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QToolButton" name="mini">
     <property name="geometry">
      <rect>
-      <x>490</x>
+      <x>530</x>
       <y>20</y>
       <width>47</width>
       <height>21</height>
@@ -205,20 +188,7 @@ color: rgb(255, 255, 255);</string>
      <enum>Qt::NoArrow</enum>
     </property>
    </widget>
-   <widget class="QToolButton" name="shutdown">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>20</y>
-      <width>47</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>...</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="newid">
+   <widget class="QPushButton" name="handin">
     <property name="geometry">
      <rect>
       <x>350</x>
@@ -231,7 +201,7 @@ color: rgb(255, 255, 255);</string>
      <string notr="true">background-color: rgb(170, 170, 127);</string>
     </property>
     <property name="text">
-     <string>没有账号？</string>
+     <string>提交</string>
     </property>
     <property name="iconSize">
      <size>
@@ -241,13 +211,11 @@ color: rgb(255, 255, 255);</string>
     </property>
    </widget>
    <zorder>label</zorder>
-   <zorder>id</zorder>
-   <zorder>login</zorder>
-   <zorder>checkBox</zorder>
+   <zorder>name</zorder>
+   <zorder>cancel</zorder>
    <zorder>password</zorder>
    <zorder>mini</zorder>
-   <zorder>shutdown</zorder>
-   <zorder>newid</zorder>
+   <zorder>handin</zorder>
   </widget>
  </widget>
  <resources>
@@ -257,27 +225,11 @@ color: rgb(255, 255, 255);</string>
   <connection>
    <sender>mini</sender>
    <signal>clicked()</signal>
-   <receiver>LogWindow</receiver>
+   <receiver>Register</receiver>
    <slot>showMinimized()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>503</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>292</x>
-     <y>213</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>shutdown</sender>
-   <signal>clicked()</signal>
-   <receiver>LogWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>553</x>
      <y>20</y>
     </hint>
     <hint type="destinationlabel">
