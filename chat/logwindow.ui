@@ -270,22 +270,6 @@ color: rgb(255, 255, 255);</string>
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>shutdown</sender>
-   <signal>clicked()</signal>
-   <receiver>LogWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>553</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>292</x>
-     <y>213</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>on_login_clicked()</slot>

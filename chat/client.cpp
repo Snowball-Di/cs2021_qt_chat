@@ -5,18 +5,20 @@ Client* Client::client = nullptr;
 
 Client::Client(QObject *parent) : QObject(parent)
 {
-
+    log_w = new LogWindow();
+    main_w = new UsrMain();
+    regis = new Register();
     connect(main_w, SIGNAL(signal_dialog(int)), this, SLOT(slot_dialog(int)));
-    // connect(main_w, SIGNAL(signal_func()), this, SLOT(slot_func()));
+    connect(main_w, SIGNAL(signal_func()), this, SLOT(slot_func()));
     connect(main_w, SIGNAL(signal_logout()), this, SLOT(slot_logout()));
     connect(main_w, SIGNAL(signal_friendList()), this, SLOT(slot_friendList()));
     connect(main_w, SIGNAL(signal_groupList()), this, SLOT(slot_groupList()));
 
     connect(regis, SIGNAL(signal_register(QString, QString)), this, SLOT(slot_register(QString, QString)));
-    // connect(regis, SIGNAL(signal_cancel()), this, SLOT(slot_cancel()));
+    connect(regis, SIGNAL(signal_cancel()), this, SLOT(slot_cancel()));
 
     connect(log_w, SIGNAL(signal_login(int, QString, bool)), this, SLOT(slot_login(int, QString, bool)));
-    // connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
+    connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
 
     for (int i = 0; i < 10; i++)
         connect(chat_w[i], SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
@@ -29,7 +31,7 @@ Client::Client(QObject *parent) : QObject(parent)
      * 待完成
      */
     int lastId = Manager::getLastID();
-    log_w = new LogWindow();
+
     if(lastId != 0)
         log_w->setUi(lastId, false);
 
@@ -87,8 +89,6 @@ void Client::slot_register(QString name, QString password)
 
     S2C::Response* res = (S2C::Response*)info.data;
 
-    //mock
-    res->success = true;
 
 
     if (res->success == true) {
@@ -134,8 +134,6 @@ void Client::slot_login(int usrID, QString password, bool save)
 
     S2C::Response* res = (S2C::Response*)info.data;
 
-    //mock
-    res->success = true;
 
     if (res->success == true) {
         // 登录成功
@@ -157,17 +155,18 @@ void Client::slot_login(int usrID, QString password, bool save)
                 newText(i.groupID);
          }
 
-        //mock
-         Friend fri[5];
-         fri[0].name = "Max";
-         fri[2].name = "Max2341234";
-         fri[1].name = "Max21";
-         fri[3].name = "我是呆瓜";
-         fri[4].name = "另一个呆瓜";
+//        //mock
+//         QVector<Friend> fri(5);
+//         fri[0].name = "Max";
+//         fri[2].name = "Max2341234";
+//         fri[1].name = "Max21";
+//         fri[3].name = "我是呆瓜";
+//         fri[4].name = "另一个呆瓜";
 
-        main_w = new UsrMain(this->cli_ui);
+
         main_w->load_friendlist(friendList);
         main_w->show();
+        log_w->close();
 
         qDebug() << "login success: " << res->success;
         qDebug() << "user's name：" << res->text;
@@ -205,9 +204,7 @@ void Client::slot_send(int groupID, QString text)
     S2C::Response* res = (S2C::Response*)info.data;
     if (res->success == true) {
         // 发送成功
-        /*
-         * 待完成
-         */
+
 
     } else {
         // 发送失败
@@ -244,14 +241,10 @@ void Client::slot_friendReq(int friendID, QString verifyText)
     S2C::Response* res = (S2C::Response*)info.data;
     if (res->success == true) {
         // 发送成功
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->more_func, tr("success"), tr(res->text), QMessageBox::Yes);
     } else {
         // 发送失败
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->more_func, tr("success"), tr(res->text), QMessageBox::Yes);
     }
 
     delete res;
@@ -318,17 +311,11 @@ void Client::slot_newGroup(QString groupName)
     if (res->success == true) {
         // 发送成功
         requestgroupList();
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->more_func, tr("success"), tr(res->text), QMessageBox::Yes);
     } else {
         // 发送失败
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->more_func, tr("fail"), tr(res->text), QMessageBox::Yes);
     }
-
-
 
     delete res;
 }
@@ -468,14 +455,10 @@ void Client::slot_groupReq(int groupID, QString text)
     S2C::Response* res = (S2C::Response*)info.data;
     if (res->success == true) {
         // 发送成功
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->more_func, tr("success"), tr(res->text), QMessageBox::Yes);
     } else {
         // 发送失败
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->more_func, tr("success"), tr(res->text), QMessageBox::Yes);
     }
 
     delete res;

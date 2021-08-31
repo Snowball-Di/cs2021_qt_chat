@@ -21,6 +21,7 @@ public:
 signals:
     void signal_login(int, QString, bool); //请求登录
     void signal_to_register(); //跳转注册页面
+    void signal_shutdown();
 
 protected:
     
@@ -31,6 +32,7 @@ protected:
 private slots:
     void on_login_clicked();
     void on_newid_clicked();
+    void on_shutdown_clicked();
 
 private:
     Ui::LogWindow *ui;

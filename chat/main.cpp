@@ -20,6 +20,6 @@ int main(int argc, char *argv[])
     // qDebug() << m->getGroups()[0].name;
 
     Client* client = Client::client_init();
-    client->execute();
+//    client->execute();
     return a.exec();
 }

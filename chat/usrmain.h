@@ -56,6 +56,9 @@ private:
     Ui::UsrMain *ui;
     QPoint p;
     Ui::Moredetail* more;
+    int Usrid;
+    int Name;
+    int pic;
     bool showfriend; // 0:显示好友列表, 1显示群组列表
     listItem* items; //item数组
     int len; //item长度
