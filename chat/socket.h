@@ -37,8 +37,6 @@ public:
     // 如果没有消息，返回的对象type和data均为0
     SocketMsg nextPendingMessage();
 
-    void connectToHost();
-
     // 关闭套接字
     void close() { s->close(); };
 

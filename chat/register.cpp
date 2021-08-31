@@ -68,6 +68,7 @@ void Register::on_handin_clicked()
     {
         QString name = ui->name->text();
         QString pw = ui->password->text();
+        this->clearInfo();
         emit this->signal_register(name, pw);
     }
 }
