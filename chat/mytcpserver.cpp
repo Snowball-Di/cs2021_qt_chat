@@ -26,14 +26,15 @@ void MyTcpServer::slot_creatNewConnection(){
 //    qDebug()<<"there are "<<onlineList.count()<<"user online !";
 }
 void MyTcpServer::slot_readyread(){
-    connect(tcp_socket0,SIGNAL(sig_readdata(tcp_socket0)),this,SLOT(slot_readdata(tcp_socket0)));
+    connect(this,SIGNAL(sig_readdata(QTcpSocket*)),this,SLOT(slot_readdata(QTcpSocket*)));
     qDebug()<<"ready read.";
+    emit(sig_readdata(tcp_socket0));
 }
 void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
     qDebug()<<"read data";
     QByteArray databyte = tcp_socket->readAll();
     char* data=databyte.data();
-    qDebug()<<databyte;
+    //qDebug()<<databyte;
     int *mestype=(int*) data;
 
     Qt_chat_sql* server2db=Qt_chat_sql::getHand();
@@ -44,9 +45,12 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         C2S::Register mes = *(C2S::Register*) (data);
         QString usrName;QString password;
         usrName = mes.name;
+        qDebug()<<"name:"<<usrName;
         password = mes.password;
+        qDebug()<<"password:"<<password;
         //注册到数据库中，分配usrID
         int usrID = server2db->Register(usrName,password);
+        qDebug()<<"usrID:"<<usrID;
         qDebug()<<"MSG_REGISTER:"<<"usrID:"<<usrID;
         bool dbreply;
         if(usrID==0)
@@ -74,11 +78,12 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
     case C2S::MSG_LOG://登录、登出
         {qDebug()<<"MSG_LOG";
         C2S::Log mes = *(C2S::Log*) (data);
+        qDebug()<<"mes.operation"<<mes.operation;
         if(mes.operation==1)//Log in
         {   struct USER_INFO userinfo;
             bool dbreply = server2db->login(mes.id,mes.password,userinfo);
             clientList.insert(mes.id,tcp_socket);
-
+            qDebug()<<userinfo.userID<<userinfo.userName<<userinfo.password;
             S2C::Response reply2client;
             reply2client.type = S2C::SERVER_REPLY;
             reply2client.success = dbreply;
@@ -96,6 +101,8 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         }
         else//Log out
         {
+            bool dbreply = server2db->Logout(mes.id,mes.sendTime);
+            qDebug()<<dbreply;
             tcp_socket = NULL;
         }
         break;}
@@ -106,10 +113,14 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         MESSAGE todb;
         todb.groupID = mes.groupID;
         todb.senderID = mes.senderID;
-        todb.time = QDateTime::fromTime_t(mes.sendTime);
+        todb.time = mes.sendTime;
         todb.type = ".txt";
         todb.content = mes.text;
+        qDebug()<<mes.sendTime<<todb.time;
+        qDebug()<<mes.groupID;
+        qDebug()<<todb.groupID<<todb.senderID<<todb.content;
         bool dbreply = server2db->newMsg(todb);
+        qDebug()<<dbreply;
 
         //回复发送方发送成功
         S2C::Response reply2client2;
@@ -118,17 +129,18 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         memset(reply2client2.text,0,sizeof(reply2client2.text));
         if(dbreply)//写入database成功
         {
-            char temp[100]="Message has send";
+            char temp[60]="Message has send";
             qDebug()<<"MSG_TEXT:"<<"Reply to sender:"<<"Message has send.";
             memcpy(reply2client2.text,temp,sizeof(temp));
         }
         else//写入database失败
         {   qDebug()<<"MSG_TEXT:"<<"Reply to sender:"<<"Message has not send.";
-            char temp[100]="Message has not send";
+            char temp[60]="Message has not send";
             memcpy(reply2client2.text,temp,sizeof(temp));
         }
         tcp_socket->write((char*)&reply2client2, sizeof(reply2client2));
 
+        qDebug()<<mes.groupID;
         //给接收的群组发消息
         if(dbreply)
         {
@@ -138,10 +150,17 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
             reply2client.groupID = mes.groupID;
             reply2client.sendTime = mes.sendTime;
             memcpy(reply2client.text,mes.text,sizeof(mes.text));
-            int groupmemberid[100];//一个群最多100人
-            int groupcount = server2db->groupMembers(mes.groupID,groupmemberid);
-            if(groupcount>1)
+            GROUP_INFO groupinfo;
+            bool dbreply2 = server2db->getGroup_info(mes.groupID,groupinfo);
+            qDebug()<<mes.groupID;
+            qDebug()<<dbreply2<<groupinfo.groupID<<groupinfo.friendID;
+
+            if(groupinfo.type==1)//要区分好友和群,1是群
             {
+                int groupmemberid[100];//一个群最多100人
+                int groupcount = server2db->groupMembers(mes.groupID,groupmemberid);
+                qDebug()<<mes.groupID<<groupmemberid;
+                qDebug()<<groupcount;
                 for(int i=0;i<groupcount;i++)//遍历群成员
                 {   if(reply2client.senderID!=groupmemberid[i])//跳过发送方本人
                     {   QHash<int,QTcpSocket*>::iterator iter;
@@ -157,6 +176,19 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
                     }
                 }
             }
+            else if(groupinfo.type==0){
+                int friendID = groupinfo.friendID;
+                QHash<int,QTcpSocket*>::iterator iter;
+                iter = clientList.find(friendID);
+                if(iter!=clientList.end()&&iter.value()!=NULL)//在线
+                {   tcp_socket = iter.value();
+                    tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+                }
+                else//离线,不在这里发消息，请求消息列表时再给
+                {
+
+                }
+            }
         }
         else
             qDebug()<<"MEG_TEXT didn't write in database.";
@@ -166,6 +198,7 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         C2S::Request mes = *(C2S::Request*) (data);
         if(mes.add)//添加好友
         {
+            qDebug()<<mes.senderID<<mes.text;
             bool dbreply;
             //向B发送待确认新好友信息
             S2C::NewFriend reply2client2;
@@ -178,11 +211,15 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
 //            std::string str=sender_infoList->userName.toStdString();
             QString senderName;
             senderName = server2db->getUserName(mes.senderID);
+            qDebug()<<senderName;
             std::string str=senderName.toStdString();
             const char* cstr=str.c_str();
-            memset(reply2client2.senderName,0,sizeof(30));
+            memset(reply2client2.senderName,0,30*sizeof(char));
             memcpy(reply2client2.senderName,cstr,str.length());
+            memset(reply2client2.text,0,50*sizeof(char));
             memcpy(reply2client2.text,mes.text,sizeof(mes.text));
+
+            qDebug()<<reply2client2.type<<reply2client2.senderID<<reply2client2.senderName<<reply2client2.text;
 
             QHash<int,QTcpSocket*>::iterator iter;
             iter = clientList.find(mes.targetID);
@@ -225,16 +262,22 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         reply2client2.type = S2C::SERVER_REPLY;
         reply2client.success = mes.accept;
         reply2client2.success = mes.accept;
+        qDebug()<<mes.senderID<<mes.targetID;
         if(mes.kind)//好友申请
         {
-            server2db->deleteFriendrequest(mes.senderID,mes.targetID);
+            bool dbreply = server2db->deleteFriendrequest(mes.senderID,mes.targetID);
+            qDebug()<<dbreply;
             if(mes.accept)
             {
+                qDebug()<<"Friend request accepted.";
                 char temp[60]="Friend request accepted.";
                 memcpy(reply2client.text,temp,sizeof(temp));
                 memcpy(reply2client2.text,temp,sizeof(temp));
                 //建立2人对话型群组
-                int groupid = server2db->newGroup(0,(QString)mes.targetID,mes.senderID);
+                QString qstr = QString::number(mes.targetID);
+                qDebug()<<qstr<<mes.senderID;
+                int groupid = server2db->newGroup(0,qstr,mes.senderID);
+                qDebug()<<groupid;
             }
             else
             {
@@ -275,7 +318,9 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         if(mes.newGroup)//建群
         {
             //写入database
+            qDebug()<<mes.name<<mes.userID;
             int groupID = server2db->newGroup(1,mes.name,mes.userID);
+            qDebug()<<groupID;
             //回复建群成功
             S2C::NewGroup reply2client;
             reply2client.type = S2C::SERVER_NEWGROUP;
@@ -294,6 +339,8 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         if(mes.join)//加群
         {
             int masterID = server2db->getgroupOwner(mes.targetID); //根据groupID找到群主ID
+            qDebug()<<mes.targetID<<masterID;
+
             QHash<int,QTcpSocket*>::iterator iter;
             iter = clientList.find(masterID);
             QTcpSocket* tcp_socket2 = iter.value();
@@ -310,6 +357,7 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
 //                std::string str=sender_infoList->userName.toStdString();
                 QString senderName;
                 senderName = server2db->getUserName(mes.senderID);
+                qDebug()<<mes.senderID<<senderName;
                 std::string str=senderName.toStdString();
                 const char* cstr=str.c_str();
                 memset(reply2master.senderName,0,sizeof(30));
@@ -337,12 +385,16 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
 
         }
         break;}
+
+
+
     case C2S::MSG_FRIENDLIST:
     {qDebug()<<"MSG_FRIENDLIST";
     C2S::FriendList mes = *(C2S::FriendList*)data;
     FRIEND_LIST friendList[20];
     int dbreply;
     dbreply = server2db->getFriendList(mes.userID,friendList);
+    qDebug()<<dbreply<<mes.userID<<friendList[0].groupID<<friendList[0].friendID;
     S2C::FriendList reply2client;
     reply2client.type = S2C::SERVER_FRIENDLIST;
     if(dbreply>=0&&dbreply<=20)
@@ -361,10 +413,12 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         {reply2client.friends[j].groupID = friendList[i].groupID;
         reply2client.friends[j].personID = friendList[i].friendID;
         QString friendName = server2db->getUserName(friendList[i].friendID);
+        qDebug()<<friendName;
         std::string str=friendName.toStdString();
         const char* cstr=str.c_str();
-        memset(reply2client.friends[j].personName,0,sizeof(30));
+        memset(reply2client.friends[j].personName,0,30*sizeof(char));
         memcpy(reply2client.friends[j].personName,cstr,str.length());
+        qDebug()<<reply2client.friends[j].personName;
         j++;}
     }
     for(;j<20;j++)
@@ -399,10 +453,12 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         if(groupList[i].friendID==0)//friendID==0是群组，不是好友
         {reply2client.groups[j].groupID = groupList[i].groupID;
         QString groupName = server2db->getGroupName(groupList[i].groupID);
+        qDebug()<<groupName;
         std::string str=groupName.toStdString();
         const char* cstr=str.c_str();
-        memset(reply2client.groups[j].groupName,0,sizeof(30));
+        memset(reply2client.groups[j].groupName,0,30*sizeof(char));
         memcpy(reply2client.groups[j].groupName,cstr,str.length());
+        qDebug()<<reply2client.groups[j].groupName;
         j++;}
     }
     for(;j<20;j++)
@@ -420,6 +476,8 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
     int dbreply;
     FRIEND_REQUEST frdrequest[20];
     dbreply = server2db->getFriendrequest(mes.userID,frdrequest);
+    qDebug()<<mes.userID<<frdrequest[0].senderID<<frdrequest[0].recieverID<<frdrequest[0].content;
+    qDebug()<<dbreply;
 
     S2C::NewFriendWaiting reply2client;
     reply2client.type = S2C::SERVER_WAITING_FRIEND;
@@ -436,9 +494,10 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
     for(int i=0;i<dbreply;i++){
         reply2client.friends[i].personID = frdrequest[i].senderID;
         QString friendName = server2db->getUserName(frdrequest[i].senderID);
+        qDebug()<<frdrequest[i].senderID<<friendName;
         std::string str=friendName.toStdString();
         const char* cstr=str.c_str();
-        memset(reply2client.friends[i].personName,0,sizeof(30));
+        memset(reply2client.friends[i].personName,0,30*sizeof(char));
         memcpy(reply2client.friends[i].personName,cstr,str.length());
         QString friendIntro = frdrequest[i].content;
         std::string str2=friendIntro.toStdString();
@@ -455,7 +514,10 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
     C2S::WaitingGroups mes = *(C2S::WaitingGroups*)data;
     int dbreply;
     GROUP_REQUEST grprequest[20];
+    qDebug()<<mes.userID;
     dbreply = server2db->getGrouprequest(mes.userID,grprequest);
+    qDebug()<<mes.userID<<grprequest[0].senderID<<grprequest[0].groupID<<grprequest[0].content;
+    qDebug()<<dbreply;
 
     S2C::NewJoinWaiting reply2client;
     reply2client.type = S2C::SERVER_WAITING_GROUP;
@@ -472,10 +534,11 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
     for(int i=0;i<dbreply;i++){
         reply2client.members[i].senderID = grprequest[i].senderID;
         reply2client.members[i].groupID = grprequest[i].groupID;
-        QString friendName = server2db->getGroupName(grprequest[i].senderID);
+        qDebug()<<grprequest[i].groupID;
+        QString friendName = server2db->getGroupName(grprequest[i].groupID);
         std::string str=friendName.toStdString();
         const char* cstr=str.c_str();
-        memset(reply2client.members[i].senderName,0,sizeof(30));
+        memset(reply2client.members[i].senderName,0,30*sizeof(char));
         memcpy(reply2client.members[i].senderName,cstr,str.length());
         QString friendIntro = grprequest[i].content;
         std::string str2=friendIntro.toStdString();
@@ -495,8 +558,9 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
     reply2client.type = S2C::SERVER_TEXTRECORD;
     int dbreply;
     MESSAGE messagelist[10];
-    QDateTime time = QDateTime::fromTime_t(mes.sendTime);
+    long long int time = mes.sendTime;
     dbreply = server2db->get_history(10,mes.groupID,messagelist,time);
+    qDebug()<<dbreply<<messagelist[0].content;
     if(dbreply>0)
     {
         reply2client.success = true;
@@ -504,11 +568,13 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
         int i=0;
         for(;i<dbreply;i++)
         {
-            reply2client.history[i].time = messagelist[i].time.toTime_t();
+//            reply2client.history[i].time = messagelist[i].time.toTime_t();
+            reply2client.history[i].time = messagelist[i].time;
             reply2client.history[i].senderID = messagelist[i].senderID;
             QString senderName = server2db->getUserName(messagelist[i].senderID);
             qstring2char(reply2client.history[i].senderName,senderName,30*sizeof(char));
             qstring2char(reply2client.history[i].content,messagelist[i].content,100*sizeof(char));
+            qDebug()<<reply2client.history[i].senderName<<reply2client.history[i].content;
         }
     }
     else
@@ -527,13 +593,17 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
     int dbreply;
     FRIEND_LIST frgrlist[20];
     //QDateTime time = QDateTime::fromTime_t(mes.sendTime);
+    qDebug()<<mes.userID;
     dbreply = server2db->getFriendList(mes.userID,frgrlist);
+    qDebug()<<dbreply;
     if(dbreply>0)
     {
         reply2client.success = true;
-        QStringList groupIDList;
+//        QStringList groupIDList;
+        GROUP_INFO groupinfo;
+        bool dbreply2;
         for(int i=0;i<dbreply;i++)
-        {
+        {   qDebug()<<i<<frgrlist[i].groupID<<frgrlist[i].friendID;
             if(frgrlist[i].friendID==0)
             {
                 reply2client.group[i].isfriend=false;
@@ -543,18 +613,28 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
                 reply2client.group[i].isfriend=true;
             }
             reply2client.group[i].groupID = frgrlist[i].groupID;
-            groupIDList.append((QString)frgrlist[i].groupID);
-        }
-        //QDateTime reqTime = QDateTime::fromTime_t(mes.reqTime);
-        int groupNum;
-        GROUP_INFO groupinfo[20];
-        groupNum = server2db->getGroup_info(groupIDList,groupinfo);
-        for(int i=0;i<dbreply;i++){
-            if((uint)mes.reqTime<groupinfo->time.toTime_t())
+            dbreply2 = server2db->getGroup_info(frgrlist[i].groupID,groupinfo);
+            qDebug()<<dbreply2;
+            qDebug()<<mes.userID;
+            time_t logouttime = server2db->getLogoutTime(mes.userID);
+            qDebug()<<logouttime<<groupinfo.time;
+            if(logouttime<groupinfo.time)
             {
                 reply2client.group[i].ifnew=true;
+                qDebug()<<i<<reply2client.group[i].ifnew;
             }
+//            groupIDList.append((QString)frgrlist[i].groupID);
         }
+//        //QDateTime reqTime = QDateTime::fromTime_t(mes.reqTime);
+//        int groupNum;
+//        GROUP_INFO groupinfo[20];
+//        groupNum = server2db->getGroup_info(groupIDList,groupinfo);
+//        for(int i=0;i<dbreply;i++){
+//            if((uint)mes.reqTime<groupinfo->time.toTime_t())
+//            {
+//                reply2client.group[i].ifnew=true;
+//            }
+//        }
     }
     else
     {
