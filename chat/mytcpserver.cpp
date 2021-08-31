@@ -485,6 +485,91 @@ void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
     }
     tcp_socket->write((char*)&reply2client, sizeof(reply2client));
     break;}
+
+
+
+    case C2S::MSG_RECORD:
+    {qDebug()<<"MSG_RECORD";
+    C2S::Record mes = *(C2S::Record*)data;
+    S2C::Record reply2client;
+    reply2client.type = S2C::SERVER_TEXTRECORD;
+    int dbreply;
+    MESSAGE messagelist[10];
+    QDateTime time = QDateTime::fromTime_t(mes.sendTime);
+    dbreply = server2db->get_history(10,mes.groupID,messagelist,time);
+    if(dbreply>0)
+    {
+        reply2client.success = true;
+        reply2client.messageNumber = dbreply;
+        int i=0;
+        for(;i<dbreply;i++)
+        {
+            reply2client.history[i].time = messagelist[i].time.toTime_t();
+            reply2client.history[i].senderID = messagelist[i].senderID;
+            QString senderName = server2db->getUserName(messagelist[i].senderID);
+            qstring2char(reply2client.history[i].senderName,senderName,30*sizeof(char));
+            qstring2char(reply2client.history[i].content,messagelist[i].content,100*sizeof(char));
+        }
+    }
+    else
+    {
+        reply2client.success = false;
+    }
+    tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+    break;}
+
+
+    case C2S::MSG_TIME:
+    {qDebug()<<"MSG_TIME";
+    C2S::Time mes = *(C2S::Time*)data;
+    S2C::Time reply2client;
+    reply2client.type = S2C::SERVER_LATEST_MSG_TIME;
+    int dbreply;
+    FRIEND_LIST frgrlist[20];
+    //QDateTime time = QDateTime::fromTime_t(mes.sendTime);
+    dbreply = server2db->getFriendList(mes.userID,frgrlist);
+    if(dbreply>0)
+    {
+        reply2client.success = true;
+        QStringList groupIDList;
+        for(int i=0;i<dbreply;i++)
+        {
+            if(frgrlist[i].friendID==0)
+            {
+                reply2client.group[i].isfriend=false;
+            }
+            else
+            {
+                reply2client.group[i].isfriend=true;
+            }
+            reply2client.group[i].groupID = frgrlist[i].groupID;
+            groupIDList.append((QString)frgrlist[i].groupID);
+        }
+        //QDateTime reqTime = QDateTime::fromTime_t(mes.reqTime);
+        int groupNum;
+        GROUP_INFO groupinfo[20];
+        groupNum = server2db->getGroup_info(groupIDList,groupinfo);
+        for(int i=0;i<dbreply;i++){
+            if((uint)mes.reqTime<groupinfo->time.toTime_t())
+            {
+                reply2client.group[i].ifnew=true;
+            }
+        }
+    }
+    else
+    {
+        reply2client.success = false;
+    }
+    tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+
+    break;}
     }
 }
 
+void qstring2char(char* ans,QString& qstr,int size)
+{
+    std::string str=qstr.toStdString();
+    const char* cstr=str.c_str();
+    memset(ans,0,size);
+    memcpy(ans,cstr,str.length());
+}
