@@ -54,6 +54,7 @@ private slots:
     void slot_func();
 
 signals:
+    void signal_newMessage(QVector<int> groupID);
 
 private:
 
@@ -76,12 +77,13 @@ private:
     QVector<S2C::NewJoinInfo> waitingGroups();
 
     // 在线时，处理三类消息
-    void newFriend(SocketMsg &msg);
-    void newJoin(SocketMsg &msg);
-    void newText(SocketMsg &msg);
+    void newFriend(int senderID, QString name, QString text);
+    void newJoin(int senderID, QString name, int groupID, QString text);
+    void newText(int groupID);
 
     void requestfriendList();
     void requestgroupList();
+    QVector<S2C::NewMesList> getOfflineMessage();
 
 
     // 需要加入UI
