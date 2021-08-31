@@ -29,10 +29,8 @@ Client::Client(QObject *parent) : QObject(parent)
      */
     int lastId = Manager::getLastID();
     log_w = new LogWindow();
-    if(lastId == 0)
+    if(lastId != 0)
         log_w->setUi(lastId, false);
-    else
-        log_w->setUi(lastId, true);
 
 
 
@@ -48,6 +46,25 @@ Client* Client::client_init()
     return client;
 }
 
+void Client::slot_to_register()
+{
+    log_w->hide();
+    regis->show();
+}
+
+void Client::slot_cancel()
+{
+    regis->close();
+    log_w->show();
+}
+
+void Client::slot_func()
+{
+    more_func = new Moredetail(this->cli_ui);
+    QString name = usrName;
+    int usr_id = usrID;
+    more_func->setUser(name, QString(usr_id), QPixmap(":/img/img/log_icon.png"));
+}
 
 void Client::slot_register(QString name, QString password)
 {
@@ -68,21 +85,28 @@ void Client::slot_register(QString name, QString password)
     }
 
     S2C::Response* res = (S2C::Response*)info.data;
+
+    //mock
+    res->success = true;
+
+
     if (res->success == true) {
         // 注册成功
         QString usrID = res->text;  // 获取ID字符串
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->cli_ui, tr("账号信息"), QString("您的帐号为：")+usrID, QMessageBox::Yes);
+        log_w->setUi(usrID.toInt(), false);
+        regis->close();
+        log_w->show();
+        qDebug() << "register success.";
+        qDebug() << "注册ID：" << res->text;
     } else {
         // 注册失败
-        /*
-         * 待完成
-         */
+       QMessageBox::information(this->cli_ui, tr("注册失败"), QString("请重试！")+usrID, QMessageBox::Yes);
+       qDebug() << "register fail.";
+       qDebug() << "注册ID：" << res->text;
     }
 
-    qDebug() << "register success.";
-    qDebug() << "注册ID：" << res->text;
+
 
     delete res;
 }
@@ -109,6 +133,9 @@ void Client::slot_login(int usrID, QString password, bool save)
 
     S2C::Response* res = (S2C::Response*)info.data;
 
+    //mock
+    res->success = true;
+
     if (res->success == true) {
         // 登录成功
         manager = Manager::getManager(usrID, save);     // 文件管理器
@@ -116,21 +143,28 @@ void Client::slot_login(int usrID, QString password, bool save)
         auto waiting_friends = waitingFriends();
         requestfriendList();
         auto friendList = manager->getFriends();
-        // 显示waiting_groups/friends
-        /*
-         * 待完成
-         */
+
+        //mock
+         Friend fri[5];
+         fri[0].name = "Max";
+         fri[2].name = "Max2341234";
+         fri[1].name = "Max21";
+         fri[3].name = "我是呆瓜";
+         fri[4].name = "另一个呆瓜";
+
 
         main_w = new UsrMain(this->cli_ui);
         main_w->load_friendlist(friendList);
+        main_w->show();
 
-
+        qDebug() << "login success: " << res->success;
+        qDebug() << "user's name：" << res->text;
     } else {
         QMessageBox::information(this->cli_ui, tr("提示"), tr("帐号或密码不正确，请检查"), QMessageBox::Yes);
+        qDebug() << "login fail: " << res->success;
+        qDebug() << "user's name：" << res->text;
     }
 
-    qDebug() << "login success: " << res->success;
-    qDebug() << "user's name：" << res->text;
     this->usrID = usrID;
     this->usrName = res->text;
     delete res;
@@ -162,6 +196,7 @@ void Client::slot_send(int groupID, QString text)
         /*
          * 待完成
          */
+
     } else {
         // 发送失败
         /*
@@ -369,6 +404,22 @@ void Client::slot_logout()
 
 void Client::slot_dialog(int groupID)
 {
+    C2S::Record msg;
+    msg.type = C2S::MSG_RECORD;
+    msg.groupID = groupID;
+    msg.messageNumber = 10;
+    time(&msg.sendTime);
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_TEXTRECORD_GROUP, 0};
+
+    if (!waiting(info)) {
+        qDebug() << "fail to get friend list.";
+        return;
+    }
+
+    S2C::GroupList* res = (S2C::GroupList*)info.data;
+
     QVector<Msg> msg = manager->getMsg(groupID);
     // 构建聊天框
     /*
@@ -535,3 +586,4 @@ void Client::newText(SocketMsg &msg)
      * 待完成
      */
 }
+
