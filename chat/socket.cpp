@@ -3,135 +3,69 @@
 
 Socket* Socket::socket = nullptr;
 
-Socket::Socket(const int _usrID) : usrID(_usrID)
+Socket::Socket(QObject *parent) : QObject(parent)
 {
-    this->setSocketDescriptor(_usrID);
-    connect(this, &Socket::disconnected, this, SLOT(disconnectHandler()));
-    connect(this, &Socket::readyRead, this, SLOT(serverMessageHandler()));
+    s = new QTcpSocket(this);
+    connect(s, SIGNAL(disconnected()), this, SLOT(disconnectHandler()));
+    connect(s, SIGNAL(readyRead()), this, SLOT(serverMessageHandler()));
+    s->connectToHost(QHostAddress::LocalHost, 5566);
 }
 
-Socket* Socket::getSocket(const int _usrID)
+Socket* Socket::getSocket()
 {
     if (socket == nullptr) {
-        socket = new Socket(_usrID);
-        if (_usrID != 0)
-            socket = new Socket(_usrID);
+        socket = new Socket();
+        qDebug() << "connect to server!";
     }
 
     return socket;
 }
 
-bool Socket::sendMessage(C2S::Message* msg)
+
+bool Socket::sendMessage(char* msg, int size)
 {
-    bool send_flag = 0, timeout_flag = 0;
+    qint64 length = s->write(msg, size);
+//    qDebug() << "send: " << length<<msg;
+//    waiting = true;
 
-    switch (msg->type())
-    {
-    case C2S::MSG_REQUEST  :
-        send_flag = send(msg, sizeof(C2S::Request));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_TEXT     :
-        send_flag = send(msg, sizeof(C2S::Text));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_DOC      :
-        send_flag = send(msg, sizeof(C2S::Doc));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_LOG      :
-        connectToHost(QHostAddress::LocalHost, 5566);
-        Sleep(500);
-        send_flag = send(msg, sizeof(C2S::Log));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_GROUP    :
-        send_flag = send(msg, sizeof(C2S::Group));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_JOIN     :
-        send_flag = send(msg, sizeof(C2S::Join));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_PROFILE  :
-        send_flag = send(msg, sizeof(C2S::Profile));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_REGISTER :
-        send_flag = send(msg, sizeof(C2S::Register));
-        if (send_flag)
-            timeout_flag = waitFor();
-        break;
-
-    case C2S::MSG_ACCEPT   :
-        send_flag = send(msg, sizeof(C2S::Accept));
-        if (send_flag)
-            timeout_flag = waitFor();
-
-        break;
-    }
-
-    return send_flag && timeout_flag;
+//    return length != -1;
+    QString mes = "QWERTYU";
+    qDebug()<<s->write(mes.toLatin1());
+    return 1;
 }
-
-bool Socket::send(C2S::Message* msg, size_t size)
-{
-
-    if (write((char *)msg, size) == -1)
-        return false;
-    emit clientMessage();
-    return true;
-}
-
-
-bool Socket::waitFor()
-{
-    wait_flag = true;
-    Sleep(7000);    // 等待7秒
-    if (wait_flag == true) {
-        /*
-         * 登录失败处理
-         */
-        qDebug() << "No response.";
-        wait_flag = false;
-        return false;
-    }
-    return true;
-}
-
 
 void Socket::serverMessageHandler()
 {
-    QByteArray array = readAll();
-    S2C::Type *msg
-            = (S2C::Type*)&array;
+    bool local_waiting = waiting;
 
-    switch (msg->type()) {
-    case S2C::SERVER_JOINOK:
+    char *data = new char[1024];
+    memcpy(data, s->readAll().data(), 1024);
+    int* type = (int*)data;
+    qDebug() << "get msg from server.";
 
-            break;
-
-    case S2C::SERVER_REPLY_JOIN:
-
-            break;
+    if (local_waiting) {
+        waiting = false;
+        responseFromServer = {*type, data};
+    } else {
+        serverMsgs.enqueue({*type, data});
     }
-
 }
 
+SocketMsg Socket::getResponse()
+{
+    auto temp = responseFromServer;
+    responseFromServer.data = 0;
+    return temp;
+}
+
+
+SocketMsg Socket::nextPendingMessage()
+{
+    if (serverMsgs.empty())
+        return {0, 0};
+
+    return serverMsgs.dequeue();
+}
 
 void Socket::disconnectHandler()
 {

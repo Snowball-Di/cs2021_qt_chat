@@ -8,6 +8,8 @@
 #include <QHostInfo>
 #include "c2s.h"
 #include "s2c.h"
+#include "qt_chat_sql.h"
+#include <cstring>
 
 class MyTcpServer : public QObject
 {
@@ -26,31 +28,14 @@ private:
     QTcpServer tcp_server;
     QTcpSocket* tcp_socket;
     //QList<QTcpSocket*> clientList;
-    QHash <int,QTcpSocket> clientList;
-
-    QString password,target,groupName;
+    QHash <int,QTcpSocket*> clientList;
     QString IP,port;
-    int usr,usr1,usr2,sender,groupID;
 private slots:
     void slot_creatNewConnection();
     void slot_readdata();
 
-//    void slot_login(int usr,QString password);
-//    void slot_logout(int usr);
-//    void slot_new_msg(int sender,int groupID);
-//    void slot_register(int usr,QString password);
-//    void slot_friendRequest(int usr, QString target);
-//    void slot_acceptFriend(int sender);
-//    void slot_deleteFriend(int sender);
-//    void slot_deleteFriend(int usr1, int usr2);
-//    void slot_newGroup(int usr, QString groupName);
-//    void slot_join(int usr, int groupID);
-//    void slot_deleteGroup(int usr, int groupID);
-//    void slot_setName(int usr, QString name);
-//    void slot_setAvatar(int usr);
-//    void slot_setGroupName(int usr, int groupID, QString groupName);
 signals:
-
+    void serverMessage();
 };
 
 #endif // MYTCPSERVER_H
