@@ -5,6 +5,7 @@ Client* Client::client = nullptr;
 
 Client::Client(QObject *parent) : QObject(parent)
 {
+
     connect(main_w, SIGNAL(signal_dialog(int)), this, SLOT(slot_dialog(int)));
     // connect(main_w, SIGNAL(signal_func()), this, SLOT(slot_func()));
     connect(main_w, SIGNAL(signal_logout()), this, SLOT(slot_logout()));
@@ -256,41 +257,40 @@ void Client::slot_friendReq(int friendID, QString verifyText)
     delete res;
 }
 
-void Client::slot_acceptReq(bool accept)
+void Client::slot_acceptReq(int senderID, int groupID, bool accept)
 {
-    accept_flag = accept;
-//    C2S::Accept msg;
-//    msg.senderID = targetID;
-//    msg.targetID = usrID;
-//    msg.type = C2S::MSG_ACCEPT;
-//    msg.kind = isFriend;
-//    msg.accept = accept;
-//    time(&msg.sendTime);
+    C2S::Accept msg;
+    msg.senderID = senderID;
+    msg.targetID = (groupID == 0)? usrID : groupID;
+    msg.type = C2S::MSG_ACCEPT;
+    msg.kind = (groupID == 0);
+    msg.accept = accept;
+    time(&msg.sendTime);
 
-//    s->sendMessage((char *)&msg, sizeof(msg));
+    s->sendMessage((char *)&msg, sizeof(msg));
 
-//    SocketMsg info = {S2C::SERVER_REPLY, 0};
+    SocketMsg info = {S2C::SERVER_REPLY, 0};
 
-//    if (!waiting(info)) {
-//        qDebug() << "fail to accept.";
-//        return;
-//    }
+    if (!waiting(info)) {
+        qDebug() << "fail to accept.";
+        return;
+    }
 
-//    S2C::Response* res = (S2C::Response*)info.data;
-//    if (res->success == true) {
-//        // 发送成功
-//        requestfriendList();
-//        /*
-//         * 待完成
-//         */
-//    } else {
-//        // 发送失败
-//        /*
-//         * 待完成
-//         */
-//    }
+    S2C::Response* res = (S2C::Response*)info.data;
+    if (res->success == true) {
+        requestfriendList();
+        // reload friend list
+        /*
+         * 待完成
+         */
+    } else {
+        // 发送失败
+        /*
+         * 待完成
+         */
+    }
 
-//    delete res;
+    delete res;
 }
 
 void Client::slot_newGroup(QString groupName)
@@ -577,11 +577,43 @@ QVector<S2C::NewJoinInfo> Client::waitingGroups()
 
 void Client::newFriend(int senderID, QString name, QString text)
 {
-    S2C::NewFriend* res = (S2C::NewFriend*)msg.data;
     // 显示
     /*
      * 待完成
      */
+    // senderID, groupID = 0
+    C2S::Accept msg;
+    msg.senderID = targetID;
+    msg.targetID = usrID;
+    msg.type = C2S::MSG_ACCEPT;
+    msg.kind = isFriend;
+    msg.accept = accept;
+    time(&msg.sendTime);
+
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_REPLY, 0};
+
+    if (!waiting(info)) {
+        qDebug() << "fail to accept.";
+        return;
+    }
+
+    S2C::Response* res = (S2C::Response*)info.data;
+    if (res->success == true) {
+        // 发送成功
+        requestfriendList();
+        /*
+         * 待完成
+         */
+    } else {
+        // 发送失败
+        /*
+         * 待完成
+         */
+    }
+
+    delete res;
 }
 
 
@@ -591,6 +623,7 @@ void Client::newJoin(int senderID, QString name, int groupID, QString text)
     /*
      * 待完成
      */
+    // senderID, groupID != 0
 }
 
 

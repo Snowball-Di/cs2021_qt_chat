@@ -42,7 +42,7 @@ private slots:
 
     void slot_newGroup(QString groupName);
     void slot_groupReq(int groupID, QString text);
-    void slot_acceptReq(bool accept);
+    void slot_acceptReq(int senderID, int groupID, bool accept);
 
     // 下面两个函数会保存后台数据，不会刷新前台
     void slot_friendList();
@@ -53,8 +53,8 @@ private slots:
     void slot_cancel();
     void slot_func();
 
-signals:
-    void signal_newMessage(QVector<int> groupID);
+//signals:
+//    void signal_newMessage(QVector<int> groupID);
 
 private:
 
