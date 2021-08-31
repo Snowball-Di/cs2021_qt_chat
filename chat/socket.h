@@ -31,9 +31,6 @@ public:
     // 向服务器发送消息
     bool sendMessage(char* msg, int length);
 
-    // 从消息队列取出一条消息
-    bool getNextMessage();  /* to be completed. */
-
     // 发送请求后，通过该函数获取反馈消息
     // 如果暂时没有消息，返回的对象type和data均为0
     SocketMsg getResponse();

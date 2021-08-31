@@ -25,13 +25,12 @@ Socket* Socket::getSocket()
 bool Socket::sendMessage(char* msg, int size)
 {
     qint64 length = s->write(msg, size);
-//    qDebug() << "send: " << length<<msg;
-//    waiting = true;
+    qDebug() << "send: " << length<<msg;
 
-//    return length != -1;
-    QString mes = "QWERTYU";
-    qDebug()<<s->write(mes.toLatin1());
-    return 1;
+    return length != -1;
+//    QString mes = "QWERTYU";
+//    qDebug()<<s->write(mes.toLatin1());
+//    return 1;
 }
 
 void Socket::serverMessageHandler()

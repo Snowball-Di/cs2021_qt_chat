@@ -304,6 +304,8 @@ void Client::slot_groupList()
     for (auto &i : res->groups) {
         temp.append({i.groupID, i.groupName});
     }
+
+
     manager->setGroups(temp);
 
     // UI更新群组列表
@@ -330,13 +332,49 @@ void Client::slot_logout()
 
 void Client::slot_dialog(int groupID)
 {
-    while (manager->isBusy());
+    QVector<Msg> msg = manager->getMsg(groupID);
+    // 构建聊天框
+    /*
+     * 待完成
+     */
 }
 
 
-void Client::slot_groupReq(int groupID)
+void Client::slot_groupReq(int groupID, QString text)
 {
+    C2S::Join msg;
+    msg.senderID = usrID;
+    msg.targetID = groupID;
+    msg.type = C2S::MSG_JOIN;
+    msg.join = true;
+    time(&msg.sendTime);
 
+    memcpy(msg.text, text.data(), text.length());
+    msg.text[text.length()] = 0;
+
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_REPLY, 0};
+
+    if (!waiting(info)) {
+        qDebug() << "fail to send request.";
+        return;
+    }
+
+    S2C::Response* res = (S2C::Response*)info.data;
+    if (res->success == true) {
+        // 发送成功
+        /*
+         * 待完成
+         */
+    } else {
+        // 发送失败
+        /*
+         * 待完成
+         */
+    }
+
+    delete[] info.data;
 }
 
 bool Client::waiting(SocketMsg& msg)
@@ -357,4 +395,23 @@ bool Client::waiting(SocketMsg& msg)
         Sleep(50);
     }
     return false;
+}
+
+void Client::execute()
+{
+    while (!exit_flag) {
+        SocketMsg m = s->nextPendingMessage();
+        if (m.type != 0) {
+            switch (m.type) {
+            case S2C::SERVER_NEWFRIEND :
+                break;
+            case S2C::SERVER_NEWGROUP:
+                break;
+            case S2C::SERVER_NEWJOIN:
+                break;
+            case S2C::SERVER_MSG_TEXT:
+
+            }
+        }
+    }
 }

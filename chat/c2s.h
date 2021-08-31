@@ -9,19 +9,21 @@ namespace C2S {
 /*
  * 消息种类列表
  */
-const int     MSG_REQUEST     =     0x01;
-const int     MSG_TEXT        =     0x02;
-const int     MSG_DOC         =     0x03;
-const int     MSG_LOG         =     0x04;
-const int     MSG_GROUP       =     0x05;
-const int     MSG_JOIN        =     0x06;
-const int     MSG_PROFILE     =     0x07;
-const int     MSG_REGISTER    =     0x08;
-const int     MSG_FRIENDLIST  =     0x09;
-const int     MSG_GROUPLIST   =     0x0A;
-const int     MSG_TIME        =     0x0B;
-const int     MSG_RECORD      =     0x0C;
-const int     MSG_ACCEPT      =     0x0D;
+const int     MSG_REQUEST           =     0x01;
+const int     MSG_TEXT              =     0x02;
+const int     MSG_DOC               =     0x03;
+const int     MSG_LOG               =     0x04;
+const int     MSG_GROUP             =     0x05;
+const int     MSG_JOIN              =     0x06;
+const int     MSG_PROFILE           =     0x07;
+const int     MSG_REGISTER          =     0x08;
+const int     MSG_FRIENDLIST        =     0x09;
+const int     MSG_GROUPLIST         =     0x0A;
+const int     MSG_TIME              =     0x0B;
+const int     MSG_RECORD            =     0x0C;
+const int     MSG_ACCEPT            =     0x0D;
+const int     MSG_WAITINNG_FRIEND   =     0x0E;
+const int     MSG_WAITINNG_GROUP    =     0x0F;
 
 
 /*
@@ -139,7 +141,7 @@ struct Join
     int targetID;
     time_t sendTime;
     bool join;
-    QString _text;
+    char text[30];
 };
 
 /*
@@ -181,6 +183,27 @@ struct Record
     int type;
     int groupID;
     int messageNumber;  // 请求消息数量, 不超过10条
+    time_t sendTime;
+};
+
+
+/*
+ * 请求等待验证的好友申请
+ */
+struct WaitingFriends
+{
+    int type;
+    int userID;
+    time_t sendTime;
+};
+
+/*
+ * 请求等待验证的群组申请
+ */
+struct WaitingGroups
+{
+    int type;
+    int userID;
     time_t sendTime;
 };
 

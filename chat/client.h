@@ -16,6 +16,8 @@ class Client : public QObject
 public:
     static Client* client_init();
 
+    void execute();
+
 private slots:
     void slot_register(QString name, QString password);
     void slot_login(int usrID, QString password, bool save);
@@ -27,7 +29,7 @@ private slots:
     void slot_friendReq(int friendID, QString verifyText);
 
     void slot_newGroup(QString groupName);
-    void slot_groupReq(int groupID);
+    void slot_groupReq(int groupID, QString text);
     void slot_acceptReq(int targetID, bool accept, bool isFriend);
 
     void slot_friendList();
@@ -45,11 +47,10 @@ private:
     Socket* s;
     Manager* manager;
 
-    int usrID;
+    int usrID = 0;
     QString usrName;
 
     bool exit_flag = false;
-
 
     bool waiting(SocketMsg& msg);
 
