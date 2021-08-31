@@ -2,6 +2,7 @@
 #include <windows.h>
 
 Client* Client::client = nullptr;
+static int sign = 0;
 
 Client::Client(QObject *parent) : QObject(parent)
 {
@@ -74,45 +75,47 @@ void Client::slot_serverHandler(SocketMsg msg)
     if (msg.type == S2C::SERVER_REPLY_REGISTER) {
         getRegister(*(S2C::Register *)msg.data);
     } else if (msg.type == S2C::SERVER_REPLY) {
-
-    } else if (msg.type == S2C::SERVER_REPLY_REGISTER) {
-
-    }
-    else if (msg.type == S2C::SERVER_NEWFRIEND) {
-
-    }
-    else if (msg.type == S2C::SERVER_NEWGROUP) {
-
+        auto k = *(S2C::Response *)msg.data;
+        switch (sign) {
+        case 1:
+            getLogin(k);break;
+        case 2:
+            getFriendReq(k);break;
+        case 3:
+            getAcceptReq(k);break;
+        case 4:
+            getNewGroup(k);break;
+        case 5:
+            getGroupReq(k);break;
+        }
+    } else if (msg.type == S2C::SERVER_NEWFRIEND) {
+        auto k = *(S2C::NewFriend *)msg.data;
+        newFriend(k.senderID, k.senderName, k.text);
     }
     else if (msg.type == S2C::SERVER_NEWJOIN) {
-
-    }
-    else if (msg.type == S2C::SERVER_JOINOK) {
-
+        auto k = *(S2C::NewJoin *)msg.data;
+        newJoin(k.senderID, k.senderName, k.groupID, k.text);
     }
     else if (msg.type == S2C::SERVER_MSG_TEXT) {
-        getText(*(S2C::Text *)msg.data);
-    }
-    else if (msg.type == S2C::SERVER_MSG_DOC) {
-
+        getText(*(S2C::Text*)msg.data);
     }
     else if (msg.type == S2C::SERVER_FRIENDLIST) {
-
+        getFriendList(*(S2C::FriendList*)msg.data);
     }
     else if (msg.type == S2C::SERVER_GROUPLIST) {
-
+        getGroupList(*(S2C::GroupList*)msg.data);
     }
     else if (msg.type == S2C::SERVER_TEXTRECORD) {
-
+        getDialog(*(S2C::Record*)msg.data);
     }
     else if (msg.type == S2C::SERVER_WAITING_FRIEND) {
-
+        getWaitingFriends(*(S2C::NewFriendWaiting*)msg.data);
     }
     else if (msg.type == S2C::SERVER_WAITING_GROUP) {
-
+        getWaitingGroups(*(S2C::NewJoinWaiting*)msg.data);
     }
     else if (msg.type == S2C::SERVER_LATEST_MSG_TIME) {
-
+        getOfflineMessage(*(S2C::Time*)msg.data);
     }
 }
 
@@ -166,6 +169,7 @@ void Client::slot_login(int usrID, QString password, bool save)
 
     this->usrID = usrID;
     s->sendMessage((char *)&msg, sizeof(msg));
+    sign = 1;
 }
 
 
@@ -237,6 +241,7 @@ void Client::slot_friendReq(int friendID, QString verifyText)
     msg.text[verifyText.length()] = 0;
 
     s->sendMessage((char *)&msg, sizeof(msg));
+    sign = 2;
 }
 
 void Client::getFriendReq(S2C::Response& res)
@@ -261,6 +266,7 @@ void Client::slot_acceptReq(int senderID, int groupID, bool accept)
     time(&msg.sendTime);
 
     s->sendMessage((char *)&msg, sizeof(msg));
+    sign = 3;
 }
 
 void Client::getAcceptReq(S2C::Response& res)
@@ -290,6 +296,7 @@ void Client::slot_newGroup(QString groupName)
     msg.name[groupName.length()] = 0;
 
     s->sendMessage((char *)&msg, sizeof(msg));
+    sign = 4;
 }
 
 void Client::getNewGroup(S2C::Response& res)
@@ -448,6 +455,7 @@ void Client::slot_groupReq(int groupID, QString text)
     msg.text[text.length()] = 0;
 
     s->sendMessage((char *)&msg, sizeof(msg));
+    sign = 5;
 }
 
 void Client::getGroupReq(S2C::Response& res)
