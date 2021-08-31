@@ -13,13 +13,18 @@ class listItem :public QWidget
 {
     Q_OBJECT
 public:
-    explicit listItem(QWidget *parent = nullptr);
+    explicit listItem(QWidget *parent = nullptr, int groupid = 0, int friid = 0);
 
     enum List_Type
     {
         Friend,
         Group
     };
+
+    QString d_name; //会话对象名字
+    QPixmap d_pic; //会话对象头像
+    int group_id; //会话对象标识号码
+    int fri_id;
 
     inline QString name() {return d_name;};
 
@@ -29,15 +34,15 @@ public:
     QSize getRealString(QString src);
     QSize fontRect(QString str);
 
-    inline int get_dialog_id(){return this->d_id;};
+    inline int get_dialog_id(){return this->group_id;};
+
+    void setItemLoad();
 
 protected:
     void paintEvent(QPaintEvent *event); 
 
 private:
-    QString d_name; //会话对象名字
-    QPixmap d_pic; //会话对象头像
-    int d_id; //会话对象标识号码
+
 
     bool d_loaded = false; //是否得到响应
     List_Type d_type; // 默认为用户会话

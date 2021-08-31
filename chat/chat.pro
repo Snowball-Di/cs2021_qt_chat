@@ -26,7 +26,9 @@ SOURCES += \
     logwindow.cpp  \
     mainwindow.cpp \
     moredetail.cpp \
+    newfrireq.cpp \
     newgroup.cpp \
+    newingroup.cpp \
     register.cpp \
     usrmain.cpp \
     chatmessagebox.cpp \
@@ -48,7 +50,9 @@ HEADERS += \
     logwindow.h \
     mainwindow.h \
     moredetail.h \
+    newfrireq.h \
     newgroup.h \
+    newingroup.h \
     register.h \
     usrmain.h   \
     chatmessagebox.h \
@@ -69,7 +73,9 @@ FORMS += \
     logwindow.ui \
     mainwindow.ui \
     moredetail.ui \
+    newfrireq.ui \
     newgroup.ui \
+    newingroup.ui \
     register.ui \
     usrmain.ui
 

@@ -14,15 +14,20 @@ class ChatWindow : public QDialog
     Q_OBJECT
 
 public:
+
+    int groupid;
+    int friendid;
+
     explicit ChatWindow(QWidget *parent = 0);
     ~ChatWindow();
 
     void loadMessageHis(QVector<Msg>&, int);
-    void me_sendingMsg(QString text);
+    void she_sendingMsg(QString text, time_t time);
 
     void dealMessage(chatmessagebox *messageW, QListWidgetItem *item, QString text, time_t time, chatmessagebox::Text_Type type);
     void dealMessageTime(time_t curMsgTime);
 
+    void setUi(QString name, QString id);
 
 signals:
     void signal_send(int, QString);

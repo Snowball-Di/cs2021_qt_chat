@@ -157,6 +157,7 @@ struct NewMesList{
 struct Time{
     int type;
     bool success;
+    int size;
     NewMesList group[20];
 };//各个群是否有新消息，ifnew[i]=true时有新消息
 

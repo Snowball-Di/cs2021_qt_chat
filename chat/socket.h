@@ -15,8 +15,6 @@ struct SocketMsg
     char *data;
 };
 
-
-
 /*
  * 此类继承自QTcpSocket，提供了标识自身的功能
  */
@@ -27,7 +25,7 @@ public:
 
     // 通过该函数获取单例
     static Socket* getSocket();
-
+    void connectToHost();
     // 向服务器发送消息
     bool sendMessage(char* msg, int length);
 
@@ -39,18 +37,20 @@ public:
     // 如果没有消息，返回的对象type和data均为0
     SocketMsg nextPendingMessage();
 
+    void connectToHost();
+
     // 关闭套接字
     void close() { s->close(); };
 
 signals:
-    void serverMessage(/* class */);
+    void serverMessage(SocketMsg msg);
 
 
 private slots:
     void serverMessageHandler();
     void disconnectHandler();
 
-private:
+public:
     explicit Socket(QObject *parent=nullptr);
 
     static Socket* socket;

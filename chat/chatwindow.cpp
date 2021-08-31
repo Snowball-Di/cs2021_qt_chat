@@ -24,7 +24,7 @@ void ChatWindow::on_send_clicked()
     ui->textEdit->clear();
     time_t time = QDateTime::currentDateTime().toTime_t(); //时间戳
 
-    emit this->signal_send(123123, msg);
+    emit this->signal_send(this->groupid, msg);
 
     bool isSending = true; // 发送中
 
@@ -97,6 +97,7 @@ void ChatWindow::dealMessageTime(time_t curMsgTime)
 
 void ChatWindow::loadMessageHis(QVector<Msg>&list, int usrid)
 {
+    this->ui->listWidget->clear();
     for(int i = 0; i< list.length(); i++)
     {
         if(list[i].senderID != usrid)
@@ -114,7 +115,10 @@ void ChatWindow::loadMessageHis(QVector<Msg>&list, int usrid)
     }
 }
 
-void ChatWindow::me_sendingMsg(QString text)
+void ChatWindow::she_sendingMsg(QString text, time_t time)
 {
-
+    dealMessageTime(time);
+    chatmessagebox* messageW = new chatmessagebox(ui->listWidget->parentWidget());
+    QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
+    dealMessage(messageW, item, text, time, chatmessagebox::User_She);
 }

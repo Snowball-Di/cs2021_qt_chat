@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>acceptReq</class>
- <widget class="QDialog" name="acceptReq">
+ <class>newinGroup</class>
+ <widget class="QDialog" name="newinGroup">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -16,7 +16,7 @@
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
-     <x>-1</x>
+     <x>0</x>
      <y>0</y>
      <width>401</width>
      <height>301</height>
@@ -28,107 +28,78 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QPushButton" name="accept">
+   <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>260</y>
-      <width>93</width>
-      <height>28</height>
+      <x>60</x>
+      <y>60</y>
+      <width>71</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>接受</string>
+     <string>萌新编号</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="refuse">
+   <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>260</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>拒绝</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="pic">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
+      <x>60</x>
       <y>10</y>
-      <width>101</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Box</enum>
-    </property>
-    <property name="text">
-     <string>头像</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="type">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>140</y>
-      <width>111</width>
-      <height>51</height>
+      <width>321</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>请求类型</string>
+     <string>您的群有新成员加入啦！</string>
     </property>
    </widget>
-   <widget class="QLabel" name="id">
+   <widget class="QLabel" name="senderid">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>30</y>
+      <x>150</x>
+      <y>60</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>100</y>
       <width>68</width>
-      <height>15</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>对方帐号</string>
+     <string>萌新昵称</string>
     </property>
    </widget>
    <widget class="QLabel" name="sendername">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>60</y>
+      <x>150</x>
+      <y>90</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>140</y>
       <width>68</width>
       <height>15</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>对方名字</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="text">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>110</y>
-      <width>171</width>
-      <height>111</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>验证信息</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="grouplabel">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>190</y>
-      <width>41</width>
-      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -138,14 +109,53 @@
    <widget class="QLabel" name="groupid">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>190</y>
+      <x>150</x>
+      <y>130</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>170</y>
       <width>68</width>
       <height>15</height>
      </rect>
     </property>
     <property name="text">
+     <string>群名称</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="groupname">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>160</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
      <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="know">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>260</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>确定</string>
     </property>
    </widget>
   </widget>

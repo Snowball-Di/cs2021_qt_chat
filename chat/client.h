@@ -15,6 +15,9 @@
 #include "acceptreq.h"
 #include "client_ui.h"
 #include <QMessageBox>
+#include "newfrireq.h"
+#include "newingroup.h"
+#include "acceptreq.h"
 
 /*
  * 客户端类
@@ -29,8 +32,6 @@ public:
     void execute();
 
 private slots:
-
-
     void slot_register(QString name, QString password);
     void slot_login(int usrID, QString password, bool save);
     void slot_logout();
@@ -42,7 +43,7 @@ private slots:
 
     void slot_newGroup(QString groupName);
     void slot_groupReq(int groupID, QString text);
-    void slot_acceptReq(bool accept);
+    void slot_acceptReq(int senderID, int groupID, bool accept);
 
     // 下面两个函数会保存后台数据，不会刷新前台
     void slot_friendList();
@@ -53,9 +54,13 @@ private slots:
     void slot_cancel();
     void slot_func();
 
-signals:
 
-private:
+    void slot_serverHandler(SocketMsg msg);
+
+//signals:
+//    void signal_newMessage(QVector<int> groupID);
+
+public:
 
     explicit Client(QObject *parent = nullptr);
 
@@ -76,22 +81,24 @@ private:
     QVector<S2C::NewJoinInfo> waitingGroups();
 
     // 在线时，处理三类消息
-    void newFriend(SocketMsg &msg);
-    void newJoin(SocketMsg &msg);
-    void newText(SocketMsg &msg);
+    void newFriend(int senderID, QString name, QString text);
+    void newJoin(int senderID, QString name, int groupID, QString text);
+    void newText(int groupID);
 
     void requestfriendList();
     void requestgroupList();
+    void getRegister(S2C::Register msg);
+    QVector<S2C::NewMesList> getOfflineMessage();
 
 
     // 需要加入UI
     LogWindow *log_w;
     Register *regis;
     UsrMain *main_w;
-    ChatWindow *chat_w[10];
-    acceptReq* acpt;
+    QVector<ChatWindow*> chat_w;
     Moredetail *more_func;
     client_ui *cli_ui = new client_ui;
+
 };
 
 #endif // CLIENT_H
