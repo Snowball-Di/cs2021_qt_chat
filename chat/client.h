@@ -47,8 +47,6 @@ private slots:
     void slot_groupList();
 
 
-
-
 signals:
 
 private:
@@ -78,6 +76,7 @@ private:
 
     void requestfriendList();
     void requestgroupList();
+
 
     // 需要加入UI
     LogWindow *log_w;

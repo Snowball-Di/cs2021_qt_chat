@@ -369,6 +369,22 @@ void Client::slot_logout()
 
 void Client::slot_dialog(int groupID)
 {
+    C2S::Record msg;
+    msg.type = C2S::MSG_RECORD;
+    msg.groupID = groupID;
+    msg.messageNumber = 10;
+    time(&msg.sendTime);
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_TEXTRECORD_GROUP, 0};
+
+    if (!waiting(info)) {
+        qDebug() << "fail to get friend list.";
+        return;
+    }
+
+    S2C::GroupList* res = (S2C::GroupList*)info.data;
+
     QVector<Msg> msg = manager->getMsg(groupID);
     // 构建聊天框
     /*
@@ -535,3 +551,4 @@ void Client::newText(SocketMsg &msg)
      * 待完成
      */
 }
+
