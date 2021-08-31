@@ -89,10 +89,10 @@ void addNew::on_send_clicked()
                 else
                    emit this->signal_groupReq(id, text);
 
-                QMessageBox::information(this, tr("提示"), tr("您已经提交成功"), QMessageBox::Yes);
-                this->id.clear();
-                this->text.clear();
-                this->close();
+//                QMessageBox::information(this, tr("提示"), tr("您已经提交成功"), QMessageBox::Yes);
+//                this->id.clear();
+//                this->text.clear();
+//                this->close();
             }
         }
 }

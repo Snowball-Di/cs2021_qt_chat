@@ -54,6 +54,10 @@ void LogWindow::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void LogWindow::on_shutdown_clicked(){
+    exit(EXIT_SUCCESS);
+}
+
 //初始化Ui框信息
 void LogWindow::setUi(int id, bool checked)
 {

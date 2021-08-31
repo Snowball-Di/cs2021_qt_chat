@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QDebug>
 
-listItem::listItem(QWidget *parent) :QWidget(parent)
+listItem::listItem(QWidget *parent, int groupid, int friid) :QWidget(parent), group_id(groupid), fri_id(friid);
 {
     //TODO 接入好友列表返回的头像
     d_pic = QPixmap(":/img/img/log_icon.png");
