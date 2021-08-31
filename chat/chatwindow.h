@@ -17,7 +17,7 @@ public:
     explicit ChatWindow(QWidget *parent = 0);
     ~ChatWindow();
 
-    void loadMessageHis(QVector<Msg>&);
+    void loadMessageHis(QVector<Msg>&, int);
     void addMessage(Msg& m);
 
     void dealMessage(chatmessagebox *messageW, QListWidgetItem *item, QString text, time_t time, chatmessagebox::Text_Type type);

@@ -9,6 +9,14 @@ Client::Client(QObject *parent) : QObject(parent)
     /*
      * 待完成
      */
+    int lastId = Manager::getLastID();
+    log_w = new LogWindow();
+    if(lastId == 0)
+        log_w->setUi(lastId, false);
+    else
+        log_w->setUi(lastId, true);
+
+    log_w->show();
 
     s = Socket::getSocket();
 }
@@ -87,15 +95,19 @@ void Client::slot_login(int usrID, QString password, bool save)
         manager = Manager::getManager(usrID, save);     // 文件管理器
         auto waiting_groups = waitingGroups();
         auto waiting_friends = waitingFriends();
+        requestfriendList();
+        auto friendList = manager->getFriends();
         // 显示waiting_groups/friends
         /*
          * 待完成
          */
+
+        main_w = new UsrMain(this->cli_ui);
+        main_w->load_friendlist(friendList);
+
+
     } else {
-        // 登陆失败
-        /*
-         * 待完成
-         */
+        QMessageBox::information(this->cli_ui, tr("提示"), tr("帐号或密码不正确，请检查"), QMessageBox::Yes);
     }
 
     qDebug() << "login success: " << res->success;
@@ -201,7 +213,7 @@ void Client::slot_acceptReq(int targetID, bool accept, bool isFriend)
     S2C::Response* res = (S2C::Response*)info.data;
     if (res->success == true) {
         // 发送成功
-        slot_friendList();
+        requestfriendList();
         /*
          * 待完成
          */
@@ -239,7 +251,7 @@ void Client::slot_newGroup(QString groupName)
 
     if (res->success == true) {
         // 发送成功
-        slot_groupList();
+        requestgroupList();
         /*
          * 待完成
          */
@@ -255,8 +267,19 @@ void Client::slot_newGroup(QString groupName)
     delete res;
 }
 
-
 void Client::slot_friendList()
+{
+    requestfriendList();
+    auto fl = manager->getFriends();
+}
+
+void Client::slot_groupList()
+{
+    requestgroupList();
+    auto gl = manager->getGroups();
+}
+
+void Client::requestfriendList()
 {
     C2S::FriendList msg;
     msg.type = C2S::MSG_FRIENDLIST;
@@ -283,7 +306,7 @@ void Client::slot_friendList()
     delete res;
 }
 
-void Client::slot_groupList()
+void Client::requestgroupList()
 {
     C2S::GroupList msg;
     msg.type = C2S::MSG_GROUPLIST;

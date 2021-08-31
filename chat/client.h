@@ -5,6 +5,16 @@
 #include "socket.h"
 #include "c2s.h"
 #include "manager.h"
+#include "logwindow.h"
+#include "register.h"
+#include "usrmain.h"
+#include "moredetail.h"
+#include "chatwindow.h"
+#include "newgroup.h"
+#include "listitem.h"
+#include "acceptreq.h"
+#include "client_ui.h"
+#include <QMessageBox>
 
 /*
  * 客户端类
@@ -36,8 +46,10 @@ private slots:
     void slot_friendList();
     void slot_groupList();
 
-signals:
 
+
+
+signals:
 
 private:
 
@@ -63,7 +75,17 @@ private:
     void newJoin(SocketMsg &msg);
     void newText(SocketMsg &msg);
 
+    void requestfriendList();
+    void requestgroupList();
+
     // 需要加入UI
+    LogWindow *log_w;
+    Register *regis;
+    UsrMain *main_w;
+    ChatWindow *chat_w[10];
+    acceptReq* acpt;
+    Moredetail *more_func;
+    client_ui *cli_ui = new client_ui;
 };
 
 #endif // CLIENT_H

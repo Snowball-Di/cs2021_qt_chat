@@ -57,12 +57,15 @@ void LogWindow::keyPressEvent(QKeyEvent *event)
 //初始化Ui框信息
 void LogWindow::setUi(int id, bool checked)
 {
-    QString str_id = QString(id);
-    this->ui->id->setText(str_id);
-    if(checked)
-        this->ui->checkBox->setCheckState(Qt::CheckState::Checked);
-    else
-        this->ui->checkBox->setCheckState(Qt::CheckState::Unchecked);
+    if(id != 0)
+    {
+        QString str_id = QString(id);
+        this->ui->id->setText(str_id);
+        if(checked)
+            this->ui->checkBox->setCheckState(Qt::CheckState::Checked);
+        else
+            this->ui->checkBox->setCheckState(Qt::CheckState::Unchecked);
+    }
 }
 
 // 登录行为
