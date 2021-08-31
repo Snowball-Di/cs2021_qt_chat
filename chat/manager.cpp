@@ -60,6 +60,7 @@ Manager::~Manager()
 
 QVector<Friend> Manager::getFriends()
 {
+    while (isBusy());
     busy = true;
     QVector<Friend> friends;
     Friend temp;
@@ -86,6 +87,7 @@ QVector<Friend> Manager::getFriends()
 
 QVector<Group> Manager::getGroups()
 {
+    while (isBusy());
     busy = true;
     QVector<Group> groups;
     Group temp;
@@ -110,6 +112,7 @@ QVector<Group> Manager::getGroups()
 
 void Manager::setFriends(QVector<Friend> &friends)
 {
+    while (isBusy());
     busy = true;
     QString s;
     char temp[100];
@@ -128,6 +131,7 @@ void Manager::setFriends(QVector<Friend> &friends)
 
 void Manager::setGroups(QVector<Group> &groups)
 {
+    while (isBusy());
     busy = true;
     QString s;
     for (auto &g : groups) {
@@ -143,6 +147,7 @@ void Manager::setGroups(QVector<Group> &groups)
 
 QVector<Msg> Manager::getMsg(int groupID)
 {
+    while (isBusy());
     busy = true;
     QString str = QString("%1").arg(groupID);
     QFile f(root + "/record/" + str);
@@ -174,6 +179,7 @@ QVector<Msg> Manager::getMsg(int groupID)
 
 void Manager::setMsg(int groupID, QVector<Msg>& messages)
 {
+    while (isBusy());
     busy = true;
     QString str = QString("%1").arg(groupID);
     QFile f(root + "/record/" + str);

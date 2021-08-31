@@ -33,7 +33,6 @@ SOURCES += \
     qt_chat_sql.cpp \
     s2c.cpp \
     socket.cpp \
-    u2c.cpp \
     manager.cpp \
     client.cpp
 
@@ -54,7 +53,6 @@ HEADERS += \
     qt_chat_sql.h \
     s2c.h \
     socket.h \
-    u2c.h \
     manager.h \
     client.h
 

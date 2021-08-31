@@ -16,6 +16,8 @@ class Client : public QObject
 public:
     static Client* client_init();
 
+    void execute();
+
 private slots:
     void slot_register(QString name, QString password);
     void slot_login(int usrID, QString password, bool save);
@@ -27,9 +29,10 @@ private slots:
     void slot_friendReq(int friendID, QString verifyText);
 
     void slot_newGroup(QString groupName);
-    void slot_groupReq(int groupID);
+    void slot_groupReq(int groupID, QString text);
     void slot_acceptReq(int targetID, bool accept, bool isFriend);
 
+    // 下面两个函数会保存后台数据，不会刷新前台
     void slot_friendList();
     void slot_groupList();
 
@@ -45,14 +48,20 @@ private:
     Socket* s;
     Manager* manager;
 
-    int usrID;
+    int usrID = 0;
     QString usrName;
 
     bool exit_flag = false;
 
-
     bool waiting(SocketMsg& msg);
 
+    QVector<S2C::NewFriendInfo> waitingFriends();
+    QVector<S2C::NewJoinInfo> waitingGroups();
+
+    // 在线时，处理三类消息
+    void newFriend(SocketMsg &msg);
+    void newJoin(SocketMsg &msg);
+    void newText(SocketMsg &msg);
 
     // 需要加入UI
 };
