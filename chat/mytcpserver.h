@@ -40,4 +40,6 @@ signals:
     void sig_readdata(QTcpSocket* tcp_socket);
 };
 
+void qstring2char(char*,QString&,int);
+
 #endif // MYTCPSERVER_H

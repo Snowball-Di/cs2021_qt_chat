@@ -148,13 +148,18 @@ struct NewJoinWaiting
 };
 
 /*message record*/
+struct NewMesList{
+    int groupID;
+    bool isfriend;
+    bool ifnew;
+};
+
 struct Time{
     int type;
     bool success;
-    int groupID;
-    bool isfriend;
-    bool ifnew[20];
-};//各个群的最新消息事件
+    int size;
+    NewMesList group[20];
+};//各个群是否有新消息，ifnew[i]=true时有新消息
 
 struct Message{
     time_t time;

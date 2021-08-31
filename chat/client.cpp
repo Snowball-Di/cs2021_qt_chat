@@ -142,6 +142,18 @@ void Client::slot_login(int usrID, QString password, bool save)
         auto waiting_friends = waitingFriends();
         requestfriendList();
         auto friendList = manager->getFriends();
+        auto msgs = getOfflineMessage();
+
+         for (auto &i : waiting_groups)
+            newJoin(i.senderID, i.senderName, i.groupID, i.text);
+
+         for (auto &i : waiting_friends)
+            newFriend(i.personID, i.personName, i.text);
+
+         for (auto &i : msgs) {
+             if (i.ifnew)
+                newText(i.groupID);
+         }
 
 //        //mock
 //         QVector<Friend> fri(5);
@@ -150,7 +162,6 @@ void Client::slot_login(int usrID, QString password, bool save)
 //         fri[1].name = "Max21";
 //         fri[3].name = "我是呆瓜";
 //         fri[4].name = "另一个呆瓜";
-
 
 
         main_w->load_friendlist(friendList);
@@ -406,9 +417,14 @@ void Client::slot_dialog(int groupID)
         return;
     }
 
-    S2C::GroupList* res = (S2C::GroupList*)info.data;
+    S2C::Record* res = (S2C::Record*)info.data;
+    QVector<Msg> temp;
+    for (int i = 0; i < res->messageNumber; i++)
+        temp.append({res->history[i].senderID, res->history[i].senderName,
+                     res->history[i].time, res->history[i].content});
+    manager->setMsg(groupID, temp);
 
-    QVector<Msg> msgs = manager->getMsg(groupID);
+    QVector<Msg> msgList = manager->getMsg(groupID);
     // 构建聊天框
     /*
      * 待完成
@@ -474,19 +490,20 @@ void Client::execute()
     while (!exit_flag) {
         SocketMsg msg = s->nextPendingMessage();
         if (msg.type != 0) {
-            switch (msg.type) {
-            case S2C::SERVER_NEWFRIEND :
-                newFriend(msg);
-                break;
-            case S2C::SERVER_NEWJOIN:
-                newJoin(msg);
-                break;
-            case S2C::SERVER_MSG_TEXT:
-                newText(msg);
-                break;
+            if (msg.type == S2C::SERVER_NEWFRIEND) {
+                S2C::NewFriend* res = (S2C::NewFriend*)msg.data;
+                newFriend(res->senderID, res->senderName, res->text);
+            } else if (msg.type == S2C::SERVER_NEWJOIN) {
+                S2C::NewJoin* res = (S2C::NewJoin*)msg.data;
+                newJoin(res->senderID, res->senderName, res->groupID, res->text);
+            } else if (msg.type == S2C::SERVER_MSG_TEXT) {
+                S2C::Text* res = (S2C::Text*)msg.data;
+                auto m = manager->getMsg(res->groupID);
+                m.append({res->senderID, manager->getFriendName(res->senderID), res->sendTime, res->text});
+                manager->setMsg(res->groupID, m);
+                newText(res->groupID);
             }
         }
-
         Sleep(100);
     }
 }
@@ -542,7 +559,7 @@ QVector<S2C::NewJoinInfo> Client::waitingGroups()
     return list;
 }
 
-void Client::newFriend(SocketMsg &msg)
+void Client::newFriend(int senderID, QString name, QString text)
 {
     S2C::NewFriend* res = (S2C::NewFriend*)msg.data;
     // 显示
@@ -552,9 +569,8 @@ void Client::newFriend(SocketMsg &msg)
 }
 
 
-void Client::newJoin(SocketMsg &msg)
+void Client::newJoin(int senderID, QString name, int groupID, QString text)
 {
-    S2C::NewJoin* res = (S2C::NewJoin*)msg.data;
     // 显示
     /*
      * 待完成
@@ -562,12 +578,41 @@ void Client::newJoin(SocketMsg &msg)
 }
 
 
-void Client::newText(SocketMsg &msg)
+void Client::newText(int groupID)
 {
-    S2C::Text* res = (S2C::Text*)msg.data;
+
+    if (1/*窗口active*/) {
+
+    } else {
+
+    }
     // 显示
     /*
      * 待完成
      */
 }
 
+QVector<S2C::NewMesList> Client::getOfflineMessage()
+{
+    C2S::Time msg;
+    msg.userID = usrID;
+    msg.type = C2S::MSG_TIME;
+    time(&msg.sendTime);
+
+    s->sendMessage((char *)&msg, sizeof(msg));
+
+    SocketMsg info = {S2C::SERVER_LATEST_MSG_TIME, 0};
+    QVector<S2C::NewMesList> list;
+
+    if (!waiting(info)) {
+        qDebug() << "fail to get list.";
+        return list;
+    }
+
+    S2C::Time* res = (S2C::Time*)info.data;
+    for (int i = 0; i < res->size; i++)
+        list.append(res->group[i]);
+
+    delete res;
+    return list;
+}

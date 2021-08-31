@@ -37,7 +37,7 @@ void Socket::serverMessageHandler()
 {
     bool local_waiting = waiting;
 
-    char *data = new char[1024];
+    char *data = new char[2048];
     memcpy(data, s->readAll().data(), 1024);
     int* type = (int*)data;
     qDebug() << "get msg from server.";

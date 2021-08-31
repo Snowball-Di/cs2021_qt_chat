@@ -197,3 +197,12 @@ void Manager::setMsg(int groupID, QVector<Msg>& messages)
     f.close();
     busy = false;
 }
+
+QString Manager::getFriendName(int id)
+{
+    auto list = getFriends();
+    for (auto &i: list)
+        if (i.id == id)
+            return i.name;
+    return "";
+}
