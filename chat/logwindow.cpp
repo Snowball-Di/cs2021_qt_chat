@@ -63,7 +63,7 @@ void LogWindow::setUi(int id, bool checked)
 {
     if(id != 0)
     {
-        QString str_id = QString(id);
+        QString str_id = QString("%1").arg(id);
         this->ui->id->setText(str_id);
         if(checked)
             this->ui->checkBox->setCheckState(Qt::CheckState::Checked);

@@ -19,6 +19,11 @@ Client::Client(QObject *parent) : QObject(parent)
 
     connect(log_w, SIGNAL(signal_login(int, QString, bool)), this, SLOT(slot_login(int, QString, bool)));
     connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
+
+//    for (int i = 0; i < 10; i++)
+//        connect(chat_w[i], SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
+
+//    connect(acpt, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
     
     
     // 启动UI
@@ -29,8 +34,6 @@ Client::Client(QObject *parent) : QObject(parent)
 
     if(lastId != 0)
         log_w->setUi(lastId, false);
-
-
 
     s = Socket::getSocket();
 }
@@ -61,7 +64,7 @@ void Client::slot_func()
     more_func = new Moredetail(this->cli_ui);
     QString name = usrName;
     int usr_id = usrID;
-    more_func->setUser(name, QString(usr_id), QPixmap(":/img/img/log_icon.png"));
+    more_func->setUser(name, QString("%1").args(usr_id), QPixmap(":/img/img/log_icon.png"));
 }
 
 void Client::slot_register(QString name, QString password)
@@ -573,6 +576,10 @@ void Client::newFriend(int senderID, QString name, QString text)
     connect(ac, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
     ac->setUi(0, senderID, name, text);
     ac->show(); 
+    /*
+     * 待完成
+     */
+    // senderID, groupID = 0
 
 }
 
