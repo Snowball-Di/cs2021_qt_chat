@@ -21,6 +21,8 @@ const int SERVER_FRIENDLIST             =0x0A;
 const int SERVER_GROUPLIST              =0x0B;
 const int SERVER_TEXTRECORD_GROUP       =0x0C;
 const int SERVER_TEXTRECORD_FRIEND      =0x0D;
+const int SERVER_WAITING_FRIEND         =0x0E;
+const int SERVER_WAITING_GROUP          =0x0F;
 
 
 struct Text
