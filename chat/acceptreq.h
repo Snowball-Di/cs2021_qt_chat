@@ -23,8 +23,13 @@ public:
     explicit acceptReq(QWidget *parent = nullptr);
     ~acceptReq();
 
+    void setsenderid(int);
+    void setgroupid(int);
+
+    void setUi(int groupid, int senderid, QString groupname, QString sendername, QString textinfo);
+
 signals:
-    void signal_acceptReq(bool);
+    void signal_acceptReq(int, int, bool);
 
 private slots:
     void on_accept_clicked();
@@ -32,6 +37,8 @@ private slots:
 
 private:
     Ui::acceptReq *ui;
+    int senderId;
+    int groupId;
 };
 
 #endif // ACCEPTREQ_H

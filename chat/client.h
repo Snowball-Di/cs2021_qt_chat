@@ -17,6 +17,7 @@
 #include <QMessageBox>
 #include "newfrireq.h"
 #include "newingroup.h"
+#include "acceptreq.h"
 
 /*
  * 客户端类

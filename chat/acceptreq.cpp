@@ -13,15 +13,29 @@ acceptReq::~acceptReq()
     delete ui;
 }
 
+void acceptReq::setUi(int groupid, int senderid, QString groupname, QString sendername, QString textinfo)
+{
+
+}
+
+void acceptReq::setgroupid(int group)
+{
+    this->groupId = group;
+}
+
+void acceptReq::setsenderid(int sender)
+{
+    this->senderId = sender;
+}
 
 void acceptReq::on_accept_clicked()
 {
-    emit this->signal_acceptReq(true);
+    emit this->signal_acceptReq(this->senderId, this->groupId, true);
     this->close();
 }
 
 void acceptReq::on_refuse_clicked()
 {
-    emit this->signal_acceptReq(false);
+    emit this->signal_acceptReq(this->senderId, this->groupId, false);
     this->close();
 }

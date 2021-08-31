@@ -563,9 +563,9 @@ void Client::newFriend(int senderID, QString name, QString text)
 {
     S2C::NewFriend* res = (S2C::NewFriend*)msg.data;
     // 显示
-    /*
-     * 待完成
-     */
+    acceptReq* ac = new acceptReq();
+    ac->setUi(0, senderID, "", name, text);
+    ac->show();
 }
 
 
