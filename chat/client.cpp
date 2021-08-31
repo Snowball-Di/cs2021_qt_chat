@@ -180,10 +180,13 @@ void Client::getLogin(S2C::Response& res)
         // 登录成功
         manager = Manager::getManager(usrID, save_flag);     // 文件管理器
         // 反复请求数据
+//        initMain();
         requestgroupList();
+        qDebug() << "login suc ";
+        qDebug() << "user's name" << res.text;
     } else {
         QMessageBox::information(this->cli_ui, tr("提示"), tr("帐号或密码不正确，请检查"), QMessageBox::Yes);
-        qDebug() << "login fail: " << res.success;
+        qDebug() << "login fail ";
         qDebug() << "user's name：" << res.text;
     }
     this->usrName = res.text;
@@ -342,8 +345,8 @@ void Client::requestfriendList()
 void Client::getFriendList(S2C::FriendList& res)
 {
     QVector<Friend> temp;
-    for (auto &i : res.friends) {
-        temp.append({i.personID, i.groupID, i.personName, ""});
+    for (int i = 0; i < res.size ; i++) {
+        temp.append({res.friends[i].personID, res.friends[i].groupID, res.friends[i].personName, ""});
     }
     manager->setFriends(temp);
 
@@ -373,13 +376,14 @@ void Client::requestgroupList()
 void Client::getGroupList(S2C::GroupList& res)
 {
     QVector<Group> temp;
-    for (auto &i : res.groups) {
-        temp.append({i.groupID, i.groupName});
+    for (int i = 0; i < res.size; i++) {
+        temp.append({res.groups[i].groupID, res.groups[i].groupName});
     }
     manager->setGroups(temp);
 
     if (showGroup) {
         // ui显示
+        this->log_w->hide();
         this->main_w->load_grouplist(temp);
         this->main_w->show();
     }

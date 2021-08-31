@@ -52,7 +52,7 @@ void Socket::serverMessageHandler()
     char *data = new char[2048];
     memcpy(data, s->readAll().data(), 2048);
     int* type = (int*)data;
-    qDebug() << "get msg from server.";
+    qDebug() << "get msg from server." << *type;
 
     responseFromServer = {*type, data};
     emit serverMessage(responseFromServer);
