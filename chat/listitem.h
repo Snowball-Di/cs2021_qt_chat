@@ -29,6 +29,8 @@ public:
     QSize getRealString(QString src);
     QSize fontRect(QString str);
 
+    inline int get_dialog_id(){return this->d_id;};
+
 protected:
     void paintEvent(QPaintEvent *event); 
 

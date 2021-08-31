@@ -3,6 +3,7 @@
 #include <QListWidgetItem>
 #include "chatmessagebox.h"
 #include <QDialog>
+#include "manager.h"
 
 namespace Ui {
 class ChatWindow;
@@ -16,8 +17,16 @@ public:
     explicit ChatWindow(QWidget *parent = 0);
     ~ChatWindow();
 
-    void dealMessage(chatmessagebox *messageW, QListWidgetItem *item, QString text, QString time, chatmessagebox::Text_Type type);
-    void dealMessageTime(QString curMsgTime);
+    void loadMessageHis(QVector<Msg>&);
+    void addMessage(Msg& m);
+
+    void dealMessage(chatmessagebox *messageW, QListWidgetItem *item, QString text, time_t time, chatmessagebox::Text_Type type);
+    void dealMessageTime(time_t curMsgTime);
+
+
+signals:
+    void signal_send(int, QString);
+
 protected:
 private slots:
     void on_send_clicked();

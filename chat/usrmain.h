@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 #include "listitem.h"
 #include "moredetail.h"
+#include "manager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class UsrMain; }
@@ -17,6 +18,12 @@ class UsrMain : public QWidget
 public:
     explicit UsrMain(QWidget *parent = nullptr);
     ~UsrMain();
+
+    void load_friendlist(QVector<Friend>&);
+    void load_grouplist(QVector<Group>&);
+
+    void insert_friend(Friend&);
+    void insert_group(Group&);
 
 protected:
 //    void resizeEvent(QResizeEvent *event);
@@ -50,7 +57,8 @@ private:
     QPoint p;
     Ui::Moredetail* more;
     bool showfriend; // 0:显示好友列表, 1显示群组列表
-
+    listItem* items; //item数组
+    int len; //item长度
 };
 
 
