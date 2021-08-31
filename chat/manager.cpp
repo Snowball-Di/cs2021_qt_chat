@@ -54,23 +54,24 @@ int Manager::getLastID()
 
 Manager::~Manager()
 {
-    usr_name.close();
-    friends_list.close();
-    groups_list.close();
     delete m;
 }
 
 
 QVector<Friend> Manager::getFriends()
 {
+    busy = true;
     QVector<Friend> friends;
     Friend temp;
 
     friends_list.open(QIODevice::ReadOnly);
     while (1) {
         auto line = QString(groups_list.readLine());
-        if (line.length() == 0)
+        if (line.length() == 0) {
+            friends_list.close();
+            busy = false;
             return friends;
+        }
 
         auto l = line.split(' ');
         temp.id = l[0].toInt();
@@ -79,12 +80,13 @@ QVector<Friend> Manager::getFriends()
         temp.avatar_path = l[3].remove('\n');
         friends.append(temp);
     }
-    friends_list.close();
+
 }
 
 
 QVector<Group> Manager::getGroups()
 {
+    busy = true;
     QVector<Group> groups;
     Group temp;
 
@@ -92,20 +94,23 @@ QVector<Group> Manager::getGroups()
 
     while (1) {
         auto line = QString(groups_list.readLine());
-        if (line.length() == 0)
+        if (line.length() == 0) {
+            groups_list.close();
+            busy = false;
             return groups;
+        }
 
         auto l = line.split(' ');
         temp.group_id = l[0].toInt();
         temp.name = l[1].remove('\n');
         groups.append(temp);
     }
-    groups_list.close();
 }
 
 
 void Manager::setFriends(QVector<Friend> &friends)
 {
+    busy = true;
     QString s;
     char temp[100];
     for (auto &f : friends) {
@@ -117,11 +122,13 @@ void Manager::setFriends(QVector<Friend> &friends)
     friends_list.open(QIODevice::WriteOnly);
     friends_list.write(s.toUtf8());
     friends_list.close();
+    busy = false;
 }
 
 
 void Manager::setGroups(QVector<Group> &groups)
 {
+    busy = true;
     QString s;
     for (auto &g : groups) {
         s.append(QString("%1 ").arg(g.group_id) + g.name + '\n');
@@ -130,6 +137,57 @@ void Manager::setGroups(QVector<Group> &groups)
     groups_list.open(QIODevice::WriteOnly);
     groups_list.write(s.toUtf8());
     groups_list.close();
+    busy = false;
 }
 
 
+QVector<Msg> Manager::getMsg(int groupID)
+{
+    busy = true;
+    QString str = QString("%1").arg(groupID);
+    QFile f(root + "/record/" + str);
+    QVector<Msg> msg;
+
+    if (!f.exists()) {
+        return msg;
+    }
+
+    f.open(QIODevice::ReadOnly);
+    Msg temp;
+    while (1) {
+        auto line = QString(f.readLine());
+        if (line.length() == 0) {
+            f.close();
+            busy = false;
+            return msg;
+        }
+
+        auto l = line.split(' ');
+        temp.senderID = l[0].toInt();
+        temp.senderName = l[1];
+        temp.sendTime = l[2].toLong();
+        temp.text = l[3].remove('\n');
+        msg.append(temp);
+    }
+}
+
+
+void Manager::setMsg(int groupID, QVector<Msg>& messages)
+{
+    busy = true;
+    QString str = QString("%1").arg(groupID);
+    QFile f(root + "/record/" + str);
+    f.open(QIODevice::WriteOnly);
+
+    QString s = "";
+    for (auto &i : messages) {
+        s += QString("%1 ").arg(i.senderID);
+        s += i.senderName + ' ';
+        s +=  QString("%1 ").arg(i.sendTime);
+        s += i.text + '\n';
+    }
+
+    f.write(s.toUtf8());
+    f.close();
+    busy = false;
+}

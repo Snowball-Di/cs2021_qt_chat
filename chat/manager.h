@@ -21,6 +21,15 @@ struct Group
     QString name;
 };
 
+// 用于存放消息
+struct Msg
+{
+    int senderID;
+    QString senderName;
+    time_t sendTime;
+    QString text;
+};
+
 
 /*
  * 使用完后务必析构！！！！
@@ -35,20 +44,15 @@ public:
     // 获取文件管理者单例，登录成功后调用
     // _save_account 表示是否保存ID
     static Manager* getManager(const int usrID, bool _save_account);
-
+    bool isBusy();
 
     QVector<Friend> getFriends();
     QVector<Group> getGroups();
     void setFriends(QVector<Friend> &friends);
     void setGroups(QVector<Group> &groups);
 
-    void getGroupMsg();
-    void getFriendMsg();
-    void setGroupMsg();
-    void setFriendMsg();
-
-signals:
-
+    QVector<Msg> getMsg(int groupID);
+    void setMsg(int groupID, QVector<Msg>& messages);
 
 private:
     ~Manager();
@@ -62,6 +66,8 @@ private:
 
     bool save_account;
     QString last_usr;
+
+    bool busy = false;
 };
 
 

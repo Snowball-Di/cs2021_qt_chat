@@ -2,8 +2,9 @@
 #define CLIENT_H
 
 #include <QObject>
-#include <socket.h>
-#include <c2s.h>
+#include "socket.h"
+#include "c2s.h"
+#include "manager.h"
 
 /*
  * 客户端类
@@ -24,11 +25,10 @@ private slots:
     void slot_send(int groupID, QString text);
 
     void slot_friendReq(int friendID, QString verifyText);
-    void slot_acceptFriendRequest();
 
     void slot_newGroup(QString groupName);
     void slot_groupReq(int groupID);
-    void slot_acceptReq(bool req);
+    void slot_acceptReq(int targetID, bool accept, bool isFriend);
 
     void slot_friendList();
     void slot_groupList();
@@ -43,8 +43,12 @@ private:
     static Client* client;
 
     Socket* s;
+    Manager* manager;
+
     int usrID;
     QString usrName;
+
+    bool exit_flag = false;
 
 
     bool waiting(SocketMsg& msg);
