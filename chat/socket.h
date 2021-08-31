@@ -15,8 +15,6 @@ struct SocketMsg
     char *data;
 };
 
-
-
 /*
  * 此类继承自QTcpSocket，提供了标识自身的功能
  */
@@ -39,11 +37,13 @@ public:
     // 如果没有消息，返回的对象type和data均为0
     SocketMsg nextPendingMessage();
 
+    void connectToHost();
+
     // 关闭套接字
     void close() { s->close(); };
 
 signals:
-    void serverMessage(/* class */);
+    void serverMessage(SocketMsg msg);
 
 
 private slots:

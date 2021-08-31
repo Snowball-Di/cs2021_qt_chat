@@ -31,8 +31,6 @@ public:
     void execute();
 
 private slots:
-
-
     void slot_register(QString name, QString password);
     void slot_login(int usrID, QString password, bool save);
     void slot_logout();
@@ -54,6 +52,9 @@ private slots:
     void slot_to_register();
     void slot_cancel();
     void slot_func();
+
+
+    void slot_serverHandler(SocketMsg msg);
 
 //signals:
 //    void signal_newMessage(QVector<int> groupID);
@@ -85,6 +86,7 @@ private:
 
     void requestfriendList();
     void requestgroupList();
+    void getRegister(S2C::Register msg);
     QVector<S2C::NewMesList> getOfflineMessage();
 
 
@@ -96,6 +98,7 @@ private:
     acceptReq* acpt;
     Moredetail *more_func;
     client_ui *cli_ui = new client_ui;
+
 };
 
 #endif // CLIENT_H

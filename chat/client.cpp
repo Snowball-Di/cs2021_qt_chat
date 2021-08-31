@@ -36,6 +36,7 @@ Client::Client(QObject *parent) : QObject(parent)
         log_w->setUi(lastId, false);
 
     s = Socket::getSocket();
+    connect(s, SIGNAL(serverMessage(SocketMsg)), this, SLOT(slot_serverHandler(SocketMsg)));
 }
 
 Client* Client::client_init()
@@ -64,50 +65,88 @@ void Client::slot_func()
     more_func = new Moredetail(this->cli_ui);
     QString name = usrName;
     int usr_id = usrID;
-    more_func->setUser(name, QString("%1").args(usr_id), QPixmap(":/img/img/log_icon.png"));
+    more_func->setUser(name, QString("%1").arg(usr_id), QPixmap(":/img/img/log_icon.png"));
+}
+
+
+void Client::slot_serverHandler(SocketMsg msg)
+{
+    if (msg.type == S2C::SERVER_REPLY_REGISTER) {
+        getRegister(*(S2C::Register *)msg.data);
+    } else if (msg.type == S2C::SERVER_REPLY) {
+
+    } else if (msg.type == S2C::SERVER_REPLY_REGISTER) {
+
+    }
+    else if (msg.type == S2C::SERVER_NEWFRIEND) {
+
+    }
+    else if (msg.type == S2C::SERVER_NEWGROUP) {
+
+    }
+    else if (msg.type == S2C::SERVER_NEWJOIN) {
+
+    }
+    else if (msg.type == S2C::SERVER_JOINOK) {
+
+    }
+    else if (msg.type == S2C::SERVER_MSG_TEXT) {
+
+    }
+    else if (msg.type == S2C::SERVER_MSG_DOC) {
+
+    }
+    else if (msg.type == S2C::SERVER_FRIENDLIST) {
+
+    }
+    else if (msg.type == S2C::SERVER_GROUPLIST) {
+
+    }
+    else if (msg.type == S2C::SERVER_TEXTRECORD) {
+
+    }
+    else if (msg.type == S2C::SERVER_WAITING_FRIEND) {
+
+    }
+    else if (msg.type == S2C::SERVER_WAITING_GROUP) {
+
+    }
+    else if (msg.type == S2C::SERVER_LATEST_MSG_TIME) {
+
+    }
 }
 
 void Client::slot_register(QString name, QString password)
 {
     C2S::Register msg;
-    memcpy(msg.name, name.data(), name.length());
-    msg.name[password.length()] = 0;
-    memcpy(msg.password, password.data(), password.length());
-    msg.password[password.length()] = 0;
+    auto n = name.toLocal8Bit();
+    auto p = password.toLocal8Bit();
+    memcpy(msg.name, n.data(), n.length());
+    msg.name[n.length()] = 0;
+    memcpy(msg.password, p.data(), p.length());
+    msg.password[p.length()] = 0;
     msg.type = C2S::MSG_REGISTER;
 
     s->sendMessage((char *)&msg, sizeof(msg));
+}
 
-    SocketMsg info = {S2C::SERVER_REPLY_REGISTER, 0};
+void Client::getRegister(S2C::Register msg)
+{
 
-    if (!waiting(info)) {
-        qDebug() << "fail to register.";
-        return;
-    }
-
-    S2C::Response* res = (S2C::Response*)info.data;
-
-
-
-    if (res->success == true) {
+    if (msg.success == true) {
         // 注册成功
-        QString usrID = res->text;  // 获取ID字符串
-        QMessageBox::information(this->cli_ui, tr("账号信息"), QString("您的帐号为：")+usrID, QMessageBox::Yes);
-        log_w->setUi(usrID.toInt(), false);
+        int usrID = msg.usrID;  // 获取ID字符串
+        QMessageBox::information(this->cli_ui, tr("账号信息"),
+                                 QString("您的帐号为：")+QString("%1").arg(usrID), QMessageBox::Yes);
+        log_w->setUi(usrID, false);
         regis->close();
         log_w->show();
         qDebug() << "register success.";
-        qDebug() << "注册ID：" << res->text;
     } else {
         // 注册失败
        QMessageBox::information(this->cli_ui, tr("注册失败"), QString("请重试！")+usrID, QMessageBox::Yes);
        qDebug() << "register fail.";
-       qDebug() << "注册ID：" << res->text;
     }
-
-
-
-    delete res;
 }
 
 void Client::slot_login(int usrID, QString password, bool save)
@@ -467,7 +506,7 @@ bool Client::waiting(SocketMsg& msg)
     time_t begin = 0, now = 0;
     time(&begin);
 
-    while (now - begin <= 7) {
+    while (now - begin <= 20) {
         auto m = s->getResponse();
         if (m.type != 0) {
             qDebug() << m.type;

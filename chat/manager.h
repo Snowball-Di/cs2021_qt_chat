@@ -55,6 +55,7 @@ public:
     void setMsg(int groupID, QVector<Msg>& messages);
 
     QString getFriendName(int id);
+    int getFriendGroup(int id);
 
 private:
     ~Manager();

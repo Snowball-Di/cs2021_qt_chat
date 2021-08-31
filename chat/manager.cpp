@@ -206,3 +206,12 @@ QString Manager::getFriendName(int id)
             return i.name;
     return "";
 }
+
+int Manager::getFriendGroup(int id)
+{
+    auto list = getFriends();
+    for (auto &i: list)
+        if (i.id == id)
+            return i.group_id;
+    return 0;
+}
