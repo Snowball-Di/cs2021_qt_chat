@@ -26,16 +26,18 @@ private:
     static MyTcpServer* tcpserverhand;
     QHostInfo hostInfo;
     QTcpServer tcp_server;
-    QTcpSocket* tcp_socket;
-    //QList<QTcpSocket*> clientList;
+    QTcpSocket* tcp_socket0;
+    //QList<QTcpSocket*> onlineList;
     QHash <int,QTcpSocket*> clientList;
     QString IP,port;
 private slots:
     void slot_creatNewConnection();
-    void slot_readdata();
+    void slot_readyread();
+    void slot_readdata(QTcpSocket* tcp_socket);
 
 signals:
-    void serverMessage();
+    //void serverMessage();
+    void sig_readdata(QTcpSocket* tcp_socket);
 };
 
 #endif // MYTCPSERVER_H

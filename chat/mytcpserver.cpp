@@ -2,9 +2,15 @@
 MyTcpServer* MyTcpServer::tcpserverhand = nullptr;
 MyTcpServer::MyTcpServer(QObject *parent) : QObject(parent)
 {
+
+}
+void MyTcpServer::openTCPserver(QString IP, QString port)
+{
+    qDebug()<<"IP = "<<IP<<"  port = "<<port.toInt();
     QHostAddress hostadd;
     hostadd.setAddress(IP);
     if(tcp_server.listen(hostadd,port.toInt())){
+//    if(tcp_server.listen(QHostAddress::Any,port.toInt())){
         connect(&tcp_server,SIGNAL(newConnection()),this,SLOT(slot_creatNewConnection()));
     }
     else{
@@ -12,192 +18,473 @@ MyTcpServer::MyTcpServer(QObject *parent) : QObject(parent)
     }
 }
 void MyTcpServer::slot_creatNewConnection(){
-    tcp_socket = tcp_server.nextPendingConnection();
-    connect(tcp_socket,SIGNAL(clientMessage()),this,SLOT(slot_readdata()));
-
+    QTcpSocket* tcp_socket = tcp_server.nextPendingConnection();
+    tcp_socket0 = tcp_socket;
+    connect(tcp_socket,SIGNAL(readyRead()),this,SLOT(slot_readyread()));
     qDebug()<<"someone connected!"<<tcp_socket->peerAddress();
-    qDebug()<<"there are "<<clientList.count()<<"user online !";
+//    onlineList.append(tcp_socket);
+//    qDebug()<<"there are "<<onlineList.count()<<"user online !";
 }
-void MyTcpServer::slot_readdata(){
+void MyTcpServer::slot_readyread(){
+    connect(tcp_socket0,SIGNAL(sig_readdata(tcp_socket0)),this,SLOT(slot_readdata(tcp_socket0)));
+    qDebug()<<"ready read.";
+}
+void MyTcpServer::slot_readdata(QTcpSocket* tcp_socket){
+    qDebug()<<"read data";
     QByteArray databyte = tcp_socket->readAll();
     char* data=databyte.data();
-    int type1,type2,type3,type4;
-    type1 = (int)*data;
-    type2 = (int)*(data+1);
-    type3 = (int)*(data+2);
-    type4 = (int)*(data+3);
-    int mestype = type1*16777216+type2*65546+type3*256+type4;
+    qDebug()<<databyte;
+    int *mestype=(int*) data;
 
     Qt_chat_sql* server2db=Qt_chat_sql::getHand();
-    server2db->InitDatabase();
-    switch (mestype){
+    server2db->InitDatabase();//数据库初始化
+    switch (*mestype){
     case C2S::MSG_REGISTER://注册
-        {C2S::Register mes = *(C2S::Register*) (data);
+        {qDebug()<<"MSG_REGISTER";
+        C2S::Register mes = *(C2S::Register*) (data);
         QString usrName;QString password;
         usrName = mes.name;
         password = mes.password;
+        //注册到数据库中，分配usrID
         int usrID = server2db->Register(usrName,password);
-        bool dbreply=false;
+        qDebug()<<"MSG_REGISTER:"<<"usrID:"<<usrID;
+        bool dbreply;
         if(usrID==0)
             dbreply = false;
         else
             dbreply = true;
-        clientList.insert(usrID,tcp_socket);
+        clientList.insert(usrID,tcp_socket);//usrID==0表示分配ID失败
 
         S2C::Register reply2client;
         reply2client.type = S2C::SERVER_REPLY;
-        reply2client.success = true;
+        reply2client.success = dbreply;
         reply2client.usrID = usrID;
-        char temp[60]="Register OK!";
-        memcpy(reply2client.text,temp,sizeof(temp));
+        if(reply2client.success)
+        {   qDebug()<<"MSG_REGISTER:"<<"Reply to client:"<<"Register OK!";
+            char temp[60]="Register OK!";
+            memcpy(reply2client.text,temp,sizeof(temp));
+        }
+        else
+        {   qDebug()<<"MSG_REGISTER:"<<"Reply to client:"<<"Register failed!";
+            char temp[60]="Register failed!";
+            memcpy(reply2client.text,temp,sizeof(temp));
+        }
         tcp_socket->write((char*)&reply2client, sizeof(reply2client));
-        emit serverMessage();
         break;}
     case C2S::MSG_LOG://登录、登出
-        {C2S::Log mes = *(C2S::Log*) (data);
-        //Log in
-        if(mes.operation==1)
-        {struct USER_INFO userinfo;
-        bool dbreply = server2db->login(mes.id,mes.password,userinfo);
-        clientList.insert(userinfo.userID,tcp_socket);
+        {qDebug()<<"MSG_LOG";
+        C2S::Log mes = *(C2S::Log*) (data);
+        if(mes.operation==1)//Log in
+        {   struct USER_INFO userinfo;
+            bool dbreply = server2db->login(mes.id,mes.password,userinfo);
+            clientList.insert(mes.id,tcp_socket);
 
-        S2C::Response reply2client;
-        reply2client.type = S2C::SERVER_REPLY;
-        reply2client.success = dbreply;
-        char temp[60]="Log in OK!";
-        memcpy(reply2client.text,temp,sizeof(temp));
-        tcp_socket->write((char*)&reply2client, sizeof(reply2client));
-        emit serverMessage();
+            S2C::Response reply2client;
+            reply2client.type = S2C::SERVER_REPLY;
+            reply2client.success = dbreply;
+            if(reply2client.success)
+            {   qDebug()<<"MSG_LOG:"<<"Reply to client:"<<"Log in OK!";
+                char temp[60]="Log in OK!";
+                memcpy(reply2client.text,temp,sizeof(temp));
+            }
+            else
+            {   qDebug()<<"MSG_LOG:"<<"Reply to client:"<<"Log in failed!";
+                char temp[60]="Log in failed!";
+                memcpy(reply2client.text,temp,sizeof(temp));
+            }
+            tcp_socket->write((char*)&reply2client, sizeof(reply2client));
         }
-        //还需加载好友列表、群组列表、消息记录、好友验证、群组验证
+        else//Log out
+        {
+            tcp_socket = NULL;
+        }
+        break;}
+    case C2S::MSG_TEXT://接收并转发text消息
+        {qDebug()<<"MSG_TEXT";
+        C2S::Text mes = *(C2S::Text*) (data);
+        //写入database
+        MESSAGE todb;
+        todb.groupID = mes.groupID;
+        todb.senderID = mes.senderID;
+        todb.time = QDateTime::fromTime_t(mes.sendTime);
+        todb.type = ".txt";
+        todb.content = mes.text;
+        bool dbreply = server2db->newMsg(todb);
 
-        //Log out
+        //回复发送方发送成功
+        S2C::Response reply2client2;
+        reply2client2.type = S2C::SERVER_REPLY;
+        reply2client2.success = dbreply;
+        memset(reply2client2.text,0,sizeof(reply2client2.text));
+        if(dbreply)//写入database成功
+        {
+            char temp[100]="Message has send";
+            qDebug()<<"MSG_TEXT:"<<"Reply to sender:"<<"Message has send.";
+            memcpy(reply2client2.text,temp,sizeof(temp));
+        }
+        else//写入database失败
+        {   qDebug()<<"MSG_TEXT:"<<"Reply to sender:"<<"Message has not send.";
+            char temp[100]="Message has not send";
+            memcpy(reply2client2.text,temp,sizeof(temp));
+        }
+        tcp_socket->write((char*)&reply2client2, sizeof(reply2client2));
+
+        //给接收的群组发消息
+        if(dbreply)
+        {
+            S2C::Text reply2client;
+            reply2client.type = S2C::SERVER_MSG_TEXT;
+            reply2client.senderID = mes.senderID;
+            reply2client.groupID = mes.groupID;
+            reply2client.sendTime = mes.sendTime;
+            memcpy(reply2client.text,mes.text,sizeof(mes.text));
+            int groupmemberid[100];//一个群最多100人
+            int groupcount = server2db->groupMembers(mes.groupID,groupmemberid);
+            if(groupcount>1)
+            {
+                for(int i=0;i<groupcount;i++)//遍历群成员
+                {   if(reply2client.senderID!=groupmemberid[i])//跳过发送方本人
+                    {   QHash<int,QTcpSocket*>::iterator iter;
+                        iter = clientList.find(groupmemberid[i]);
+                        if(iter!=clientList.end()&&iter.value()!=NULL)//在线
+                        {   tcp_socket = iter.value();
+                            tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+                        }
+                        else//离线,不在这里发消息，请求消息列表时再给
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
         else
+            qDebug()<<"MEG_TEXT didn't write in database.";
+        break;}
+    case C2S::MSG_REQUEST:
+        {qDebug()<<"MSG_REQUEST";
+        C2S::Request mes = *(C2S::Request*) (data);
+        if(mes.add)//添加好友
+        {
+            bool dbreply;
+            //向B发送待确认新好友信息
+            S2C::NewFriend reply2client2;
+            reply2client2.type = S2C::SERVER_NEWFRIEND;
+            reply2client2.senderID = mes.senderID;
+//            QStringList sender;
+//            sender.append((QString) mes.senderID);
+//            USER_INFO* sender_infoList;
+//            server2db->getUser_info(sender,sender_infoList);
+//            std::string str=sender_infoList->userName.toStdString();
+            QString senderName;
+            senderName = server2db->getUserName(mes.senderID);
+            std::string str=senderName.toStdString();
+            const char* cstr=str.c_str();
+            memset(reply2client2.senderName,0,sizeof(30));
+            memcpy(reply2client2.senderName,cstr,str.length());
+            memcpy(reply2client2.text,mes.text,sizeof(mes.text));
+
+            QHash<int,QTcpSocket*>::iterator iter;
+            iter = clientList.find(mes.targetID);
+            if(iter!=clientList.end()&&iter.value()!=NULL)//对方在线
+            {
+                QTcpSocket* tcp_socket2 = iter.value();
+                tcp_socket2->write((char*)&reply2client2, sizeof(reply2client2));
+                dbreply = true;
+            }
+            else//对方离线
+            {
+                dbreply = server2db->addFriendrequest(mes.senderID,mes.targetID,mes.text);
+            }
+
+            //向A发送确认收到
+            S2C::Response reply2client;
+            reply2client.type = S2C::SERVER_REPLY;
+            reply2client.success = dbreply;//写入db申请列表
+            if(dbreply)
+            {
+                char temp[60]="Request has send.";
+                memset(reply2client.text,0,sizeof(reply2client.text));
+                memcpy(reply2client.text,temp,sizeof(temp));
+            }
+            else
+            {
+                char temp[60]="Request has send.";
+                memset(reply2client.text,0,sizeof(reply2client.text));
+                memcpy(reply2client.text,temp,sizeof(temp));
+            }
+            tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+        }
+        break;}
+    case C2S::MSG_ACCEPT:
+        {qDebug()<<"MSG_ACCEPT";
+        C2S::Accept mes = *(C2S::Accept*)data;
+        QTcpSocket* tcp_socket2;
+        S2C::Response reply2client,reply2client2;
+        reply2client.type = S2C::SERVER_REPLY;
+        reply2client2.type = S2C::SERVER_REPLY;
+        reply2client.success = mes.accept;
+        reply2client2.success = mes.accept;
+        if(mes.kind)//好友申请
+        {
+            server2db->deleteFriendrequest(mes.senderID,mes.targetID);
+            if(mes.accept)
+            {
+                char temp[60]="Friend request accepted.";
+                memcpy(reply2client.text,temp,sizeof(temp));
+                memcpy(reply2client2.text,temp,sizeof(temp));
+                //建立2人对话型群组
+                int groupid = server2db->newGroup(0,(QString)mes.targetID,mes.senderID);
+            }
+            else
+            {
+                char temp[60]="Friend request refused.";
+                memcpy(reply2client.text,temp,sizeof(temp));
+                memcpy(reply2client2.text,temp,sizeof(temp));
+            }
+        }
+        else//群主批复
+        {
+            server2db->deleteGrouprequest(mes.senderID,mes.targetID);
+            if(mes.accept)
+            {
+                char temp[60]="Join group request accepted.";
+                memcpy(reply2client.text,temp,sizeof(temp));
+                memcpy(reply2client2.text,temp,sizeof(temp));
+            }
+            else
+            {
+                char temp[60]="Join group request refused.";
+                memcpy(reply2client.text,temp,sizeof(temp));
+                memcpy(reply2client2.text,temp,sizeof(temp));
+            }
+        }
+        QHash<int,QTcpSocket*>::iterator iter;
+        iter = clientList.find(mes.senderID);
+        if(iter!=clientList.end()&&iter.value()!=NULL)//对方不在线则不发送好友已添加或被拒绝的提示信息
+        {
+            tcp_socket2 = iter.value();
+            tcp_socket2->write((char*)&reply2client2, sizeof(reply2client2));
+        }
+        tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+        break;
+        }
+    case C2S::MSG_GROUP:
+        {qDebug()<<"MSG_GROUP";
+        C2S::Group mes = *(C2S::Group*)data;
+        if(mes.newGroup)//建群
+        {
+            //写入database
+            int groupID = server2db->newGroup(1,mes.name,mes.userID);
+            //回复建群成功
+            S2C::NewGroup reply2client;
+            reply2client.type = S2C::SERVER_NEWGROUP;
+            reply2client.groupID = groupID;//groupID==0表示未成功
+            memcpy(reply2client.groupName,mes.name,sizeof(mes.name));
+            tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+        }
+        else//删群
         {
 
         }
         break;}
-//    case C2S::MSG_TEXT://接收并转发text消息
-//        {C2S::Text mes = *(C2S::Text*) (data);
-//        MESSAGE todb;
-//        todb.groupID = mes.groupID;
-//        todb.senderID = mes.senderID;
-//        todb.time = mes.sendTime;
-//        todb.type = ".txt";
-//        todb.content = mes.text;
-//        bool dbreply = server2db->newMsg(todb);
-
-//        S2C::Response reply2client2;
-//        reply2client2.type = S2C::SERVER_REPLY;
-//        reply2client2.success = dbreply;
-//        memset(reply2client2.text,0,sizeof(reply2client2.text));
-//        tcp_socket->write((char*)&reply2client2, sizeof(reply2client2));
-//        emit serverMessage();
-
-//        S2C::Text reply2client;
-//        reply2client.type = S2C::SERVER_MSG_TEXT;
-//        reply2client.senderID = mes.senderID;
-//        reply2client.groupID = mes.groupID;
-//        reply2client.sendTime = mes.sendTime;
-//        int groupmemberid[100];
-//        int groupcount = server2db->groupMembers(mes.groupID,groupmemberid);
-//        if(groupcount>1)
-//        {
-//            for(int i=0;i<groupcount;i++)//遍历群成员
-//            {   if(reply2client.senderID!=groupmemberid[i])//跳过发送方本人
-//                {   QHash<int,QTcpSocket*>::iterator iter;
-//                    iter = clientList.find(groupmemberid[i]);
-//                    if(iter!=clientList.end())//在线
-//                    {   tcp_socket = (iter.value());
-//                        tcp_socket->write((char*)&reply2client, sizeof(reply2client));
-//                    }
-//                    else//离线
-//                    {
-
-//                    }
-//                }
-//            }
-//            emit serverMessage();
-//        }
-//        else
-//            qDebug()<<"MEG_TEXT groupMember wrong.";
-//        break;}
-//    case C2S::MSG_REQUEST:
-//        {C2S::Request mes = *(C2S::Request*) (data);
-//        if(mes.add)//添加好友
-//        {
-//            S2C::Response reply2client;
-//            reply2client.type = S2C::SERVER_REPLY_LOGIN;
-//            reply2client.success = dbreply;
-//            memset(reply2client.text,0,sizeof(reply2client.text));
-//            tcp_socket->write((char*)&reply2client, sizeof(reply2client));
-//            emit serverMessage();
-
-
-//            QStringList sender;
-//            sender.append((QString) mes->sender());
-//            USER_INFO* sender_infoList;
-//            server2db->getUser_info(sender,sender_infoList);
-//            S2C::NewFriend reply2client2(mes->sender(),sender_infoList->userName);
-//            QHash<int,QTcpSocket*>::iterator iter;
-//            iter = clientList.find(mes->target());
-//            if(iter==clientList.end())//对方离线
-//            {
-
-//            }
-//            else//对方在线
-//            {
-//                QTcpSocket* tcp_socket2 = iter.value();
-//                tcp_socket2->write((char*)&reply2client2, sizeof(reply2client2));
-//                tcp_socket->write((char*)&reply2client, sizeof(reply2client));
-//                emit serverMessage();
-//            }
-
-//        }
-//        //int groupID = server2db.newGroup(0,(QString)mes->target(),mes->sender());
-//// ///////////////////先验证再成立二人群
-
-//        break;}
-//    case C2S::MSG_ACCEPT:
-//        {
-//            C2S::Accept* mes = (C2S::Accept*)data;
-//            if(QString::compare( mes->kind(),"group",Qt::CaseSensitive))//群主批复
-//            {
-//            }
-//            else if(QString::compare( mes->kind(),"friend",Qt::CaseSensitive))//好友申请通过
-//            {
-//                usrID1 = mes->sender();
-//                usrID2 = mes->target();
+    case C2S::MSG_JOIN:
+        {qDebug()<<"MSG_JOIN";
+        C2S::Join mes = *(C2S::Join*)data;
+        if(mes.join)//加群
+        {
+            int masterID = server2db->getgroupOwner(mes.targetID); //根据groupID找到群主ID
+            QHash<int,QTcpSocket*>::iterator iter;
+            iter = clientList.find(masterID);
+            QTcpSocket* tcp_socket2 = iter.value();
+            if(iter.value()!=NULL&&iter!=clientList.end())//群主在线
+            {   //给群主发NewJoin
+                S2C::NewJoin reply2master;
+                reply2master.type = S2C::SERVER_NEWJOIN;
+                reply2master.senderID = mes.senderID;
+                //查找senderName
+//                QStringList sender;
+//                sender.append((QString) mes.senderID);
 //                USER_INFO* sender_infoList;
 //                server2db->getUser_info(sender,sender_infoList);
-//                S2C::NewFriendOK reply2client(true,);
-//                QHash<int,QTcpSocket*>::iterator iter;
-//                iter = clientList.find(mes->target());
-//            }
-//            break;
-//        }
-//    case C2S::MSG_GROUP:
-//        {
-//            if()//建群
-//            {
+//                std::string str=sender_infoList->userName.toStdString();
+                QString senderName;
+                senderName = server2db->getUserName(mes.senderID);
+                std::string str=senderName.toStdString();
+                const char* cstr=str.c_str();
+                memset(reply2master.senderName,0,sizeof(30));
+                memcpy(reply2master.senderName,cstr,str.length());
+                memcpy(reply2master.text,mes.text,sizeof(mes.text));
 
-//            }
-//            else//删群
-//            {
+                tcp_socket2->write((char*)&reply2master, sizeof(reply2master));
+                //给请求加群的用户确认消息
+                S2C::Response reply2client;
+                reply2client.type = S2C::SERVER_REPLY;
+                reply2client.success = true;
+                char temp[60]="Join message has send.";
+                memset(reply2client.text,0,sizeof(reply2client.text));
+                memcpy(reply2client.text,temp,sizeof(temp));
+                tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+            }
+            else//群主离线
+            {
+                //写入数据库
+                server2db->addGrouprequest(mes.senderID,mes.targetID,mes.text);
+            }
+        }
+        else//退群
+        {
 
-//            }
-//        }
-//    case C2S::MSG_JOIN:
-//        {
-//            if()//加群
-//            {
+        }
+        break;}
+    case C2S::MSG_FRIENDLIST:
+    {qDebug()<<"MSG_FRIENDLIST";
+    C2S::FriendList mes = *(C2S::FriendList*)data;
+    FRIEND_LIST friendList[20];
+    int dbreply;
+    dbreply = server2db->getFriendList(mes.userID,friendList);
+    S2C::FriendList reply2client;
+    reply2client.type = S2C::SERVER_FRIENDLIST;
+    if(dbreply>=0&&dbreply<=20)
+    {
+        reply2client.success = true;
+        reply2client.size = dbreply;
+    }
+    else
+    {
+        reply2client.success = false;
+        reply2client.size = dbreply;
+    }
+    int j=0;
+    for(int i=0;i<dbreply;i++){
+        if(friendList[i].friendID!=0)//friendID==0是群组，不是好友
+        {reply2client.friends[j].groupID = friendList[i].groupID;
+        reply2client.friends[j].personID = friendList[i].friendID;
+        QString friendName = server2db->getUserName(friendList[i].friendID);
+        std::string str=friendName.toStdString();
+        const char* cstr=str.c_str();
+        memset(reply2client.friends[j].personName,0,sizeof(30));
+        memcpy(reply2client.friends[j].personName,cstr,str.length());
+        j++;}
+    }
+    for(;j<20;j++)
+    {
+        reply2client.friends[j].groupID = 0;
+        reply2client.friends[j].personID = 0;
+        memset(reply2client.friends[j].personName,0,sizeof(30));
+    }
+    tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+    break;}
 
-//            }
-//            else//退群
-//            {
+    case C2S::MSG_GROUPLIST:
+    {qDebug()<<"MSG_GROUPLIST";
+    C2S::GroupList mes = *(C2S::GroupList*)data;
+    FRIEND_LIST groupList[20];
+    S2C::GroupList reply2client;
+    reply2client.type = S2C::SERVER_GROUPLIST;
+    int dbreply;
+    dbreply = server2db->getFriendList(mes.userID,groupList);
+    if(dbreply>=0&&dbreply<=20)
+    {
+        reply2client.success = true;
+        reply2client.size = dbreply;
+    }
+    else
+    {
+        reply2client.success = false;
+        reply2client.size = dbreply;
+    }
+    int j=0;
+    for(int i=0;i<dbreply;i++){
+        if(groupList[i].friendID==0)//friendID==0是群组，不是好友
+        {reply2client.groups[j].groupID = groupList[i].groupID;
+        QString groupName = server2db->getGroupName(groupList[i].groupID);
+        std::string str=groupName.toStdString();
+        const char* cstr=str.c_str();
+        memset(reply2client.groups[j].groupName,0,sizeof(30));
+        memcpy(reply2client.groups[j].groupName,cstr,str.length());
+        j++;}
+    }
+    for(;j<20;j++)
+    {
+        reply2client.groups[j].groupID = 0;
+        memset(reply2client.groups[j].groupName,0,sizeof(30));
+    }
+    tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+    break;}
 
-//            }
-//        }
-//    }
+
+    case C2S::MSG_WAITINNG_FRIEND:
+    {qDebug()<<"MSG_WAITINNG_FRIEND";
+    C2S::WaitingFriends mes = *(C2S::WaitingFriends*)data;
+    int dbreply;
+    FRIEND_REQUEST frdrequest[20];
+    dbreply = server2db->getFriendrequest(mes.userID,frdrequest);
+
+    S2C::NewFriendWaiting reply2client;
+    reply2client.type = S2C::SERVER_WAITING_FRIEND;
+    if(dbreply>=0&&dbreply<=20)
+    {
+        reply2client.success = true;
+        reply2client.size = dbreply;
+    }
+    else
+    {
+        reply2client.success = false;
+        reply2client.size = dbreply;
+    }
+    for(int i=0;i<dbreply;i++){
+        reply2client.friends[i].personID = frdrequest[i].senderID;
+        QString friendName = server2db->getUserName(frdrequest[i].senderID);
+        std::string str=friendName.toStdString();
+        const char* cstr=str.c_str();
+        memset(reply2client.friends[i].personName,0,sizeof(30));
+        memcpy(reply2client.friends[i].personName,cstr,str.length());
+        QString friendIntro = frdrequest[i].content;
+        std::string str2=friendIntro.toStdString();
+        const char* cstr2=str2.c_str();
+        memset(reply2client.friends[i].text,0,sizeof(reply2client.friends[i].text));
+        memcpy(reply2client.friends[i].text,cstr2,str2.length());
+    }
+    tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+    break;}
+
+
+    case C2S::MSG_WAITINNG_GROUP:
+    {qDebug()<<"MSG_WAITINNG_GROUP";
+    C2S::WaitingGroups mes = *(C2S::WaitingGroups*)data;
+    int dbreply;
+    GROUP_REQUEST grprequest[20];
+    dbreply = server2db->getGrouprequest(mes.userID,grprequest);
+
+    S2C::NewJoinWaiting reply2client;
+    reply2client.type = S2C::SERVER_WAITING_GROUP;
+    if(dbreply>=0&&dbreply<=20)
+    {
+        reply2client.success = true;
+        reply2client.size = dbreply;
+    }
+    else
+    {
+        reply2client.success = false;
+        reply2client.size = dbreply;
+    }
+    for(int i=0;i<dbreply;i++){
+        reply2client.members[i].senderID = grprequest[i].senderID;
+        reply2client.members[i].groupID = grprequest[i].groupID;
+        QString friendName = server2db->getGroupName(grprequest[i].senderID);
+        std::string str=friendName.toStdString();
+        const char* cstr=str.c_str();
+        memset(reply2client.members[i].senderName,0,sizeof(30));
+        memcpy(reply2client.members[i].senderName,cstr,str.length());
+        QString friendIntro = grprequest[i].content;
+        std::string str2=friendIntro.toStdString();
+        const char* cstr2=str2.c_str();
+        memset(reply2client.members[i].text,0,sizeof(reply2client.members[i].text));
+        memcpy(reply2client.members[i].text,cstr2,str2.length());
+    }
+    tcp_socket->write((char*)&reply2client, sizeof(reply2client));
+    break;}
+    }
 }
 

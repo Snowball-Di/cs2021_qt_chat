@@ -19,10 +19,12 @@ const int SERVER_MSG_DOC                =0x09;
 
 const int SERVER_FRIENDLIST             =0x0A;
 const int SERVER_GROUPLIST              =0x0B;
-const int SERVER_TEXTRECORD_GROUP       =0x0C;
-const int SERVER_TEXTRECORD_FRIEND      =0x0D;
-const int SERVER_WAITING_FRIEND         =0x0E;
-const int SERVER_WAITING_GROUP          =0x0F;
+const int SERVER_TEXTRECORD             =0x0C;
+
+const int SERVER_WAITING_FRIEND         =0x0D;
+const int SERVER_WAITING_GROUP          =0x0E;
+
+const int SERVER_LATEST_MSG_TIME        =0x0F;
 
 
 struct Text
@@ -58,6 +60,7 @@ struct NewFriend
     int type;
     int senderID;
     char senderName[30];
+    char text[50];
 };
 
 
@@ -77,6 +80,7 @@ struct NewJoin
     char senderName[30];
     int groupID;
     char groupName[30];
+    char text[50];
 };
 
 
@@ -98,6 +102,7 @@ struct GroupInfo
 struct NewFriendInfo{
     int personID;
     char personName[30];
+    char text[50];
 };
 
 struct NewJoinInfo
@@ -105,19 +110,22 @@ struct NewJoinInfo
     int senderID;
     int groupID;
     char senderName[30];
+    char text[50];
 };
 
 /*friend list*/
 struct FriendList
 {
     int type;
+    bool success;
     int size; // 好友总数
     PersonInfo friends[10];//最多100个好友，从0开始
 };
 
-struct NewFriendWaiting
+struct NewFriendWaiting//等待验证的新好友
 {
     int type;
+    bool success;
     int size;
     NewFriendInfo friends[10];
 };
@@ -126,6 +134,7 @@ struct NewFriendWaiting
 struct GroupList
 {
     int type;
+    bool success;
     int size; // 群组总数
     GroupInfo groups[20];
 };
@@ -133,25 +142,30 @@ struct GroupList
 struct NewJoinWaiting
 {
     int type;
+    bool success;
     int size;
-    NewJoinInfo friends[10];
+    NewJoinInfo members[20];
 };
 
 /*message record*/
 struct Time{
     int type;
+    bool success;
     int groupID;
     bool isfriend;
-    time_t latest_time;
+    bool ifnew[20];
 };//各个群的最新消息事件
 
 struct Message{
     time_t time;
+    int senderID;
+    char senderName[30];
     char content[100];
 };
 
 struct Record{
     int type;
+    bool success;
     int messageNumber;
     Message history[10];
 };
