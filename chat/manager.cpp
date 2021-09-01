@@ -118,12 +118,12 @@ void Manager::setFriends(QVector<Friend> &friends)
     char temp[100];
     for (auto &f : friends) {
         sprintf(temp, "%d %d %s %s\n",
-                f.id, f.group_id, f.name.toUtf8().data(), f.avatar_path.toUtf8().data());
+                f.id, f.group_id, f.name.toStdString().c_str(), f.avatar_path.toStdString().c_str());
         s.append(temp);
     }
 
     friends_list.open(QIODevice::WriteOnly);
-    friends_list.write(s.toUtf8());
+    friends_list.write(s.toStdString().c_str());
     friends_list.close();
     busy = false;
 }
@@ -139,7 +139,7 @@ void Manager::setGroups(QVector<Group> &groups)
     }
 
     groups_list.open(QIODevice::WriteOnly);
-    groups_list.write(s.toUtf8());
+    groups_list.write(.toStdString().c_str());
     groups_list.close();
     busy = false;
 }
@@ -193,7 +193,7 @@ void Manager::setMsg(int groupID, QVector<Msg>& messages)
         s += i.text + '\n';
     }
 
-    f.write(s.toUtf8());
+    f.write(s.toStdString().c_str());
     f.close();
     busy = false;
 }
