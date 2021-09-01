@@ -15,9 +15,11 @@ acceptReq::~acceptReq()
 
 void acceptReq::setUi(int groupid, int senderid, QString sendername, QString textinfo)
 {
-    this->ui->id->setText(QString(senderid));
+    this->ui->id->setText(QString("%1").arg(senderid));
     this->ui->text->setText(textinfo);
     this->ui->sendername->setText(sendername);
+    groupId = groupid;
+    senderId = senderid;
 
     if(groupid == 0)
     {
@@ -29,18 +31,8 @@ void acceptReq::setUi(int groupid, int senderid, QString sendername, QString tex
     {
         this->ui->type->setText("请求加入群聊");
         this->ui->grouplabel->show();
-        this->ui->groupid->setText(QString(groupid));
+        this->ui->groupid->setText(QString("%1").arg(groupid));
     }
-}
-
-void acceptReq::setgroupid(int group)
-{
-    this->groupId = group;
-}
-
-void acceptReq::setsenderid(int sender)
-{
-    this->senderId = sender;
 }
 
 void acceptReq::on_accept_clicked()
