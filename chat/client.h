@@ -89,7 +89,7 @@ public:
 
     // 在线时，处理三类消息
     void newFriend(int senderID, QString name, QString text);
-    void newJoin(int senderID, QString name, int groupID, QString text);
+    void newJoin(int senderID, QString senderName, int groupID, QString groupName, QString text);
     void newText(int groupID);
 
     void requestfriendList();

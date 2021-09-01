@@ -153,7 +153,9 @@ QVector<Msg> Manager::getMsg(int groupID)
     QVector<Msg> msg;
 
     if (!f.exists()) {
+        f.open(QIODevice::WriteOnly);
         busy = false;
+        f.close();
         return msg;
     }
 
