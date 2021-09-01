@@ -53,7 +53,7 @@ public:
 
     QVector<Msg> getMsg(int groupID);
     void setMsg(int groupID, QVector<Msg>& messages);
-    void appendMsg(int groupID, Msg messages);
+    void appendMsg(int groupID, Msg msg);
 
     QString getFriendName(int id);
     int getFriendGroup(int id);
