@@ -46,10 +46,6 @@ void UsrMain::on_morefunc_clicked()
     emit this->signal_func();
 }
 
-void UsrMain::on_search_clicked()
-{
-    this->showdialog();
-}
 
 void UsrMain::on_logout_clicked()
 {

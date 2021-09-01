@@ -26,8 +26,6 @@ Client::Client(QObject *parent) : QObject(parent)
 
     connect(log_w, SIGNAL(signal_login(int, QString, bool)), this, SLOT(slot_login(int, QString, bool)));
     connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
-
-    connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
     
     // 启动UI
     /*
@@ -101,7 +99,7 @@ void Client::slot_serverHandler(SocketMsg msg)
     }
     else if (msg.type == S2C::SERVER_NEWJOIN) {
         auto k = *(S2C::NewJoin *)msg.data;
-        newJoin(k.senderID, k.senderName, k.groupID, k.text);
+        newJoin(k.senderID, k.senderName, k.groupID, k.groupName, k.text);
     }
     else if (msg.type == S2C::SERVER_MSG_TEXT) {
         getText(*(S2C::Text*)msg.data);
@@ -539,7 +537,7 @@ void Client::newFriend(int senderID, QString name, QString text)
     ac->show(); 
 }
 
-void Client::newJoin(int senderID, QString name, int groupID, QString text)
+void Client::newJoin(int senderID, QString senderName, int groupID, QString groupName, QString text)
 {
     // 显示
     acceptReq* ac = new acceptReq();

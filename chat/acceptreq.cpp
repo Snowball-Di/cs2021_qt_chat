@@ -13,7 +13,7 @@ acceptReq::~acceptReq()
     delete ui;
 }
 
-void acceptReq::setUi(int groupid, int senderid, QString sendername, QString textinfo)
+void acceptReq::setUi(int senderid, QString sendername, int groupid, QString groupname, QString textinfo)
 {
     this->ui->id->setText(QString("%1").arg(senderid));
     this->ui->text->setText(textinfo);
