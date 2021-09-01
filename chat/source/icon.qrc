@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>icon/icon_addGroup.png</file>
+        <file>icon/icon_back.png</file>
+        <file>icon/icon_mini.png</file>
+        <file>icon/icon_newfriend.png</file>
+        <file>icon/icon_newGroup.png</file>
+        <file>icon/icon_newmessage.png</file>
+        <file>icon/icon_shutdown.png</file>
+        <file>icon/icon_pic.png</file>
+    </qresource>
+</RCC>

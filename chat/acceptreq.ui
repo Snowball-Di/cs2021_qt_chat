@@ -67,7 +67,13 @@
      <enum>QFrame::Box</enum>
     </property>
     <property name="text">
-     <string>头像</string>
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="source/icon.qrc">:/icon/icon/icon_pic.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="type">
@@ -150,6 +156,8 @@
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="source/icon.qrc"/>
+ </resources>
  <connections/>
 </ui>

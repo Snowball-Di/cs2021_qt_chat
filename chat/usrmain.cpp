@@ -16,7 +16,6 @@ UsrMain::UsrMain(QWidget *parent) :
     ui->setupUi(this);
     setWindowFlags(Qt::FramelessWindowHint | windowFlags());
     setAttribute(Qt::WA_TranslucentBackground);
-    resize(800, 600);    
     ui->friendlist->setChecked(true);
 }
 
@@ -55,6 +54,7 @@ void UsrMain::on_search_clicked()
 void UsrMain::on_logout_clicked()
 {
     emit signal_logout();
+    exit(EXIT_SUCCESS);
 }
 
 void UsrMain::setDialogItem(listItem *dialog,

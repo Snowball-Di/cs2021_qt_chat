@@ -1,11 +1,15 @@
 #include "moredetail.h"
 #include "ui_moredetail.h"
+#include <QPainter>
+#include <QMouseEvent>
 
 Moredetail::Moredetail(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Moredetail)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::FramelessWindowHint | windowFlags());
+
 }
 
 Moredetail::~Moredetail()
@@ -41,4 +45,21 @@ void Moredetail::on_newgroup_clicked()
 {
     this->newgroup->setinfo();
     this->newgroup->show();
+}
+
+void Moredetail::mousePressEvent(QMouseEvent *e)
+{
+    if(e->button() == Qt::LeftButton)
+    {
+        p = e->globalPos() - this->frameGeometry().topLeft();
+    }
+}
+
+void Moredetail::mouseMoveEvent(QMouseEvent *e)
+{
+    if(e->buttons() & Qt::LeftButton)
+    {
+        move(e->globalPos() - p);
+    }
+
 }

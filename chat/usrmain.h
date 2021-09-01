@@ -6,6 +6,8 @@
 #include "listitem.h"
 #include "moredetail.h"
 #include "manager.h"
+#include <QPainter>
+#include <QMouseEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class UsrMain; }
@@ -32,10 +34,13 @@ public:
     listItem* items; //item数组
     int len; //item长度
 
+    void mouseMoveEvent(QMouseEvent *e);
+
+    void mousePressEvent(QMouseEvent *e);
+
 protected:
 //    void resizeEvent(QResizeEvent *event);
-    void mouseMoveEvent(QMouseEvent *e);
-    void mousePressEvent(QMouseEvent *e);
+
 
     void setDialogItem(listItem *dialog,
         QListWidgetItem *item, 

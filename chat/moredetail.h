@@ -3,7 +3,10 @@
 
 #include <QDialog>
 #include "addnew.h"
+#include <QPainter>
+#include <QMouseEvent>
 #include "newgroup.h"
+
 namespace Ui {
 class Moredetail;
 }
@@ -22,8 +25,14 @@ public:
     addNew *addgroup = new addNew(this, false);
     newGroup *newgroup = new newGroup(this);
 
+
+    void mousePressEvent(QMouseEvent *e);
+
+    void mouseMoveEvent(QMouseEvent *e);
+
 private:
     Ui::Moredetail *ui;
+    QPoint p;
 
 
 private slots:

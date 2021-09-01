@@ -18,9 +18,12 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>401</width>
-     <height>131</height>
+     <width>441</width>
+     <height>441</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(226, 249, 255);</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::StyledPanel</enum>
@@ -92,9 +95,15 @@
     <property name="text">
      <string>返回</string>
     </property>
+    <property name="icon">
+     <iconset resource="source/icon.qrc">
+      <normaloff>:/icon/icon/icon_back.png</normaloff>:/icon/icon/icon_back.png</iconset>
+    </property>
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="source/icon.qrc"/>
+ </resources>
  <connections/>
 </ui>

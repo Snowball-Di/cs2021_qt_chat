@@ -22,6 +22,9 @@
      <height>211</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background: rgb(226, 249, 255);</string>
+   </property>
    <property name="frameShape">
     <enum>QFrame::StyledPanel</enum>
    </property>
@@ -37,6 +40,9 @@
       <height>28</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background: transparent;</string>
+    </property>
     <property name="text">
      <string>保存</string>
     </property>
@@ -49,6 +55,9 @@
       <width>93</width>
       <height>28</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: transparent;</string>
     </property>
     <property name="text">
      <string>发送</string>
@@ -63,6 +72,9 @@
       <height>91</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background: rgb(255, 255, 255);</string>
+    </property>
     <property name="placeholderText">
      <string>请输入验证消息</string>
     </property>
@@ -75,6 +87,9 @@
       <width>311</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background: rgb(255, 255, 255);</string>
     </property>
     <property name="placeholderText">
      <string>请输入群账号或好友账号</string>
@@ -89,12 +104,27 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background: transparent;</string>
+    </property>
     <property name="text">
      <string>返回</string>
+    </property>
+    <property name="icon">
+     <iconset resource="source/icon.qrc">
+      <normaloff>:/icon/icon/icon_back.png</normaloff>:/icon/icon/icon_back.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>25</width>
+      <height>25</height>
+     </size>
     </property>
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="source/icon.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -34,7 +34,6 @@ void acceptReq::setUi(int groupid, int senderid, QString sendername, QString tex
         this->ui->grouplabel->show();
         this->ui->groupid->setText(QString("%1").arg(groupid));
         this->ui->text->setText(textinfo);
-
     }
 }
 

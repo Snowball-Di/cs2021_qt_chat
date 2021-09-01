@@ -80,7 +80,8 @@ FORMS += \
     usrmain.ui
 
 RESOURCES += \
-    source\img.qrc
+    source\img.qrc \
+    source\icon.qrc
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

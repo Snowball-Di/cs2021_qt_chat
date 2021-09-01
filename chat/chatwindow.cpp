@@ -12,7 +12,6 @@ ChatWindow::ChatWindow(QWidget *parent) :
     ui->setupUi(this);
 
     setWindowFlags(Qt::FramelessWindowHint | windowFlags());
-    setAttribute(Qt::WA_TranslucentBackground);
 }
 
 ChatWindow::~ChatWindow()
