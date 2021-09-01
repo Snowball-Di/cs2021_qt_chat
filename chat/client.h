@@ -98,7 +98,7 @@ public:
     void getLogin(S2C::Response& res);
     void getFriendReq(S2C::Response& res);
     void getAcceptReq(S2C::Response& res);
-    void getNewGroup(S2C::Response& res);
+    void getNewGroup(S2C::NewGroup& res);
     void getFriendList(S2C::FriendList& res);
     void getGroupList(S2C::GroupList& res);
     void getDialog(S2C::Record& res);

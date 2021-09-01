@@ -116,7 +116,7 @@ void Manager::setFriends(QVector<Friend> &friends)
     QString s;
     char temp[100];
     for (auto &f : friends) {
-        sprintf(temp, "%d %d %s\n",
+        sprintf(temp, "%d %d %s\n\0",
                 f.id, f.group_id, f.name.toStdString().c_str());
         s.append(temp);
     }
