@@ -10,12 +10,12 @@
 listItem::listItem(QWidget *parent, int groupid, int friid) :QWidget(parent), group_id(groupid), fri_id(friid)
 {
     //TODO 接入好友列表返回的头像
-    d_pic = QPixmap(":/img/img/log_icon.png");
+    d_pic = QPixmap(":/icon/icon/icon_pic.png");
     d_name = QString("Snowball");
 
     //TODO 更改等待页面
     d_waitingMovie = new QMovie(this);
-    d_waitingMovie->setFileName(":/img/img/log_icon.png");
+    d_waitingMovie->setFileName(":/icon/icon/icon_pic.png");
     d_waiting = new QLabel(this);
     d_waiting->setMovie(d_waitingMovie);
     d_waiting->resize(16, 16);
@@ -28,9 +28,11 @@ void listItem::setItem(QString name, QPixmap pic, List_Type type)
     d_name = name;
     d_type = type;
 
+    setAttribute(Qt::WA_TranslucentBackground,true);
+
     if(d_type == Group)
     {
-        d_pic = QPixmap(":/img/img/log_icon.png");
+        d_pic = QPixmap(":/icon/icon/icon_log.png");
     }
     else d_pic = pic;
 

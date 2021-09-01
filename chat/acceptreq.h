@@ -26,7 +26,7 @@ public:
     void setsenderid(int);
     void setgroupid(int);
 
-    void setUi(int groupid, int senderid, QString sendername, QString textinfo);
+    void setUi(int senderid, QString sendername, int groupid, QString groupname, QString textinfo);
 
 signals:
     void signal_acceptReq(int, int, bool);
@@ -39,6 +39,7 @@ private:
     Ui::acceptReq *ui;
     int senderId;
     int groupId;
+    QString groupname;
 };
 
 #endif // ACCEPTREQ_H

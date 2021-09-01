@@ -17,11 +17,11 @@ chatmessagebox::chatmessagebox(QWidget *parent) : QWidget(parent)
 //    te_font.setLetterSpacing(QFont::PercentageSpacing, 100);          //300%,100为默认  //设置字间距%
 //    te_font.setLetterSpacing(QFont::AbsoluteSpacing, 0);             //设置字间距为3像素 //设置字间距像素值
     this->setFont(te_font);
-    m_leftPixmap = QPixmap(":/img/img/log_icon.png");
-    m_rightPixmap = QPixmap(":/img/img/log_icon.png");
+    m_leftPixmap = QPixmap(":/icon/icon/icon_pic.png");
+    m_rightPixmap = QPixmap(":/icon/icon/icon_pic.png");
 
     m_loadingMovie = new QMovie(this);
-    m_loadingMovie->setFileName(":/img/loading4.gif");
+    m_loadingMovie->setFileName(":/icon/icon/icon_pic.png");
     m_loading = new QLabel(this);
     m_loading->setMovie(m_loadingMovie);
     m_loading->resize(16,16);

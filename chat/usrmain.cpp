@@ -46,11 +46,6 @@ void UsrMain::on_morefunc_clicked()
     emit this->signal_func();
 }
 
-void UsrMain::on_search_clicked()
-{
-    this->showdialog();
-}
-
 void UsrMain::on_logout_clicked()
 {
     emit signal_logout();
@@ -133,7 +128,7 @@ void UsrMain::load_friendlist(QVector<Friend>& list)
         friends[i] = new listItem(ui->listWidget->parentWidget(), list[i].group_id, list[i].id);
         // TODO 接入头像
         QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
-        UsrMain::setDialogItem(friends[i], item, list[i].name, QPixmap(":/img/img/log_icon.png"), listItem::Group);
+        UsrMain::setDialogItem(friends[i], item, list[i].name, QPixmap(":/icon/icon/icon_pic.png"), listItem::Group);
     }
 }
 
@@ -141,14 +136,14 @@ void UsrMain::insert_friend(Friend &fri)
 {
     listItem *data = new listItem(ui->listWidget->parentWidget());
     QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
-    UsrMain::setDialogItem(data, item, fri.name, QPixmap(":/img/img/log_icon.png"), listItem::Friend);
+    UsrMain::setDialogItem(data, item, fri.name, QPixmap(":/icon/icon/icon_pic.png"), listItem::Friend);
 }
 
 void UsrMain::insert_group(Group& gro)
 {
     listItem *data = new listItem(ui->listWidget->parentWidget());
     QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
-    UsrMain::setDialogItem(data, item, gro.name, QPixmap(":/img/img/log_icon.png"), listItem::Group);
+    UsrMain::setDialogItem(data, item, gro.name, QPixmap(":/icon/icon/icon_pic.png"), listItem::Group);
 }
 
 

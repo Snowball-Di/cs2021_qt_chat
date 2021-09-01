@@ -59,7 +59,6 @@ signals:
 private slots:
     void on_morefunc_clicked();
     void on_logout_clicked();
-    void on_search_clicked();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
     void on_friendlist_clicked();
     void on_grouplist_clicked();

@@ -153,6 +153,7 @@ QVector<Msg> Manager::getMsg(int groupID)
     QVector<Msg> msg;
 
     if (!f.exists()) {
+        busy = false;
         return msg;
     }
 

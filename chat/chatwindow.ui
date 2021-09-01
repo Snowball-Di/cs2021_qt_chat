@@ -125,7 +125,7 @@
     <widget class="QLabel" name="name">
      <property name="geometry">
       <rect>
-       <x>280</x>
+       <x>270</x>
        <y>10</y>
        <width>121</width>
        <height>31</height>
@@ -157,6 +157,9 @@
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background: rgb(226, 249, 255);</string>
+    </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
     </property>
@@ -177,6 +180,9 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 255);</string>
      </property>
     </widget>
     <widget class="QPushButton" name="send">
@@ -209,9 +215,9 @@
    <widget class="QListWidget" name="listWidget">
     <property name="geometry">
      <rect>
-      <x>-330</x>
+      <x>0</x>
       <y>70</y>
-      <width>1031</width>
+      <width>741</width>
       <height>311</height>
      </rect>
     </property>
@@ -221,17 +227,15 @@
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
+    <property name="tabletTracking">
+     <bool>false</bool>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
     <property name="styleSheet">
-     <string notr="true">QListWidget{background-image: url(:/img/img/cat3.jpg);
-background-position:center; color:rgb(51,51,51); border: 1px solid  rgb(247, 247, 247);outline:0px;}
-QListWidget::Item{background-color: rgb(247, 247, 247);}
-QListWidget::Item:hover{background-color: rgb(247, 247, 247); }
-QListWidget::item:selected{
-	background-color: rgb(247, 247, 247);
-	color:black; 
-    border: 1px solid  rgb(247, 247, 247);
-}
-QListWidget::item:selected:!active{border: 1px solid  rgb(247, 247, 247); background-color: rgb(247, 247, 247); color:rgb(51,51,51); } </string>
+     <string notr="true">background-image: url(:/img/img/cat3.jpg);
+background-position:center </string>
     </property>
     <property name="verticalScrollBarPolicy">
      <enum>Qt::ScrollBarAsNeeded</enum>

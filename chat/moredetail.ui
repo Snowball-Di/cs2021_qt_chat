@@ -26,7 +26,8 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-image: url(:/img/img/cat1.jpg);
+   <string notr="true">QDialog{background-image: url(:/img/img/cat1.jpg);}
+QMessageBox{background:rgb(226, 249, 255);}
 </string>
   </property>
   <widget class="QFrame" name="frame">

@@ -13,19 +13,22 @@ acceptReq::~acceptReq()
     delete ui;
 }
 
-void acceptReq::setUi(int groupid, int senderid, QString sendername, QString textinfo)
+void acceptReq::setUi(int senderid, QString sendername, int groupid, QString groupname, QString textinfo)
 {
     this->ui->id->setText(QString("%1").arg(senderid));
     this->ui->text->setText(textinfo);
     this->ui->sendername->setText(sendername);
     groupId = groupid;
     senderId = senderid;
+    this->groupname = groupname;
 
     if(groupid == 0)
     {
         this->ui->type->setText("请求加你为好友");
         this->ui->grouplabel->hide();
         this->ui->groupid->hide();
+        this->ui->groupname->hide();
+        this->ui->label->hide();
         this->ui->text->setText(textinfo);
     }
     else
@@ -33,6 +36,7 @@ void acceptReq::setUi(int groupid, int senderid, QString sendername, QString tex
         this->ui->type->setText("请求加入群聊");
         this->ui->grouplabel->show();
         this->ui->groupid->setText(QString("%1").arg(groupid));
+        this->ui->groupname->setText(groupname);
         this->ui->text->setText(textinfo);
     }
 }
