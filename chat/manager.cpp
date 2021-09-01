@@ -78,7 +78,6 @@ QVector<Friend> Manager::getFriends()
         temp.id = l[0].toInt();
         temp.group_id = l[1].toInt();
         temp.name = l[2];
-        temp.avatar_path = l[3].remove('\n');
         friends.append(temp);
     }
 
@@ -117,8 +116,8 @@ void Manager::setFriends(QVector<Friend> &friends)
     QString s;
     char temp[100];
     for (auto &f : friends) {
-        sprintf(temp, "%d %d %s %s\n",
-                f.id, f.group_id, f.name.toStdString().c_str(), f.avatar_path.toStdString().c_str());
+        sprintf(temp, "%d %d %s\n",
+                f.id, f.group_id, f.name.toStdString().c_str());
         s.append(temp);
     }
 
@@ -139,7 +138,7 @@ void Manager::setGroups(QVector<Group> &groups)
     }
 
     groups_list.open(QIODevice::WriteOnly);
-    groups_list.write(.toStdString().c_str());
+    groups_list.write(s.toStdString().c_str());
     groups_list.close();
     busy = false;
 }
@@ -161,13 +160,13 @@ QVector<Msg> Manager::getMsg(int groupID)
     Msg temp;
     while (1) {
         auto line = QString(f.readLine());
-        if (line.length() == 0) {
+        if (line.length() < 8) {
             f.close();
             busy = false;
             return msg;
         }
 
-        auto l = line.split(' ');
+        auto l = line.split('`');
         temp.senderID = l[0].toInt();
         temp.senderName = l[1];
         temp.sendTime = l[2].toLong();
@@ -187,11 +186,33 @@ void Manager::setMsg(int groupID, QVector<Msg>& messages)
 
     QString s = "";
     for (auto &i : messages) {
-        s += QString("%1 ").arg(i.senderID);
-        s += i.senderName + ' ';
-        s +=  QString("%1 ").arg(i.sendTime);
+        s += QString("%1`").arg(i.senderID);
+        s += i.senderName + '`';
+        s +=  QString("%1`").arg(i.sendTime);
         s += i.text + '\n';
     }
+
+    f.write(s.toStdString().c_str());
+    f.close();
+    busy = false;
+}
+
+void Manager::appendMsg(int groupID, Msg msg)
+{
+    while (isBusy());
+    busy = true;
+    QString str = QString("%1").arg(groupID);
+    QFile f(root + "/record/" + str);
+    if (f.exists())
+        f.open(QIODevice::Append);
+    else
+        f.open(QIODevice::WriteOnly);
+
+    QString s = "";
+    s += QString("%1`").arg(msg.senderID);
+    s += msg.senderName + '`';
+    s +=  QString("%1`").arg(msg.sendTime);
+    s += msg.text + '\n';
 
     f.write(s.toStdString().c_str());
     f.close();

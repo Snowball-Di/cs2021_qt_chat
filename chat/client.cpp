@@ -221,20 +221,18 @@ void Client::slot_send(int groupID, QString text)
     time(&msg.sendTime);
 
     q2c(msg.text, text, sizeof(msg.text));
+    manager->appendMsg(groupID, {usrID, usrName, msg.sendTime, text});
 
     s->sendMessage((char *)&msg, sizeof(msg));
+    /*
+     * ui
+     */
 }
 
 void Client::getText(S2C::Text& res)
 {
     auto msgs = manager->getMsg(res.groupID);
-    Msg m;
-    m.text = res.text;
-    m.sendTime = res.sendTime;
-    m.senderID = res.senderID;
-    m.senderName = res.senderName;
-    msgs.append(m);
-    manager->setMsg(res.groupID, msgs);
+    manager->appendMsg(res.groupID, {res.senderID, res.senderName, res.sendTime, res.text});
     newText(res.groupID);
 }
 
