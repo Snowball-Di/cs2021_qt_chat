@@ -2,6 +2,7 @@
 #include "ui_chatwindow.h"
 #include <QDateTime>
 #include <QDebug>
+#include <QMouseEvent>
 
 
 ChatWindow::ChatWindow(QWidget *parent) :
@@ -10,7 +11,8 @@ ChatWindow::ChatWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    resize(800, 600);
+    setWindowFlags(Qt::FramelessWindowHint | windowFlags());
+    setAttribute(Qt::WA_TranslucentBackground);
 }
 
 ChatWindow::~ChatWindow()
@@ -58,6 +60,23 @@ void ChatWindow::on_send_clicked()
     ui->listWidget->setCurrentRow(ui->listWidget->count()-1);
 }
 
+void ChatWindow::mousePressEvent(QMouseEvent *e)
+{
+    if(e->button() == Qt::LeftButton)
+    {
+        p = e->globalPos() - this->frameGeometry().topLeft();
+    }
+}
+
+void ChatWindow::mouseMoveEvent(QMouseEvent *e)
+{
+    if(e->buttons() & Qt::LeftButton)
+    {
+        move(e->globalPos() - p);
+    }
+
+}
+
 void ChatWindow::dealMessage(chatmessagebox *messageW, QListWidgetItem *item, QString text, time_t time,  chatmessagebox::Text_Type type)
 {
     messageW->setFixedWidth(this->width());
@@ -67,6 +86,16 @@ void ChatWindow::dealMessage(chatmessagebox *messageW, QListWidgetItem *item, QS
     ui->listWidget->setItemWidget(item, messageW);
 }
 
+void ChatWindow::on_clear_clicked()
+{
+    ui->textEdit->clear();
+}
+
+void ChatWindow::on_back_clicked()
+{
+    this->hide();
+}
+
 
 void ChatWindow::dealMessageTime(time_t curMsgTime)
 {
@@ -74,10 +103,10 @@ void ChatWindow::dealMessageTime(time_t curMsgTime)
     if(ui->listWidget->count() > 0) {
         QListWidgetItem* lastItem = ui->listWidget->item(ui->listWidget->count() - 1);
         chatmessagebox* messageW = (chatmessagebox*)ui->listWidget->itemWidget(lastItem);
-        int lastTime = messageW->time().toInt();
+        int lastTime = messageW->time();
         int curTime = curMsgTime;
         qDebug() << "curTime lastTime:" << curTime - lastTime;
-        isShowTime = ((curTime - lastTime) > 60); // 两个消息相差一分钟
+        isShowTime = ((curTime - lastTime) > 120); // 两个消息相差两分钟
 //        isShowTime = true;
     } else {
         isShowTime = true;
@@ -113,6 +142,7 @@ void ChatWindow::loadMessageHis(QVector<Msg>&list, int usrid)
             dealMessage(messageW, item, list[i].text, list[i].sendTime, chatmessagebox::User_Me);
         }
     }
+    ui->listWidget->setCurrentRow(ui->listWidget->count()-1);
 }
 
 void ChatWindow::she_sendingMsg(QString text, time_t time)

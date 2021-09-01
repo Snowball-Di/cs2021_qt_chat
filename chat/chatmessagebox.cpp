@@ -41,7 +41,7 @@ void chatmessagebox::setItem(QString text, time_t time, QSize allSize, chatmessa
     m_msg = text;
     m_userType = userType;
     m_time = time;
-    m_curTime = QDateTime::fromTime_t(time).toString("hh:mm");
+    m_curTime = QDateTime::fromTime_t(m_time).toString("hh:mm");
     m_allSize = allSize;
     if(userType == User_Me) {
         if(!m_isSending) {

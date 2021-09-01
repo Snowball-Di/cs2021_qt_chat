@@ -30,7 +30,7 @@ public:
     QSize fontRect(QString str);
 
     inline QString text() {return m_msg;}
-    inline QString time() {return m_time;}
+    inline time_t time() {return m_time;}
     inline Text_Type userType() {return m_userType;}
 
 protected:
@@ -38,7 +38,7 @@ protected:
 
 private:
     QString m_msg;
-    QString m_time;
+    time_t m_time;
     QString m_curTime;
 
     QSize m_allSize;

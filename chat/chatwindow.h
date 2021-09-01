@@ -29,6 +29,9 @@ public:
 
     void setUi(QString name, QString id);
 
+    void mousePressEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
+
 signals:
     void signal_send(int, QString);
 
@@ -36,8 +39,12 @@ protected:
 private slots:
     void on_send_clicked();
 
+    void on_back_clicked();
+    void on_clear_clicked();
+
 private:
     Ui::ChatWindow *ui;
+    QPoint p;
 };
 
 #endif // MAINWINDOW_H
