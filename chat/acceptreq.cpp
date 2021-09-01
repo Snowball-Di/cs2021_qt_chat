@@ -26,12 +26,15 @@ void acceptReq::setUi(int groupid, int senderid, QString sendername, QString tex
         this->ui->type->setText("请求加你为好友");
         this->ui->grouplabel->hide();
         this->ui->groupid->hide();
+        this->ui->text->setText(textinfo);
     }
     else
     {
         this->ui->type->setText("请求加入群聊");
         this->ui->grouplabel->show();
         this->ui->groupid->setText(QString("%1").arg(groupid));
+        this->ui->text->setText(textinfo);
+
     }
 }
 

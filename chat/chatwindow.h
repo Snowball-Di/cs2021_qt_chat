@@ -32,6 +32,8 @@ public:
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
 
+    void keyPressEvent(QKeyEvent *e);
+
 signals:
     void signal_send(int, QString);
 

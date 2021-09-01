@@ -419,11 +419,16 @@ void Client::slot_dialog(int groupID)
 
 void Client::getDialog(S2C::Record& res)
 {
-    QVector<Msg> temp;
-    for (int i = 0; i < res.messageNumber; i++)
-        temp.append({res.history[i].senderID, res.history[i].senderName,
-                     res.history[i].time, res.history[i].content});
-    manager->setMsg(groupID_dialog, temp);
+
+    if(res.success)
+    {
+        QVector<Msg> temp;
+        for (int i = 0; i < res.messageNumber; i++)
+            temp.append({res.history[i].senderID, res.history[i].senderName,
+                         res.history[i].time, res.history[i].content});
+        manager->setMsg(groupID_dialog, temp);
+    }
+
 
     QVector<Msg> msgList = manager->getMsg(groupID_dialog);
 
@@ -438,7 +443,6 @@ void Client::getDialog(S2C::Record& res)
     }
 
     ChatWindow *temp_w = new ChatWindow(this->main_w);
-    connect(temp_w, SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
     connect(temp_w, SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
     temp_w->groupid = groupID_dialog;
     // todo 显示对方信息

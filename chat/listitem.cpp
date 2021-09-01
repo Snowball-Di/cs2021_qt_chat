@@ -54,6 +54,8 @@ void listItem::setItemDone()
 
 void listItem::setItemLoad()
 {
+    d_loaded = false;
+    d_waiting->move(m_kuangRightRect.x() - d_waiting->width() - 10, m_kuangRightRect.y()+m_kuangRightRect.height()/2- d_waiting->height()/2);
     d_waiting->show();
     d_waitingMovie->start();
 }

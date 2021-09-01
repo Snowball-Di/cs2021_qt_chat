@@ -14,6 +14,8 @@ UsrMain::UsrMain(QWidget *parent) :
 {
     this->showfriend = true;
     ui->setupUi(this);
+    setWindowFlags(Qt::FramelessWindowHint | windowFlags());
+    setAttribute(Qt::WA_TranslucentBackground);
     resize(800, 600);    
     ui->friendlist->setChecked(true);
 }

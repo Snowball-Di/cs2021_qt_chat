@@ -77,6 +77,14 @@ void ChatWindow::mouseMoveEvent(QMouseEvent *e)
 
 }
 
+void ChatWindow::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+    {
+        emit ui->send->clicked();
+    }
+}
+
 void ChatWindow::dealMessage(chatmessagebox *messageW, QListWidgetItem *item, QString text, time_t time,  chatmessagebox::Text_Type type)
 {
     messageW->setFixedWidth(this->width());

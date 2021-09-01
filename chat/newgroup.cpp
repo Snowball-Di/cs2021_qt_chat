@@ -31,9 +31,9 @@ void newGroup::on_up_clicked()
     else
     {
         emit this->signal_newGroup(this->ui->lineEdit->text());
-        QMessageBox::information(this, tr("提示"), tr("提交成功"), QMessageBox::Yes);
-        this->ui->lineEdit->clear();
-        this->name.clear();
+//        QMessageBox::information(this, tr("提示"), tr("提交成功"), QMessageBox::Yes);
+//        this->ui->lineEdit->clear();
+//        this->name.clear();
     }
 }
 

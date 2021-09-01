@@ -54,6 +54,7 @@ void addNew::on_save_clicked()
     this->id = ui->id->text();
     this->text = ui->text->toPlainText();
     QMessageBox::information(this, tr("提示"), tr("您填写的信息已保存"), QMessageBox::Yes);
+    this->hide();
 }
 
 void addNew::on_send_clicked()
@@ -89,10 +90,7 @@ void addNew::on_send_clicked()
                 else
                    emit this->signal_groupReq(id, text);
 
-//                QMessageBox::information(this, tr("提示"), tr("您已经提交成功"), QMessageBox::Yes);
-//                this->id.clear();
-//                this->text.clear();
-//                this->close();
+                this->close();
             }
         }
 }
