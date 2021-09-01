@@ -12,6 +12,5 @@ int main(int argc, char *argv[])
 
     Client* client = Client::client_init();
     client->s->connectToHost();
-//    client->execute();
     return a.exec();
 }

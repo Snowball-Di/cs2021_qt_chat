@@ -18,12 +18,13 @@ public:
 
 
     void setUser(QString name, QString id, QPixmap pic);
-
-private:
-    Ui::Moredetail *ui;
     addNew *addfriend = new addNew(this, true);
     addNew *addgroup = new addNew(this, false);
     newGroup *newgroup = new newGroup(this);
+
+private:
+    Ui::Moredetail *ui;
+
 
 private slots:
     void on_close_clicked();

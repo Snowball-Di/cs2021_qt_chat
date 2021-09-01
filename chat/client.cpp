@@ -9,6 +9,11 @@ Client::Client(QObject *parent) : QObject(parent)
     log_w = new LogWindow();
     main_w = new UsrMain();
     regis = new Register();
+    //
+    /*
+     * 添加好友功能没有connect
+     *
+     */
     connect(main_w, SIGNAL(signal_dialog(int)), this, SLOT(slot_dialog(int)));
     connect(main_w, SIGNAL(signal_func()), this, SLOT(slot_func()));
     connect(main_w, SIGNAL(signal_logout()), this, SLOT(slot_logout()));
@@ -21,11 +26,7 @@ Client::Client(QObject *parent) : QObject(parent)
     connect(log_w, SIGNAL(signal_login(int, QString, bool)), this, SLOT(slot_login(int, QString, bool)));
     connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
 
-//    for (int i = 0; i < 10; i++)
-//        connect(chat_w[i], SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
-
-//    connect(acpt, SIGNAL(signal_acceptReq(bool)), this, SLOT(slot_acceptReq(bool)));
-    
+    connect(log_w, SIGNAL(signal_to_register()), this, SLOT(slot_to_register()));
     
     // 启动UI
     /*
@@ -66,7 +67,11 @@ void Client::slot_func()
     more_func = new Moredetail(this->cli_ui);
     QString name = usrName;
     int usr_id = usrID;
+    more_func->show();
     more_func->setUser(name, QString("%1").arg(usr_id), QPixmap(":/img/img/log_icon.png"));
+    connect(more_func->addfriend, SIGNAL(signal_friendReq(int, QString)), this, SLOT(slot_friendReq(int, QString)));
+    connect(more_func->addgroup, SIGNAL(signal_groupReq(int, QString)), this, SLOT(slot_groupReq(int, QString)));
+    connect(more_func->newgroup, SIGNAL(signal_newGroup(QString)), this, SLOT(slot_newGroup(QString)));
 }
 
 
@@ -120,15 +125,19 @@ void Client::slot_serverHandler(SocketMsg msg)
     }
 }
 
+void q2c(char* ans,QString& qstr,int size)
+{
+    std::string str=qstr.toStdString();
+    const char* cstr=str.c_str();
+    memset(ans,0,size);
+    memcpy(ans,cstr,str.length());
+}
+
 void Client::slot_register(QString name, QString password)
 {
     C2S::Register msg;
-    auto n = name.toLocal8Bit();
-    auto p = password.toLocal8Bit();
-    memcpy(msg.name, n.data(), n.length());
-    msg.name[n.length()] = 0;
-    memcpy(msg.password, p.data(), p.length());
-    msg.password[p.length()] = 0;
+    q2c(msg.name, name, sizeof(msg.name));
+    q2c(msg.password, password, sizeof(msg.password));
     msg.type = C2S::MSG_REGISTER;
 
     s->sendMessage((char *)&msg, sizeof(msg));
@@ -136,7 +145,6 @@ void Client::slot_register(QString name, QString password)
 
 void Client::getRegister(S2C::Register& msg)
 {
-
     if (msg.success == true) {
         // 注册成功
         int usrID = msg.usrID;  // 获取ID字符串
@@ -164,9 +172,7 @@ void Client::slot_login(int usrID, QString password, bool save)
     time(&msg.sendTime);
     msg.operation = true;
 
-    auto p = password.toStdString();
-    memcpy(msg.password, p.c_str(), p.length());
-    msg.password[p.length()] = 0;
+    q2c(msg.password, password, sizeof(msg.password));
 
     this->usrID = usrID;
     s->sendMessage((char *)&msg, sizeof(msg));
@@ -182,6 +188,7 @@ void Client::getLogin(S2C::Response& res)
         // 反复请求数据
 //        initMain();
         requestgroupList();
+        this->log_w->hide();
         qDebug() << "login suc ";
         qDebug() << "user's name" << res.text;
     } else {
@@ -213,8 +220,7 @@ void Client::slot_send(int groupID, QString text)
     msg.groupID = groupID;
     time(&msg.sendTime);
 
-    memcpy(msg.text, text.data(), text.length());
-    msg.text[text.length()] = 0;
+    q2c(msg.text, text, sizeof(msg.text));
 
     s->sendMessage((char *)&msg, sizeof(msg));
 }
@@ -226,7 +232,7 @@ void Client::getText(S2C::Text& res)
     m.text = res.text;
     m.sendTime = res.sendTime;
     m.senderID = res.senderID;
-//    m.senderName = res.name;
+    m.senderName = res.senderName;
     msgs.append(m);
     manager->setMsg(res.groupID, msgs);
     newText(res.groupID);
@@ -241,8 +247,7 @@ void Client::slot_friendReq(int friendID, QString verifyText)
     msg.add = true;
     time(&msg.sendTime);
 
-    memcpy(msg.text, verifyText.data(), verifyText.length());
-    msg.text[verifyText.length()] = 0;
+    q2c(msg.text, verifyText, sizeof(msg.text));
 
     s->sendMessage((char *)&msg, sizeof(msg));
     sign = 2;
@@ -296,8 +301,7 @@ void Client::slot_newGroup(QString groupName)
     msg.userID = usrID;
     time(&msg.sendTime);
 
-    memcpy(msg.name, groupName.data(), groupName.length());
-    msg.name[groupName.length()] = 0;
+    q2c(msg.name, groupName, sizeof(msg.name));
 
     s->sendMessage((char *)&msg, sizeof(msg));
     sign = 4;
@@ -350,7 +354,6 @@ void Client::getFriendList(S2C::FriendList& res)
     }
     manager->setFriends(temp);
 
-
     if (showFriend) {
         // ui显示
         this->main_w->load_friendlist(temp);
@@ -383,7 +386,6 @@ void Client::getGroupList(S2C::GroupList& res)
 
     if (showGroup) {
         // ui显示
-        this->log_w->hide();
         this->main_w->load_grouplist(temp);
         this->main_w->show();
     }

@@ -25,7 +25,6 @@ public:
     void insert_friend(Friend&);
     void insert_group(Group&);
 
-    Ui::Moredetail* more;
     int Usrid;
     int Name;
     int pic;

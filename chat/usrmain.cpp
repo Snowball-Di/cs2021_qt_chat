@@ -42,11 +42,6 @@ void UsrMain::mouseMoveEvent(QMouseEvent *e)
 
 void UsrMain::on_morefunc_clicked()
 {
-    // TO DELETE
-    Moredetail *more = new Moredetail(this);
-    more->show();
-
-
     emit this->signal_func();
 }
 
@@ -99,7 +94,7 @@ void UsrMain::on_friendlist_clicked()
     if(ui->friendlist->isChecked())
     {
         this->showfriend = true;
-        emit this->signal_groupList();
+        emit this->signal_friendList();
         ui->grouplist->setChecked(false);
     }
 }
