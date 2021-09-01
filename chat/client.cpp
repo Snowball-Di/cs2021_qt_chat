@@ -113,7 +113,7 @@ void Client::slot_serverHandler(SocketMsg msg)
         getGroupList(*(S2C::GroupList*)msg.data);
     }
     else if (msg.type == S2C::SERVER_TEXTRECORD) {
-        getDialog(*(S2C::Record*)msg.data);
+        getRecord(*(S2C::Record*)msg.data);
     }
     else if (msg.type == S2C::SERVER_WAITING_FRIEND) {
         getWaitingFriends(*(S2C::NewFriendWaiting*)msg.data);
@@ -255,10 +255,10 @@ void Client::getFriendReq(S2C::Response& res)
 {
     if (res.success == true) {
         // 发送成功
-        QMessageBox::information(this->more_func, tr("success"), tr(res.text), QMessageBox::Yes);
+        QMessageBox::information(this->more_func, tr("Success"), tr(res.text), QMessageBox::Yes);
     } else {
         // 发送失败
-        QMessageBox::information(this->more_func, tr("success"), tr(res.text), QMessageBox::Yes);
+        QMessageBox::information(this->more_func, tr("Attention"), tr(res.text), QMessageBox::Yes);
     }
 }
 
@@ -404,12 +404,12 @@ void Client::slot_logout()
     s->sendMessage((char *)&msg, sizeof(msg));
 }
 
-static int groupID_dialog = 0;
+static int groupID_record = 0;
 
-void Client::slot_dialog(int groupID)
+void Client::slot_records(int groupID)
 {
     C2S::Record msg;
-    groupID_dialog = groupID;
+    groupID_record = groupID;
     msg.type = C2S::MSG_RECORD;
     msg.groupID = groupID;
     msg.messageNumber = 10;
@@ -417,23 +417,26 @@ void Client::slot_dialog(int groupID)
     s->sendMessage((char *)&msg, sizeof(msg));
 }
 
-void Client::getDialog(S2C::Record& res)
-{
 
+void Client::getRecord(S2C::Record& res)
+{
     if (res.success) {
         QVector<Msg> temp;
         for (int i = res.messageNumber-1; i >= 0; i--)
             temp.append({res.history[i].senderID, res.history[i].senderName,
                          res.history[i].time, res.history[i].content});
-        manager->setMsg(groupID_dialog, temp);
+        manager->setMsg(groupID_record, temp);
     }
+}
 
 
-    QVector<Msg> msgList = manager->getMsg(groupID_dialog);
+void Client::slot_dialog(int groupID)
+{
+    QVector<Msg> msgList = manager->getMsg(groupID);
 
     for(int i = 0; i < chat_w.length(); i++)
     {
-        if (chat_w[i]->groupid == groupID_dialog)
+        if (chat_w[i]->groupid == groupID)
         {
             chat_w[i]->loadMessageHis(msgList, usrID);
             chat_w[i]->show();
@@ -443,7 +446,7 @@ void Client::getDialog(S2C::Record& res)
 
     ChatWindow *temp_w = new ChatWindow(this->main_w);
     connect(temp_w, SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
-    temp_w->groupid = groupID_dialog;
+    temp_w->groupid = groupID;
     temp_w->loadMessageHis(msgList, usrID);
     // todo 显示对方信息
     temp_w->show();

@@ -55,6 +55,7 @@ void UsrMain::on_search_clicked()
 void UsrMain::on_logout_clicked()
 {
     emit signal_logout();
+    exit(EXIT_SUCCESS);
 }
 
 void UsrMain::setDialogItem(listItem *dialog,

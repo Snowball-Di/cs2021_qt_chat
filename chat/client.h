@@ -37,6 +37,7 @@ private slots:
 
     void slot_logout();
 
+    void slot_records(int groupID);
     void slot_dialog(int groupID);
     void slot_send(int groupID, QString text);
 
@@ -101,7 +102,7 @@ public:
     void getNewGroup(S2C::NewGroup& res);
     void getFriendList(S2C::FriendList& res);
     void getGroupList(S2C::GroupList& res);
-    void getDialog(S2C::Record& res);
+    void getRecord(S2C::Record& res);
     void getGroupReq(S2C::Response& res);
     void getWaitingFriends(S2C::NewFriendWaiting& res);
     void getWaitingGroups(S2C::NewJoinWaiting& res);
