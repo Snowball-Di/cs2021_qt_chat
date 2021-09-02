@@ -54,6 +54,25 @@ void ChatWindow::on_send_clicked()
 
     bool isSending = true; // 发送中
 
+    QPixmap pic1;
+    switch(myid % 5){
+        case 0:
+            pic1 = QPixmap(":/icon/icon/icon1.png");
+        break;
+        case 1:
+            pic1 = QPixmap(":/icon/icon/icon2.png");
+                    break;
+        case 2:
+            pic1 = QPixmap(":/icon/icon/icon3.png");
+                    break;
+        case 3:
+            pic1 = QPixmap(":/icon/icon/icon4.png");
+                    break;
+        case 4:
+            pic1 = QPixmap(":/icon/icon/icon5.png");
+                    break;
+    }
+
     qDebug()<<"addMessage" << msg << time << ui->listWidget->count();
 
         if(isSending) {
@@ -61,6 +80,7 @@ void ChatWindow::on_send_clicked()
 
             chatmessagebox* messageW = new chatmessagebox(ui->listWidget->parentWidget());
             QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
+            messageW->setPixmap(pic1, pic1);
             dealMessage(messageW, item, msg, time, chatmessagebox::User_Me);
         } else {
             bool isOver = true;
@@ -76,6 +96,7 @@ void ChatWindow::on_send_clicked()
 
                 chatmessagebox* messageW = new chatmessagebox(ui->listWidget->parentWidget());
                 QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
+                messageW->setPixmap(pic1, pic1);
                 dealMessage(messageW, item, msg, time, chatmessagebox::User_Me);
                 messageW->setItemSuccess();
             }

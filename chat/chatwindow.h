@@ -18,6 +18,7 @@ public:
     int groupid;
     int friendid;
     QString dialogname;
+    int myid;
 
     explicit ChatWindow(QWidget *parent = 0);
     ~ChatWindow();

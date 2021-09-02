@@ -459,7 +459,14 @@ void Client::slot_dialog(int groupID)
     QString ui_name = manager->getName(groupID, manager_id_data);
 
     QString ui_id = QString("%1").arg(manager_id_data);
-    temp_w->setUi(ui_name, QString("%1").arg(ui_id));
+    if(manager_id_data == 0)
+    {
+        temp_w->setUi(ui_name, QString("%1").arg(groupID));
+    }
+    else
+    {
+        temp_w->setUi(ui_name, QString("%1").arg(ui_id));
+    }
     temp_w->loadMessageHis(msgList, usrID);
     temp_w->show();
     chat_w.append(temp_w);
