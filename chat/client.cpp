@@ -441,23 +441,9 @@ void Client::slot_dialog(int groupID)
             return;
         }
     }
-
-    ChatWindow *temp_w = new ChatWindow(this->main_w);
+    ChatWindow *temp_w = new ChatWindow();
     connect(temp_w, SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
     temp_w->groupid = groupID;
-    for(int i = 0; i < this->main_w->len; i++)
-    {
-        if(this->main_w->items[i].group_id == groupID && this->main_w->items[i].d_type == listItem::Friend)
-        {
-            temp_w->setUi(this->main_w->items[i].d_name, QString("%1").arg(this->main_w->items[i].fri_id));
-            break;
-        }
-        else if(this->main_w->items[i].group_id == groupID && this->main_w->items[i].d_type == listItem::Group)
-        {
-            temp_w->setUi(this->main_w->items[i].d_name, QString("%1").arg(this->main_w->items[i].group_id));
-            break;
-        }
-    }
     temp_w->loadMessageHis(msgList, usrID);
     temp_w->show();
     chat_w.append(temp_w);

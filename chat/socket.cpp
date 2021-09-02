@@ -28,7 +28,7 @@ Socket* Socket::getSocket()
 
 void Socket::connectToHost()
 {
-    s->connectToHost("192.168.72.169" , 11111);
+    s->connectToHost("192.168.65.206" , 11111);
     connect(s, SIGNAL(disconnected()), this, SLOT(disconnectHandler()));
     connect(s, SIGNAL(readyRead()), this, SLOT(serverMessageHandler()));
 }
