@@ -442,22 +442,22 @@ void Client::slot_dialog(int groupID)
         }
     }
 
-    ChatWindow *temp_w = new ChatWindow(this->main_w);
+    ChatWindow *temp_w = new ChatWindow();
     connect(temp_w, SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
     temp_w->groupid = groupID;
-    for(int i = 0; i < this->main_w->len; i++)
-    {
-        if(this->main_w->items[i].group_id == groupID && this->main_w->items[i].d_type == listItem::Friend)
-        {
-            temp_w->setUi(this->main_w->items[i].d_name, QString("%1").arg(this->main_w->items[i].fri_id));
-            break;
-        }
-        else if(this->main_w->items[i].group_id == groupID && this->main_w->items[i].d_type == listItem::Group)
-        {
-            temp_w->setUi(this->main_w->items[i].d_name, QString("%1").arg(this->main_w->items[i].group_id));
-            break;
-        }
-    }
+//    for(int i = 0; i < this->main_w->len; i++)
+//    {
+//        if(this->main_w->items[i].group_id == groupID && this->main_w->items[i].d_type == listItem::Friend)
+//        {
+//            temp_w->setUi(this->main_w->items[i].d_name, QString("%1").arg(this->main_w->items[i].fri_id));
+//            break;
+//        }
+//        else if(this->main_w->items[i].group_id == groupID && this->main_w->items[i].d_type == listItem::Group)
+//        {
+//            temp_w->setUi(this->main_w->items[i].d_name, QString("%1").arg(this->main_w->items[i].group_id));
+//            break;
+//        }
+//    }
     temp_w->loadMessageHis(msgList, usrID);
     temp_w->show();
     chat_w.append(temp_w);
@@ -575,14 +575,14 @@ void Client::newText(int groupID)
     }
 
     // 在列表中标识新消息
-    for(int i = 0; i < this->main_w->len; i++)
-    {
-        if(this->main_w->items[i].group_id == groupID)
-        {
-            this->main_w->items[i].setItemLoad();
-            return;
-        }
-    }
+//    for(int i = 0; i < this->main_w->len; i++)
+//    {
+//        if(this->main_w->items[i].group_id == groupID)
+//        {
+//            this->main_w->items[i].setItemLoad();
+//            return;
+//        }
+//    }
 }
 
 void Client::slot_offlineMessage()
@@ -600,7 +600,7 @@ void Client::getOfflineMessage(S2C::Time& res)
     for (int i = 0; i < res.size; i++) {
         waitingText.append(res.group[i]);
         if (res.group[i].ifnew)
-            newText(res.group[i].groupID);
+            slot_records(res.group[i].groupID);
     }
     init_flag = false;
 
