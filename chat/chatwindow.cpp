@@ -19,6 +19,12 @@ ChatWindow::~ChatWindow()
     delete ui;
 }
 
+void ChatWindow::setUi(QString name, QString id)
+{
+    this->ui->id->setText(id);
+    this->ui->name->setText(name);
+}
+
 void ChatWindow::on_send_clicked()
 {
     QString msg = ui->textEdit->toPlainText();

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>UsrMain</class>
- <widget class="QWidget" name="UsrMain">
+ <widget class="QDialog" name="UsrMain">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>798</width>
     <height>578</height>
    </rect>
   </property>
@@ -184,12 +184,16 @@
        <height>491</height>
       </rect>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="autoFillBackground">
       <bool>false</bool>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-image: url(:/img/img/cat2.jpg);
-background-position:center</string>
+      <string notr="true">QListWidget{background:url(:/img/img/cat2.jpg);
+background-position:center; }
+</string>
      </property>
     </widget>
    </widget>

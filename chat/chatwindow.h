@@ -17,6 +17,7 @@ public:
 
     int groupid;
     int friendid;
+    QString dialogname;
 
     explicit ChatWindow(QWidget *parent = 0);
     ~ChatWindow();
@@ -48,5 +49,7 @@ private:
     Ui::ChatWindow *ui;
     QPoint p;
 };
+
+
 
 #endif // MAINWINDOW_H

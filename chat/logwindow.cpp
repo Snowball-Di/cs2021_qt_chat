@@ -19,16 +19,6 @@ LogWindow::~LogWindow()
     delete ui;
 }
 
-//void LogWindow::setid(QString id)
-//{
-//    this->ui->id->setText(id);
-//}
-
-//void LogWindow::setpw(QString pw)
-//{
-//    this->ui->password->setText(pw);
-//}
-
 void LogWindow::mousePressEvent(QMouseEvent *e)
 {
     if(e->button() == Qt::LeftButton)

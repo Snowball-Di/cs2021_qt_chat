@@ -35,12 +35,12 @@ QMessageBox{background:rgb(226, 249, 255);}
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>271</width>
+     <width>291</width>
      <height>101</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background:transparent;</string>
+    <string notr="true">background-color: rgb(226, 249, 255);</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::StyledPanel</enum>

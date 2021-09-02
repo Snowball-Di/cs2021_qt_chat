@@ -9,7 +9,7 @@
 #include "ui_chatwindow.h"
 
 UsrMain::UsrMain(QWidget *parent) :
-    QWidget(parent),
+    QDialog(parent),
     ui(new Ui::UsrMain)
 {
     this->showfriend = true;
@@ -29,6 +29,7 @@ void UsrMain::mousePressEvent(QMouseEvent *e)
     if(e->button() == Qt::LeftButton)
     {
         p = e->globalPos() - this->frameGeometry().topLeft();
+
     }
 }
 

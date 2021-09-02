@@ -22,6 +22,9 @@
      <height>301</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(226, 249, 255);</string>
+   </property>
    <property name="frameShape">
     <enum>QFrame::StyledPanel</enum>
    </property>
@@ -36,6 +39,9 @@
       <width>93</width>
       <height>28</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(226, 249, 255);</string>
     </property>
     <property name="text">
      <string>接受</string>

@@ -170,9 +170,9 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>20</y>
+       <y>50</y>
        <width>701</width>
-       <height>111</height>
+       <height>81</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -180,6 +180,12 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <family>AdLib WGL4 BT</family>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">background-color: rgb(255, 255, 255);</string>
@@ -191,7 +197,7 @@
        <x>640</x>
        <y>140</y>
        <width>81</width>
-       <height>23</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
@@ -204,7 +210,7 @@
        <x>540</x>
        <y>140</y>
        <width>81</width>
-       <height>21</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
@@ -218,7 +224,7 @@
       <x>0</x>
       <y>70</y>
       <width>741</width>
-      <height>311</height>
+      <height>351</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -234,8 +240,14 @@
      <enum>Qt::NoFocus</enum>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-image: url(:/img/img/cat3.jpg);
-background-position:center </string>
+     <string notr="true">QListWidget{background:url(:/img/img/cat3.jpg);
+background-position:center; }
+QListWidget::Item{background:transparent;}
+QListWidget::Item:hover{background:transparent;}
+QListWidget::item:selected{
+	background:transparent;
+}
+QListWidget::item:selected:!active{background:transparent;}</string>
     </property>
     <property name="verticalScrollBarPolicy">
      <enum>Qt::ScrollBarAsNeeded</enum>

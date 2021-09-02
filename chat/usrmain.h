@@ -13,7 +13,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class UsrMain; }
 QT_END_NAMESPACE
 
-class UsrMain : public QWidget
+class UsrMain : public QDialog
 {
     Q_OBJECT
 
@@ -33,21 +33,17 @@ public:
     bool showfriend; // 0:显示好友列表, 1显示群组列表
     listItem* items; //item数组
     int len; //item长度
+    void showdialog();
 
-    void mouseMoveEvent(QMouseEvent *e);
-
-    void mousePressEvent(QMouseEvent *e);
 
 protected:
-//    void resizeEvent(QResizeEvent *event);
-
-
     void setDialogItem(listItem *dialog,
         QListWidgetItem *item, 
         QString text, QPixmap pic, 
         listItem::List_Type type);
 
-    void showdialog();
+    void mouseMoveEvent(QMouseEvent *e);
+    void mousePressEvent(QMouseEvent *e);
 
 signals:
     void signal_dialog(int);

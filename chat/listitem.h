@@ -25,7 +25,7 @@ public:
     QPixmap d_pic; //会话对象头像
     int group_id; //会话对象标识号码
     int fri_id;
-
+    List_Type d_type; // 默认为用户会话
     inline QString name() {return d_name;};
 
     void setItem(QString name, QPixmap pic, List_Type type);
@@ -45,7 +45,6 @@ private:
 
 
     bool d_loaded = false; //是否得到响应
-    List_Type d_type; // 默认为用户会话
     int m_kuangWidth;
     int m_textWidth;
     int m_spaceWid;
