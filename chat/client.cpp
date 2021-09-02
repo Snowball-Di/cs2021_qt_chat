@@ -580,15 +580,15 @@ void Client::newText(int groupID)
         }
     }
 
-     // 在打开列表中标识新消息
-    for(int i = 0; i < this->main_w->len; i++)
-    {
-        if(this->main_w->items[i].group_id == groupID)
-        {
-            this->main_w->items[i].setItemLoad();
-            return;
-        }
-    }
+//     // 在打开列表中标识新消息
+//    for(int i = 0; i < this->main_w->len; i++)
+//    {
+//        if(this->main_w->items[i].group_id == groupID)
+//        {
+//            this->main_w->items[i].setItemLoad();
+//            return;
+//        }
+//    }
 }
 
 void Client::slot_offlineMessage()

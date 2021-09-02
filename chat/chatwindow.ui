@@ -100,10 +100,10 @@
     <widget class="QLabel" name="id">
      <property name="geometry">
       <rect>
-       <x>230</x>
-       <y>20</y>
+       <x>220</x>
+       <y>10</y>
        <width>131</width>
-       <height>31</height>
+       <height>16</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -114,8 +114,9 @@
      </property>
      <property name="font">
       <font>
-       <family>AdLib WGL4 BT</family>
+       <family>Consolas</family>
        <pointsize>10</pointsize>
+       <italic>false</italic>
       </font>
      </property>
      <property name="text">
@@ -125,15 +126,15 @@
     <widget class="QLabel" name="name">
      <property name="geometry">
       <rect>
-       <x>390</x>
-       <y>20</y>
+       <x>220</x>
+       <y>30</y>
        <width>141</width>
-       <height>31</height>
+       <height>20</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <family>AdLib WGL4 BT</family>
+       <family>Consolas</family>
        <pointsize>10</pointsize>
       </font>
      </property>
@@ -224,7 +225,7 @@
       <x>0</x>
       <y>70</y>
       <width>741</width>
-      <height>351</height>
+      <height>311</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -241,8 +242,7 @@
     </property>
     <property name="styleSheet">
      <string notr="true">QListWidget{background:url(:/img/img/cat3.jpg);
-background-position:center; 
-background-repeat:no-repeat}
+background-position:center; }
 QListWidget::Item{background:transparent;}
 QListWidget::Item:hover{background:transparent;}
 QListWidget::item:selected{

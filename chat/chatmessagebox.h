@@ -6,8 +6,8 @@
 
 class QPaintEvent;
 class QPainter;
-class QLabel;
 class QMovie;
+class QLabel;
 
 class chatmessagebox : public QWidget
 {
@@ -25,7 +25,7 @@ public:
 
     void setItemSuccess();
     void setItem(QString text, time_t time, QSize allSize, Text_Type userType);
-
+    void setPixmap(QPixmap left, QPixmap right);
     QSize getRealString(QString src);
     QSize fontRect(QString str);
 

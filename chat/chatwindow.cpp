@@ -27,14 +27,19 @@ void ChatWindow::setUi(QString name, QString id)
     switch(num){
         case 0:
             this->ui->label->setPixmap(QPixmap(":/icon/icon/icon1.png"));
+                break;
         case 1:
             this->ui->label->setPixmap(QPixmap(":/icon/icon/icon2.png"));
+                break;
         case 2:
             this->ui->label->setPixmap(QPixmap(":/icon/icon/icon3.png"));
+                break;
         case 3:
             this->ui->label->setPixmap(QPixmap(":/icon/icon/icon4.png"));
+                break;
         case 4:
             this->ui->label->setPixmap(QPixmap(":/icon/icon/icon5.png"));
+                break;
     }
     this->ui->label->setScaledContents(true);
 }
@@ -153,18 +158,75 @@ void ChatWindow::dealMessageTime(time_t curMsgTime)
 
 void ChatWindow::loadMessageHis(QVector<Msg>&list, int usrid)
 {
+    QPixmap pic1;
+    QPixmap pic2;
+
+    switch(usrid % 5){
+        case 0:
+            pic1 = QPixmap(":/icon/icon/icon1.png");
+        break;
+        case 1:
+            pic1 = QPixmap(":/icon/icon/icon2.png");
+                    break;
+        case 2:
+            pic1 = QPixmap(":/icon/icon/icon3.png");
+                    break;
+        case 3:
+            pic1 = QPixmap(":/icon/icon/icon4.png");
+                    break;
+        case 4:
+            pic1 = QPixmap(":/icon/icon/icon5.png");
+                    break;
+    }
+
     this->ui->listWidget->clear();
     for(int i = 0; i< list.length(); i++)
     {
         if(list[i].senderID != usrid)
         {
-        chatmessagebox* messageW = new chatmessagebox(ui->listWidget->parentWidget());
+            chatmessagebox* messageW = new chatmessagebox(ui->listWidget->parentWidget());
+            switch(list[i].senderID % 5){
+            case 0:
+                pic2 = QPixmap(":/icon/icon/icon1.png");
+                        break;
+            case 1:
+                pic2 = QPixmap(":/icon/icon/icon2.png");
+                        break;
+            case 2:
+                pic2 = QPixmap(":/icon/icon/icon3.png");
+                        break;
+            case 3:
+                pic2 = QPixmap(":/icon/icon/icon4.png");
+                        break;
+            case 4:
+                pic2 = QPixmap(":/icon/icon/icon5.png");
+                        break;
+        }
+        messageW->setPixmap(pic2, pic2);
         QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
         dealMessage(messageW, item, list[i].text, list[i].sendTime, chatmessagebox::User_She);
         }
         else
         {
             chatmessagebox* messageW = new chatmessagebox(ui->listWidget->parentWidget());
+            switch(list[i].senderID % 5){
+                case 0:
+                    pic2 = QPixmap(":/icon/icon/icon1.png");
+                            break;
+                case 1:
+                    pic2 = QPixmap(":/icon/icon/icon2.png");
+                            break;
+                case 2:
+                    pic2 = QPixmap(":/icon/icon/icon3.png");
+                            break;
+                case 3:
+                    pic2 = QPixmap(":/icon/icon/icon4.png");
+                            break;
+                case 4:
+                    pic2 = QPixmap(":/icon/icon/icon5.png");
+                            break;
+            }
+            messageW->setPixmap(pic1, pic1);
             QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
             dealMessage(messageW, item, list[i].text, list[i].sendTime, chatmessagebox::User_Me);
         }

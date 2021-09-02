@@ -17,9 +17,8 @@ chatmessagebox::chatmessagebox(QWidget *parent) : QWidget(parent)
 //    te_font.setLetterSpacing(QFont::PercentageSpacing, 100);          //300%,100为默认  //设置字间距%
 //    te_font.setLetterSpacing(QFont::AbsoluteSpacing, 0);             //设置字间距为3像素 //设置字间距像素值
     this->setFont(te_font);
-//    m_leftPixmap = QPixmap(":/icon/icon/icon_pic.png");
-//    m_rightPixmap = QPixmap(":/icon/icon/icon_pic.png");
-
+    m_leftPixmap = QPixmap(":/icon/icon/icon_pic.png");
+    m_rightPixmap = QPixmap(":/icon/icon/icon_pic.png");
     m_loadingMovie = new QMovie(this);
     m_loadingMovie->setFileName(":/icon/icon/icon_newmessage.png");
     m_loading = new QLabel(this);
@@ -54,6 +53,12 @@ void chatmessagebox::setItem(QString text, time_t time, QSize allSize, chatmessa
     }
 
     this->update();
+}
+
+void chatmessagebox::setPixmap(QPixmap left, QPixmap right)
+{
+    m_leftPixmap = left;
+    m_rightPixmap = right;
 }
 
 QSize chatmessagebox::fontRect(QString str)
@@ -152,7 +157,6 @@ void chatmessagebox::paintEvent(QPaintEvent *event)
         //头像
 //        painter.drawRoundedRect(m_iconLeftRect,m_iconLeftRect.width(),m_iconLeftRect.height());
         painter.drawPixmap(m_iconLeftRect, m_leftPixmap);
-
         //框加边
         QColor col_KuangB(234, 234, 234);
         painter.setBrush(QBrush(col_KuangB));
