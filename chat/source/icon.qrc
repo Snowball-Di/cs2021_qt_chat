@@ -8,5 +8,10 @@
         <file>icon/icon_newmessage.png</file>
         <file>icon/icon_shutdown.png</file>
         <file>icon/icon_pic.png</file>
+        <file>icon/icon1.png</file>
+        <file>icon/icon2.png</file>
+        <file>icon/icon3.png</file>
+        <file>icon/icon4.png</file>
+        <file>icon/icon5.png</file>
     </qresource>
 </RCC>

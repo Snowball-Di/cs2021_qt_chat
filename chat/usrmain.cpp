@@ -117,7 +117,21 @@ void UsrMain::load_grouplist(QVector<Group>& list)
         groups[i] = new listItem(ui->listWidget->parentWidget(), list[i].group_id);
         // TODO 接入头像
         QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
-        UsrMain::setDialogItem(groups[i], item, list[i].name, QPixmap(":/img/img/log_icon.png"), listItem::Group);
+        int num = groups[i]->group_id % 5;
+        QPixmap pic;
+        switch(num){
+            case 0:
+                pic = QPixmap(":/icon/icon/icon1.png");
+            case 1:
+                pic = QPixmap(":/icon/icon/icon2.png");
+            case 2:
+                pic = QPixmap(":/icon/icon/icon3.png");
+            case 3:
+                pic = QPixmap(":/icon/icon/icon4.png");
+            case 4:
+                pic = QPixmap(":/icon/icon/icon5.png");
+        }
+        UsrMain::setDialogItem(groups[i], item, list[i].name, pic, listItem::Group);
     }
 }
 
@@ -130,22 +144,22 @@ void UsrMain::load_friendlist(QVector<Friend>& list)
         friends[i] = new listItem(ui->listWidget->parentWidget(), list[i].group_id, list[i].id);
         // TODO 接入头像
         QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
-        UsrMain::setDialogItem(friends[i], item, list[i].name, QPixmap(":/icon/icon/icon_pic.png"), listItem::Group);
+        int num = friends[i]->group_id % 5;
+        QPixmap pic;
+        switch(num){
+            case 0:
+                pic = QPixmap(":/icon/icon/icon1.png");
+            case 1:
+                pic = QPixmap(":/icon/icon/icon2.png");
+            case 2:
+                pic = QPixmap(":/icon/icon/icon3.png");
+            case 3:
+                pic = QPixmap(":/icon/icon/icon4.png");
+            case 4:
+                pic = QPixmap(":/icon/icon/icon5.png");
+        }
+        UsrMain::setDialogItem(friends[i], item, list[i].name, pic, listItem::Group);
     }
-}
-
-void UsrMain::insert_friend(Friend &fri)
-{
-    listItem *data = new listItem(ui->listWidget->parentWidget());
-    QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
-    UsrMain::setDialogItem(data, item, fri.name, QPixmap(":/icon/icon/icon_pic.png"), listItem::Friend);
-}
-
-void UsrMain::insert_group(Group& gro)
-{
-    listItem *data = new listItem(ui->listWidget->parentWidget());
-    QListWidgetItem* item = new QListWidgetItem(ui->listWidget);
-    UsrMain::setDialogItem(data, item, gro.name, QPixmap(":/icon/icon/icon_pic.png"), listItem::Group);
 }
 
 

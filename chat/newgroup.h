@@ -15,6 +15,7 @@ public:
     explicit newGroup(QWidget *parent = nullptr);
     ~newGroup();
     void setinfo();
+    void clearinfo();
 
 signals:
     void signal_newGroup(QString);

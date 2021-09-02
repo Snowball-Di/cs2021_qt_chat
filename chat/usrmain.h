@@ -24,9 +24,6 @@ public:
     void load_friendlist(QVector<Friend>&);
     void load_grouplist(QVector<Group>&);
 
-    void insert_friend(Friend&);
-    void insert_group(Group&);
-
     int Usrid;
     int Name;
     int pic;

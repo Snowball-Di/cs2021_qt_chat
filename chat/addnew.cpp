@@ -23,6 +23,13 @@ void addNew::setInfo()
     this->ui->text->setText(this->text);
 }
 
+void addNew::clearinfo()
+{
+    this->id = "";
+    this->text = "";
+    this->ui->text->clear();
+    this->ui->id->clear();
+}
 
 void addNew::mousePressEvent(QMouseEvent *e)
 {
@@ -90,7 +97,7 @@ void addNew::on_send_clicked()
                 else
                    emit this->signal_groupReq(id, text);
 
-                this->close();
+                this->hide();
             }
         }
 }
