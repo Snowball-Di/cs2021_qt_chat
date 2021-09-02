@@ -239,3 +239,22 @@ int Manager::getFriendGroup(int id)
             return i.group_id;
     return 0;
 }
+
+QString Manager::getName(int groupID, int& friendID)
+{
+    auto list = getFriends();
+    for (auto &i: list)
+        if (i.group_id == groupID) {
+            friendID = i.id;
+            return i.name;
+        }
+
+    auto list2 = getGroups();
+    for (auto &i: list2)
+        if (i.group_id == groupID) {
+            friendID = 0;
+            return i.name;
+        }
+
+    return "Unknown ID";
+}

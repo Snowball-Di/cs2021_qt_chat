@@ -57,6 +57,7 @@ public:
 
     QString getFriendName(int id);
     int getFriendGroup(int id);
+    QString getName(int groupID, int& friendID);
 
 private:
     ~Manager();
