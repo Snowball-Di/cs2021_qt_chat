@@ -67,7 +67,7 @@ QVector<Friend> Manager::getFriends()
 
     friends_list.open(QIODevice::ReadOnly);
     while (1) {
-        auto line = QString(groups_list.readLine());
+        auto line = QString(friends_list.readLine());
         if (line.length() == 0) {
             friends_list.close();
             busy = false;
