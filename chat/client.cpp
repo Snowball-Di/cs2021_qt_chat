@@ -522,7 +522,7 @@ void Client::getWaitingGroups(S2C::NewJoinWaiting& res)
     for (int i = 0; i < res.size; i++) {
         waitingGroups.append(res.members[i]);
         newJoin(res.members[i].senderID, res.members[i].senderName,
-                res.members[i].groupID, res.members[i].text);
+                res.members[i].groupID, "", res.members[i].text);
     }
 
     slot_waitingFriends();
@@ -533,7 +533,7 @@ void Client::newFriend(int senderID, QString name, QString text)
     // 显示
     acceptReq* ac = new acceptReq();
     connect(ac, SIGNAL(signal_acceptReq(int, int, bool)), this, SLOT(slot_acceptReq(int, int, bool)));
-    ac->setUi(0, senderID, name, text);
+    ac->setUi(senderID, name, 0, "", text);
     ac->show(); 
 }
 
@@ -542,7 +542,7 @@ void Client::newJoin(int senderID, QString senderName, int groupID, QString grou
     // 显示
     acceptReq* ac = new acceptReq();
     connect(ac, SIGNAL(signal_acceptReq(int, int, bool)), this, SLOT(slot_acceptReq(int, int, bool)));
-    ac->setUi(groupID, senderID, name, text);
+    ac->setUi(senderID, senderName, groupID, groupName, text);
     ac->show();
 }
 
