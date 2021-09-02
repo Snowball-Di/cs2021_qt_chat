@@ -402,12 +402,12 @@ void Client::slot_logout()
     s->sendMessage((char *)&msg, sizeof(msg));
 }
 
-static int groupID_record = 0;
+static QQueue<int> q;
 
 void Client::slot_records(int groupID)
 {
     C2S::Record msg;
-    groupID_record = groupID;
+    q.enqueue(groupID);
     msg.type = C2S::MSG_RECORD;
     msg.groupID = groupID;
     msg.messageNumber = 10;
@@ -423,7 +423,7 @@ void Client::getRecord(S2C::Record& res)
         for (int i = res.messageNumber-1; i >= 0; i--)
             temp.append({res.history[i].senderID, res.history[i].senderName,
                          res.history[i].time, res.history[i].content});
-        manager->setMsg(groupID_record, temp);
+        manager->setMsg(q.dequeue(), temp);
     }
 }
 
@@ -591,8 +591,9 @@ void Client::getOfflineMessage(S2C::Time& res)
 {
     for (int i = 0; i < res.size; i++) {
         waitingText.append(res.group[i]);
-        if (res.group[i].ifnew)
+        if (res.group[i].ifnew) {
             slot_records(res.group[i].groupID);
+        }
     }
     init_flag = false;
 
