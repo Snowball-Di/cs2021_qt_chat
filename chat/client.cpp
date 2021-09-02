@@ -455,7 +455,7 @@ void Client::slot_dialog(int groupID)
     connect(temp_w, SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
     temp_w->groupid = groupID;
     int manager_id_data;
-
+    temp_w->myid = usrID;
     QString ui_name = manager->getName(groupID, manager_id_data);
 
     QString ui_id = QString("%1").arg(manager_id_data);
