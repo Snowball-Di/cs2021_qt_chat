@@ -63,6 +63,7 @@ void UsrMain::setDialogItem(listItem *dialog,
     item->setSizeHint(size);
     dialog->setItem(name, pic, type);
     ui->listWidget->setItemWidget(item, dialog);
+    len++;
 }
 
 void UsrMain::showdialog()
