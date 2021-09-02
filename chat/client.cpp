@@ -259,6 +259,8 @@ void Client::getFriendReq(S2C::Response& res)
     if (res.success == true) {
         // 发送成功
         QMessageBox::information(this->more_func, tr("Success"), tr(res.text), QMessageBox::Yes);
+        this->more_func->addfriend->clearinfo();
+        this->more_func->addfriend->hide();
     } else {
         // 发送失败
         QMessageBox::information(this->more_func, tr("Attention"), tr(res.text), QMessageBox::Yes);
@@ -312,6 +314,8 @@ void Client::getNewGroup(S2C::NewGroup& res)
 {
 // Todo ui
     QMessageBox::information(this->more_func, tr("success"), QString("%1").arg(res.groupID), QMessageBox::Yes);
+    this->more_func->newgroup->clearinfo();
+    this->more_func->newgroup->hide();
     requestgroupList();
 }
 
@@ -451,6 +455,7 @@ void Client::slot_dialog(int groupID)
     connect(temp_w, SIGNAL(signal_send(int, QString)), this, SLOT(slot_send(int, QString)));
     temp_w->groupid = groupID;
     int manager_id_data;
+
     QString ui_name = manager->getName(groupID, manager_id_data);
 
     QString ui_id = QString("%1").arg(manager_id_data);
@@ -481,6 +486,8 @@ void Client::getGroupReq(S2C::Response& res)
     if (res.success == true) {
         // 发送成功
         QMessageBox::information(this->more_func, tr("success"), tr(res.text), QMessageBox::Yes);
+        this->more_func->addgroup->clearinfo();
+        this->more_func->addgroup->hide();
     } else {
         // 发送失败
         QMessageBox::information(this->more_func, tr("success"), tr(res.text), QMessageBox::Yes);
@@ -558,23 +565,30 @@ void Client::newText(int groupID)
     // 已经初始化窗口，在现在的窗口中加载记录
     for(int i = 0; i < chat_w.length(); i++)
     {
-        if(chat_w[i]->groupid == groupID)
+        if(chat_w[i]->groupid == groupID && !chat_w[i]->isHidden())
         {
            QVector<Msg> temp_msgs = manager->getMsg(groupID);
            chat_w[i]->loadMessageHis(temp_msgs, usrID);
            break;
         }
+        if(chat_w[i]->groupid == groupID && chat_w[i]->isHidden())
+        {
+           QVector<Msg> temp_msgs = manager->getMsg(groupID);
+           chat_w[i]->loadMessageHis(temp_msgs, usrID);
+           chat_w[i]->show();
+           break;
+        }
     }
 
-    // 在列表中标识新消息
-//    for(int i = 0; i < this->main_w->len; i++)
-//    {
-//        if(this->main_w->items[i].group_id == groupID)
-//        {
-//            this->main_w->items[i].setItemLoad();
-//            return;
-//        }
-//    }
+     // 在打开列表中标识新消息
+    for(int i = 0; i < this->main_w->len; i++)
+    {
+        if(this->main_w->items[i].group_id == groupID)
+        {
+            this->main_w->items[i].setItemLoad();
+            return;
+        }
+    }
 }
 
 void Client::slot_offlineMessage()

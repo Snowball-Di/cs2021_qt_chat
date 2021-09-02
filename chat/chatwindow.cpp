@@ -23,6 +23,20 @@ void ChatWindow::setUi(QString name, QString id)
 {
     this->ui->id->setText(id);
     this->ui->name->setText(name);
+    int num = id.toInt() % 5;
+    switch(num){
+        case 0:
+            this->ui->label->setPixmap(QPixmap(":/icon/icon/icon1.png"));
+        case 1:
+            this->ui->label->setPixmap(QPixmap(":/icon/icon/icon2.png"));
+        case 2:
+            this->ui->label->setPixmap(QPixmap(":/icon/icon/icon3.png"));
+        case 3:
+            this->ui->label->setPixmap(QPixmap(":/icon/icon/icon4.png"));
+        case 4:
+            this->ui->label->setPixmap(QPixmap(":/icon/icon/icon5.png"));
+    }
+    this->ui->label->setScaledContents(true);
 }
 
 void ChatWindow::on_send_clicked()

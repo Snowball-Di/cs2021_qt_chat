@@ -76,7 +76,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap resource="source/icon.qrc">:/icon/icon/icon_pic.png</pixmap>
+     <pixmap>:/icon/icon/icon_pic.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -119,19 +119,6 @@
     </property>
     <property name="text">
      <string>对方名字</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="text">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>110</y>
-      <width>171</width>
-      <height>111</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>验证信息</string>
     </property>
    </widget>
    <widget class="QLabel" name="grouplabel">
@@ -186,10 +173,18 @@
      <string>TextLabel</string>
     </property>
    </widget>
+   <widget class="QTextBrowser" name="text">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>110</y>
+      <width>181</width>
+      <height>131</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
  </widget>
- <resources>
-  <include location="source/icon.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

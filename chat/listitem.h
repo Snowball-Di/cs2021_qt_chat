@@ -13,7 +13,7 @@ class listItem :public QWidget
 {
     Q_OBJECT
 public:
-    explicit listItem(QWidget *parent = nullptr, int groupid = 0, int friid = 0);
+    explicit listItem(QWidget *parent = nullptr, int groupid = 0, int friid = 0, QString name = "");
 
     enum List_Type
     {

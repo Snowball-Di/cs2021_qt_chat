@@ -192,7 +192,8 @@
      </property>
      <property name="styleSheet">
       <string notr="true">QListWidget{background:url(:/img/img/cat2.jpg);
-background-position:center; }
+background-position:center; 
+background-repeat:no-repeat}
 </string>
      </property>
     </widget>

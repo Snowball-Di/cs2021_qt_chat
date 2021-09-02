@@ -16,6 +16,12 @@ newGroup::~newGroup()
     delete ui;
 }
 
+void newGroup::clearinfo()
+{
+    this->name = "";
+    this->ui->lineEdit->clear();
+}
+
 void newGroup::on_save_clicked()
 {
     this->name = this->ui->lineEdit->text();
@@ -27,6 +33,7 @@ void newGroup::on_up_clicked()
     if(this->ui->lineEdit->text() == "")
     {
         QMessageBox::information(this, tr("提示"), tr("群名字不能为空！"), QMessageBox::Yes);
+        ui->lineEdit->setFocus();
     }
     else
     {

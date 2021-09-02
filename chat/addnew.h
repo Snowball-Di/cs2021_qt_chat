@@ -15,6 +15,7 @@ public:
     explicit addNew(QWidget *parent = nullptr, bool addfriend = true);
     ~addNew();
     void setInfo();
+    void clearinfo();
 
 protected:
     void keyPressEvent(QKeyEvent *event);
