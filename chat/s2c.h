@@ -110,6 +110,7 @@ struct NewJoinInfo
 {
     int senderID;
     int groupID;
+    char groupName[30];
     char senderName[30];
     char text[50];
 };

@@ -28,8 +28,7 @@ class Client : public QObject
     Q_OBJECT
 public:
     static Client* client_init();
-
-    void execute();
+    void connectToServer();
 
 private slots:
     void slot_register(QString name, QString password);
@@ -65,7 +64,7 @@ private slots:
 //signals:
 //    void signal_newMessage(QVector<int> groupID);
 
-public:
+private:
 
     explicit Client(QObject *parent = nullptr);
 

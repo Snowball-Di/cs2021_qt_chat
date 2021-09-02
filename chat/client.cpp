@@ -49,6 +49,11 @@ Client* Client::client_init()
     return client;
 }
 
+void Client::connectToServer()
+{
+    s->connectToHost();
+}
+
 void Client::slot_to_register()
 {
     log_w->hide();
@@ -483,11 +488,6 @@ void Client::getGroupReq(S2C::Response& res)
 }
 
 
-void Client::execute()
-{
-
-}
-
 void Client::slot_waitingFriends()
 {
     C2S::WaitingFriends msg;
@@ -528,7 +528,7 @@ void Client::getWaitingGroups(S2C::NewJoinWaiting& res)
     for (int i = 0; i < res.size; i++) {
         waitingGroups.append(res.members[i]);
         newJoin(res.members[i].senderID, res.members[i].senderName,
-                res.members[i].groupID, "", res.members[i].text);
+                res.members[i].groupID, res.members[i].groupName, res.members[i].text);
     }
 
     slot_waitingFriends();

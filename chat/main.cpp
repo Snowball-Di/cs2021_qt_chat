@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     Client* client = Client::client_init();
-    client->s->connectToHost();
+    client->connectToServer();
 
     return a.exec();
 }
